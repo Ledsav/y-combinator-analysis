@@ -1,0 +1,491 @@
+company_id,company_slug,field,method,success,original_value,imputed_value
+375,clickfacts,oneLiner,first_sentence_extraction,True,,ClickFacts is a Malware Software Solutions company...
+374,textpayme,oneLiner,first_sentence_extraction,True,,"Founded in 2005, TextPayMe is an SMS payment servi..."
+373,loopt,oneLiner,first_sentence_extraction,True,,"Loopt, based in Silicon-Valley and backed by leadi..."
+380,infogami,oneLiner,first_sentence_extraction,True,,What is Infogami?
+377,memamp,oneLiner,first_sentence_extraction,True,,Better Desktop search solution.
+355,xobni,oneLiner,first_sentence_extraction,True,,Xobni makes your inbox and address book smarter.
+365,jumpchat,oneLiner,first_sentence_extraction,True,,"A platform bridging mobile text messages, email, a..."
+364,likebetter,oneLiner,first_sentence_extraction,True,,"An online personality test game, where you look at..."
+361,shoutfit,oneLiner,first_sentence_extraction,True,,A “fashion related community”.
+358,jamglue,oneLiner,first_sentence_extraction,True,,Jamglue is an online community allowing users to l...
+369,project-wedding,oneLiner,first_sentence_extraction,True,,Finding wedding vendors is hard.
+367,clustrix,oneLiner,first_sentence_extraction,True,,Clustrix provides the leading scale-out relational...
+366,inkling,oneLiner,first_sentence_extraction,True,,"Inkling, based in Chicago, Illinois, offers collec..."
+372,audiobeta,oneLiner,first_sentence_extraction,True,,AudioBeta develops web-based applications that hel...
+371,flagr,oneLiner,first_sentence_extraction,True,,"Flagr enables users to share places, adding photos..."
+343,virtualmin,oneLiner,first_sentence_extraction,True,,Virtualmin is taking on the lack of innovation in ...
+349,auctomatic,oneLiner,first_sentence_extraction,True,,"Auctomatic, a Y Combinator company, offers an auct..."
+353,socialmoth,oneLiner,first_sentence_extraction,True,,Socialmoth is a community to post your thoughts an...
+352,view3,oneLiner,first_sentence_extraction,True,,"View 3, an active clad-alignment splicer with the ..."
+351,whitenoise,oneLiner,first_sentence_extraction,True,,Whitenoise is like a social network for the music ...
+350,writewith,oneLiner,first_sentence_extraction,True,,"Writewith is a collaborative writing web app, enab..."
+326,blue-frog-gaming,oneLiner,first_sentence_extraction,True,,Blue Frog Gaming
+337,anywhere-fm,oneLiner,first_sentence_extraction,True,,Anywhere.fm lets you upload your music collection ...
+336,appjet,oneLiner,first_sentence_extraction,True,,Y Combinator funded AppJet is an online programmin...
+335,clickpass,oneLiner,first_sentence_extraction,True,,Clickpass provides single-sign-on services to ente...
+324,songkick,oneLiner,first_sentence_extraction,True,,Songkick is the great live music startup.
+340,fuzzwich,oneLiner,first_sentence_extraction,True,,Fuzzwich is an online animation platform developed...
+331,splashup,oneLiner,first_sentence_extraction,True,,"Splashup, formerly known as fauxto, is an online i..."
+330,ijigg-top440,oneLiner,first_sentence_extraction,True,,iJigg is a social music site that lets users vote ...
+329,hello-chair,oneLiner,first_sentence_extraction,True,,"Hello, Chair Inc."
+328,bountii,oneLiner,first_sentence_extraction,True,,Bountii is a price search startup that has built a...
+312,280-north,oneLiner,first_sentence_extraction,True,,280 North is a web application company based on th...
+322,joberator,oneLiner,first_sentence_extraction,True,,Joberator was formed to tackle head-on the growing...
+320,snaptalent,oneLiner,first_sentence_extraction,True,,Snaptalent powers a distributed job advertisement ...
+319,yumdots,oneLiner,first_sentence_extraction,True,,YumDots wants to be the go-to mobile application f...
+318,deluux,oneLiner,first_sentence_extraction,True,,"Deluux aims to become distributed Facebook, or inv..."
+317,kirkland-north,oneLiner,first_sentence_extraction,True,,Kirkland North is taking an infectious campus-wide...
+314,socialbrowse,oneLiner,first_sentence_extraction,True,,SocialBrowse is a Firefox extension for sharing li...
+313,wundrbar,oneLiner,first_sentence_extraction,True,,Wundrbar wants to improve upon the search bar expe...
+309,fathomdb,oneLiner,first_sentence_extraction,True,,"FathomDB offers databases as a service, taking car..."
+308,mightyquiz,oneLiner,first_sentence_extraction,True,,MightyQuiz powers a collection of user generated q...
+301,treehouse,oneLiner,first_sentence_extraction,True,,Treehouse is an online technology school that offe...
+299,people-and-pages,oneLiner,first_sentence_extraction,True,,People and Pages is a service similar to Google Gr...
+297,snipd,oneLiner,first_sentence_extraction,True,,"Grab pieces of enjoyable content from any page, sa..."
+296,ticket-stumbler,oneLiner,first_sentence_extraction,True,,TicketStumbler is a secondary ticket market search...
+294,team-apart,oneLiner,first_sentence_extraction,True,,Team Apart is a real-time online group collaborati...
+293,youlicit,oneLiner,first_sentence_extraction,True,,The Youlicit web content recommendation engine lev...
+287,anyvite,oneLiner,first_sentence_extraction,True,,Anyvite is a free site dedicated to event invitati...
+286,frogmetrics,oneLiner,first_sentence_extraction,True,,Frogmetrics aggregates your data from unlimited lo...
+283,ohlife,oneLiner,first_sentence_extraction,True,,OhLife is a personal journal that you'll actually ...
+275,cloudkick,oneLiner,first_sentence_extraction,True,,"Cloudkick is system to manage cloud servers, such ..."
+272,divvyshot,oneLiner,first_sentence_extraction,True,,Divvyshot is a photo-sharing platform that enables...
+279,voxli,oneLiner,first_sentence_extraction,True,,Voxli offers browser-based group voice chat for ga...
+278,nambii,oneLiner,first_sentence_extraction,True,,Nambii is an online dating service with iPhone app...
+277,picurio,oneLiner,first_sentence_extraction,True,,Picurio is web-based photo sharing and photo manag...
+269,foodoro,oneLiner,first_sentence_extraction,True,,Foodoro is a marketplace where people can buy spec...
+265,recurious,oneLiner,first_sentence_extraction,True,,"thesixtyone is Digg for new music, a social filter..."
+256,flightcaster,oneLiner,first_sentence_extraction,True,,FlightCaster predicts flight delays.
+242,dailybooth,oneLiner,first_sentence_extraction,True,,DailyBooth lets users follow their friends and upd...
+264,instantq,oneLiner,first_sentence_extraction,True,,InstantQ is an online platform that enables restau...
+263,wakemate,oneLiner,first_sentence_extraction,True,,WakeMate makes personalized alarm clocks that sync...
+254,plurchase,oneLiner,first_sentence_extraction,True,,Plurchase is an online social shopping site.
+247,jobspice,oneLiner,first_sentence_extraction,True,,"JobSpice is a surprisingly easy-to-use, intuitive ..."
+232,etacts,oneLiner,first_sentence_extraction,True,,Etacts was born from the frustration of keeping in...
+230,cardpool,oneLiner,first_sentence_extraction,True,,Cardpool is a gift card exchange marketplace where...
+224,cue,oneLiner,first_sentence_extraction,True,,Cue (formerly Greplin) is a free service that help...
+220,nowmov,oneLiner,first_sentence_extraction,True,,Nowmov is an endless stream of videos recommended ...
+218,embedly,oneLiner,first_sentence_extraction,True,,Embedly provides a platform and suite of tools to ...
+212,mertado,oneLiner,first_sentence_extraction,True,,"Mertado
+Mertado is an online social shopping platf..."
+238,notifo,oneLiner,first_sentence_extraction,True,,Notifo is a mobile application and platform which ...
+236,infoharmoni,oneLiner,first_sentence_extraction,True,,Inforharmoni is a data visualization company that ...
+235,newcope,oneLiner,first_sentence_extraction,True,,Virtual goods commerce
+234,newslabs,oneLiner,first_sentence_extraction,True,,"NewsLabs offers a platform that looks to help ""old..."
+233,data-marketplace,oneLiner,first_sentence_extraction,True,,"Data Marketplace helps people find, buy and sell d..."
+228,gamador,oneLiner,first_sentence_extraction,True,,Gamador is a social game developer that has releas...
+227,zenedy,oneLiner,first_sentence_extraction,True,,"Zenedy
+Zenedy was started as a means to showcase i..."
+225,answerly,oneLiner,first_sentence_extraction,True,,There is no better way to engage with potential cu...
+217,fabricly,oneLiner,first_sentence_extraction,True,,Fabricly is an online marketplace that takes the r...
+205,fanvibe,oneLiner,first_sentence_extraction,True,,Check-in to games to chat and trash-talk with frie...
+69,picplum,oneLiner,first_sentence_extraction,True,,Picplum is a photo printing service that is the pe...
+1719,coderwall,oneLiner,first_sentence_extraction,True,,Coderwall is a collaborative learning platform for...
+12824,midnox,oneLiner,first_sentence_extraction,True,,Luma (formerly Midnox) allows you to record and sh...
+1720,jellyfish-art,oneLiner,first_sentence_extraction,True,,Jellyfish Art makes jellyfish aquariums and suppli...
+393,kamcord,oneLiner,first_sentence_extraction,True,,Our core thesis at Kamcord was that people do very...
+770,instavest,oneLiner,first_sentence_extraction,True,,"Investors can list their trades on Instavest, incl..."
+742,3dot,oneLiner,first_sentence_extraction,True,,"3dot is a think-tank company based in Ljubljana, S..."
+1166,direct-match,oneLiner,first_sentence_extraction,True,,Direct Match was a venture-backed startup building...
+910,chaldal,oneLiner,first_sentence_extraction,True,,"Chaldal.com is an online shop based in Dhaka, Bang..."
+912,sphere-secure-workspace,oneLiner,first_sentence_extraction,True,,"Sphere Secure Workspace
+
+For a product demonstra..."
+965,vive,oneLiner,first_sentence_extraction,True,,Vive is the modern beauty concierge for the modern...
+886,call9,oneLiner,first_sentence_extraction,True,,Call9 delivers true Emergency Medicine and Palliat...
+1071,sanitation-and-health-rights-in-india-shri,oneLiner,first_sentence_extraction,True,,Sanitation and Health Rights in India (SHRI) fight...
+1436,runkit,oneLiner,first_sentence_extraction,True,,RunKit is the best tool for prototyping server-sid...
+1671,imbue,oneLiner,first_sentence_extraction,True,,"Imbue builds AI systems that reason and code, enab..."
+1642,helpwear,oneLiner,first_sentence_extraction,True,,HelpWear is striving to better at-home healthcare ...
+1761,nexgent,oneLiner,first_sentence_extraction,True,,"We can provide you with the skills, experience  an..."
+1728,torch,oneLiner,first_sentence_extraction,True,,Torch is a learning and development company that h...
+1853,iambiq-technologies,oneLiner,first_sentence_extraction,True,,We help organizations read and process large amoun...
+1770,ourmenu,oneLiner,first_sentence_extraction,True,,OurMenu provides an online food ordering service.
+22854,topkey,oneLiner,first_sentence_extraction,True,,Topkey is the all-in-one financial operating platf...
+24424,kodda,oneLiner,first_sentence_extraction,True,,"We empower people to a lasting, healthier lifestyl..."
+27165,entvin,oneLiner,first_sentence_extraction,True,,Entvin helps life sciences companies like pharmace...
+378,kiko,founder_count,aggregation_from_founders_csv,False,0.0,0
+374,textpayme,founder_count,aggregation_from_founders_csv,False,0.0,0
+376,simmery,founder_count,aggregation_from_founders_csv,False,0.0,0
+357,omgpop,founder_count,aggregation_from_founders_csv,False,0.0,0
+360,talkito,founder_count,aggregation_from_founders_csv,False,0.0,0
+369,project-wedding,founder_count,aggregation_from_founders_csv,False,0.0,0
+366,inkling,founder_count,aggregation_from_founders_csv,False,0.0,0
+372,audiobeta,founder_count,aggregation_from_founders_csv,False,0.0,0
+383,twitch,founder_count,aggregation_from_founders_csv,False,0.0,0
+349,auctomatic,founder_count,aggregation_from_founders_csv,False,0.0,0
+348,zenter,founder_count,aggregation_from_founders_csv,False,0.0,0
+353,socialmoth,founder_count,aggregation_from_founders_csv,False,0.0,0
+351,whitenoise,founder_count,aggregation_from_founders_csv,False,0.0,0
+350,writewith,founder_count,aggregation_from_founders_csv,False,0.0,0
+306,ninite,founder_count,aggregation_from_founders_csv,False,0.0,0
+310,omnisio,founder_count,aggregation_from_founders_csv,False,0.0,0
+323,bitsample,founder_count,aggregation_from_founders_csv,False,0.0,0
+291,backtype,founder_count,aggregation_from_founders_csv,False,0.0,0
+290,picwing,founder_count,aggregation_from_founders_csv,False,0.0,0
+287,anyvite,founder_count,aggregation_from_founders_csv,False,0.0,0
+268,wattvision,founder_count,aggregation_from_founders_csv,False,0.0,0
+280,petasales,founder_count,aggregation_from_founders_csv,False,0.0,0
+244,wepay,founder_count,aggregation_from_founders_csv,False,0.0,0
+246,rethinkdb,founder_count,aggregation_from_founders_csv,False,0.0,0
+221,optimizely,founder_count,aggregation_from_founders_csv,False,0.0,0
+382,,founder_count,aggregation_from_founders_csv,False,0.0,0
+228,gamador,founder_count,aggregation_from_founders_csv,False,0.0,0
+227,zenedy,founder_count,aggregation_from_founders_csv,False,0.0,0
+191,homejoy,founder_count,aggregation_from_founders_csv,False,0.0,0
+145,hellosign,founder_count,aggregation_from_founders_csv,False,0.0,0
+162,mailgun,founder_count,aggregation_from_founders_csv,False,0.0,0
+153,pebble,founder_count,aggregation_from_founders_csv,False,0.0,0
+156,convore,founder_count,aggregation_from_founders_csv,False,0.0,0
+116,imgix,founder_count,aggregation_from_founders_csv,False,0.0,0
+89,citus-data,founder_count,aggregation_from_founders_csv,False,0.0,0
+70,freshplum,founder_count,aggregation_from_founders_csv,False,0.0,0
+117,compose,founder_count,aggregation_from_founders_csv,False,0.0,0
+32,cleverdeck,founder_count,aggregation_from_founders_csv,False,0.0,0
+65,socialcam,founder_count,aggregation_from_founders_csv,False,0.0,0
+38,exec,founder_count,aggregation_from_founders_csv,False,0.0,0
+63,carsabi,founder_count,aggregation_from_founders_csv,False,0.0,0
+55,documents-me,founder_count,aggregation_from_founders_csv,False,0.0,0
+33,make-school,founder_count,aggregation_from_founders_csv,False,0.0,0
+27,minefold,founder_count,aggregation_from_founders_csv,False,0.0,0
+1720,jellyfish-art,founder_count,aggregation_from_founders_csv,False,0.0,0
+429,lever,founder_count,aggregation_from_founders_csv,False,0.0,0
+389,boosted,founder_count,aggregation_from_founders_csv,False,0.0,0
+386,tomoguides,founder_count,aggregation_from_founders_csv,False,0.0,0
+507,zenefits,founder_count,aggregation_from_founders_csv,False,0.0,0
+499,medxt,founder_count,aggregation_from_founders_csv,False,0.0,0
+487,medisas,founder_count,aggregation_from_founders_csv,False,0.0,0
+542,casetext,founder_count,aggregation_from_founders_csv,False,0.0,0
+528,coreos,founder_count,aggregation_from_founders_csv,False,0.0,0
+555,reebee,founder_count,aggregation_from_founders_csv,False,0.0,0
+543,layer-by-layer,founder_count,aggregation_from_founders_csv,False,0.0,0
+595,flexport,founder_count,aggregation_from_founders_csv,False,0.0,0
+634,zinc,founder_count,aggregation_from_founders_csv,False,0.0,0
+588,codenow,founder_count,aggregation_from_founders_csv,False,0.0,0
+648,vidpresso,founder_count,aggregation_from_founders_csv,False,0.0,0
+637,gobble,founder_count,aggregation_from_founders_csv,False,0.0,0
+610,stacklead,founder_count,aggregation_from_founders_csv,False,0.0,0
+599,,founder_count,aggregation_from_founders_csv,False,0.0,0
+572,abacus,founder_count,aggregation_from_founders_csv,False,0.0,0
+635,zowpow,founder_count,aggregation_from_founders_csv,False,0.0,0
+700,rigetti-computing,founder_count,aggregation_from_founders_csv,False,0.0,0
+1434,democracyos,founder_count,aggregation_from_founders_csv,False,0.0,0
+824,popular-pays,founder_count,aggregation_from_founders_csv,False,0.0,0
+792,mobydish,founder_count,aggregation_from_founders_csv,False,0.0,0
+778,pachyderm,founder_count,aggregation_from_founders_csv,False,0.0,0
+828,rescue-forensics,founder_count,aggregation_from_founders_csv,False,0.0,0
+819,nextop,founder_count,aggregation_from_founders_csv,False,0.0,0
+804,dealyze,founder_count,aggregation_from_founders_csv,False,0.0,0
+921,markhor,founder_count,aggregation_from_founders_csv,False,0.0,0
+901,thrive-agritech,founder_count,aggregation_from_founders_csv,False,0.0,0
+879,sourcedna,founder_count,aggregation_from_founders_csv,False,0.0,0
+970,voiq,founder_count,aggregation_from_founders_csv,False,0.0,0
+973,lattice,founder_count,aggregation_from_founders_csv,False,0.0,0
+1214,amberbox-gunshot-detection,founder_count,aggregation_from_founders_csv,False,0.0,0
+1100,perlara,founder_count,aggregation_from_founders_csv,False,0.0,0
+1052,golorry,founder_count,aggregation_from_founders_csv,False,0.0,0
+1012,inevitable-tech,founder_count,aggregation_from_founders_csv,False,0.0,0
+1013,lendedu,founder_count,aggregation_from_founders_csv,False,0.0,0
+1297,omg-digital,founder_count,aggregation_from_founders_csv,False,0.0,0
+1232,women-who-code,founder_count,aggregation_from_founders_csv,False,0.0,0
+1182,seneca-systems,founder_count,aggregation_from_founders_csv,False,0.0,0
+1273,starsky-robotics,founder_count,aggregation_from_founders_csv,False,0.0,0
+1242,coub,founder_count,aggregation_from_founders_csv,False,0.0,0
+1220,sway-finance,founder_count,aggregation_from_founders_csv,False,0.0,0
+1208,farmstead,founder_count,aggregation_from_founders_csv,False,0.0,0
+1189,,founder_count,aggregation_from_founders_csv,False,0.0,0
+1541,upkeep,founder_count,aggregation_from_founders_csv,False,0.0,0
+1530,nanonets,founder_count,aggregation_from_founders_csv,False,0.0,0
+1517,plane,founder_count,aggregation_from_founders_csv,False,0.0,0
+1455,sleep-reset,founder_count,aggregation_from_founders_csv,False,0.0,0
+1456,shipamax,founder_count,aggregation_from_founders_csv,False,0.0,0
+1481,origin,founder_count,aggregation_from_founders_csv,False,0.0,0
+1630,upfort,founder_count,aggregation_from_founders_csv,False,0.0,0
+1656,guilded,founder_count,aggregation_from_founders_csv,False,0.0,0
+1633,plasticity,founder_count,aggregation_from_founders_csv,False,0.0,0
+1617,mystery-org,founder_count,aggregation_from_founders_csv,False,0.0,0
+1592,feather,founder_count,aggregation_from_founders_csv,False,0.0,0
+1582,py,founder_count,aggregation_from_founders_csv,False,0.0,0
+1585,sunfolding,founder_count,aggregation_from_founders_csv,False,0.0,0
+1871,helloverify,founder_count,aggregation_from_founders_csv,False,0.0,0
+1865,mind-emulation-foundation,founder_count,aggregation_from_founders_csv,False,0.0,0
+1808,universe,founder_count,aggregation_from_founders_csv,False,0.0,0
+1795,sourcify,founder_count,aggregation_from_founders_csv,False,0.0,0
+1754,mighty-buildings,founder_count,aggregation_from_founders_csv,False,0.0,0
+1739,observant,founder_count,aggregation_from_founders_csv,False,0.0,0
+1732,shogun,founder_count,aggregation_from_founders_csv,False,0.0,0
+1858,jido-maps,founder_count,aggregation_from_founders_csv,False,0.0,0
+1759,sepsis-scout,founder_count,aggregation_from_founders_csv,False,0.0,0
+1786,envkey,founder_count,aggregation_from_founders_csv,False,0.0,0
+1993,momentus,founder_count,aggregation_from_founders_csv,False,0.0,0
+1977,mentalhappy,founder_count,aggregation_from_founders_csv,False,0.0,0
+1970,alpha-vantage,founder_count,aggregation_from_founders_csv,False,0.0,0
+1933,clear-gene,founder_count,aggregation_from_founders_csv,False,0.0,0
+1901,jetlenses,founder_count,aggregation_from_founders_csv,False,0.0,0
+1899,dinesafe,founder_count,aggregation_from_founders_csv,False,0.0,0
+1912,inokyo,founder_count,aggregation_from_founders_csv,False,0.0,0
+12263,rune,founder_count,aggregation_from_founders_csv,False,0.0,0
+11963,nettrons,founder_count,aggregation_from_founders_csv,False,0.0,0
+11946,ultralight,founder_count,aggregation_from_founders_csv,False,0.0,0
+12260,axdraft,founder_count,aggregation_from_founders_csv,False,0.0,0
+12011,viosera-therapeutics,founder_count,aggregation_from_founders_csv,False,0.0,0
+12897,apurata,founder_count,aggregation_from_founders_csv,False,0.0,0
+12876,gitstart,founder_count,aggregation_from_founders_csv,False,0.0,0
+12851,flowbot,founder_count,aggregation_from_founders_csv,False,0.0,0
+12797,spice-data,founder_count,aggregation_from_founders_csv,False,0.0,0
+12738,vahan,founder_count,aggregation_from_founders_csv,False,0.0,0
+12723,lokal,founder_count,aggregation_from_founders_csv,False,0.0,0
+12677,earth-ai,founder_count,aggregation_from_founders_csv,False,0.0,0
+12637,asayer,founder_count,aggregation_from_founders_csv,False,0.0,0
+12611,audiofocus,founder_count,aggregation_from_founders_csv,False,0.0,0
+12507,playground,founder_count,aggregation_from_founders_csv,False,0.0,0
+12584,intersect-labs,founder_count,aggregation_from_founders_csv,False,0.0,0
+12542,palifer,founder_count,aggregation_from_founders_csv,False,0.0,0
+12741,namaste-business,founder_count,aggregation_from_founders_csv,False,0.0,0
+12737,tensil,founder_count,aggregation_from_founders_csv,False,0.0,0
+12658,blair,founder_count,aggregation_from_founders_csv,False,0.0,0
+12656,adla,founder_count,aggregation_from_founders_csv,False,0.0,0
+12629,nonu,founder_count,aggregation_from_founders_csv,False,0.0,0
+12526,mofe,founder_count,aggregation_from_founders_csv,False,0.0,0
+11929,pippin-rent-the-backyard,founder_count,aggregation_from_founders_csv,False,0.0,0
+13620,legionfarm,founder_count,aggregation_from_founders_csv,False,0.0,0
+13516,healthlane,founder_count,aggregation_from_founders_csv,False,0.0,0
+13353,hiration,founder_count,aggregation_from_founders_csv,False,0.0,0
+13273,dropbase,founder_count,aggregation_from_founders_csv,False,0.0,0
+13172,startplaying-games,founder_count,aggregation_from_founders_csv,False,0.0,0
+13165,paymobil,founder_count,aggregation_from_founders_csv,False,0.0,0
+13121,handoff,founder_count,aggregation_from_founders_csv,False,0.0,0
+13120,deep-meditate,founder_count,aggregation_from_founders_csv,False,0.0,0
+13072,breezeful,founder_count,aggregation_from_founders_csv,False,0.0,0
+12742,finlens,founder_count,aggregation_from_founders_csv,False,0.0,0
+13340,able,founder_count,aggregation_from_founders_csv,False,0.0,0
+13156,glimpse,founder_count,aggregation_from_founders_csv,False,0.0,0
+13100,fitnessai,founder_count,aggregation_from_founders_csv,False,0.0,0
+13526,labgrid,founder_count,aggregation_from_founders_csv,False,0.0,0
+13480,orchata,founder_count,aggregation_from_founders_csv,False,0.0,0
+13223,multiverse,founder_count,aggregation_from_founders_csv,False,0.0,0
+13209,scout,founder_count,aggregation_from_founders_csv,False,0.0,0
+13158,protobase,founder_count,aggregation_from_founders_csv,False,0.0,0
+22247,rally,founder_count,aggregation_from_founders_csv,False,0.0,0
+22045,nephrogen,founder_count,aggregation_from_founders_csv,False,0.0,0
+21903,doola,founder_count,aggregation_from_founders_csv,False,0.0,0
+21787,momence,founder_count,aggregation_from_founders_csv,False,0.0,0
+22049,virtually,founder_count,aggregation_from_founders_csv,False,0.0,0
+21984,oico,founder_count,aggregation_from_founders_csv,False,0.0,0
+13306,trident-bioscience,founder_count,aggregation_from_founders_csv,False,0.0,0
+13173,racer,founder_count,aggregation_from_founders_csv,False,0.0,0
+13159,openbase,founder_count,aggregation_from_founders_csv,False,0.0,0
+23460,hoop-dev,founder_count,aggregation_from_founders_csv,False,0.0,0
+23368,spline,founder_count,aggregation_from_founders_csv,False,0.0,0
+23355,svix,founder_count,aggregation_from_founders_csv,False,0.0,0
+23226,soraban,founder_count,aggregation_from_founders_csv,False,0.0,0
+22935,aurabeat,founder_count,aggregation_from_founders_csv,False,0.0,0
+22934,auricle,founder_count,aggregation_from_founders_csv,False,0.0,0
+22880,true3d,founder_count,aggregation_from_founders_csv,False,0.0,0
+22840,nirva,founder_count,aggregation_from_founders_csv,False,0.0,0
+22828,aviron-interactive,founder_count,aggregation_from_founders_csv,False,0.0,0
+22764,valink-therapeutics,founder_count,aggregation_from_founders_csv,False,0.0,0
+22722,pesto,founder_count,aggregation_from_founders_csv,False,0.0,0
+22704,triplit,founder_count,aggregation_from_founders_csv,False,0.0,0
+22665,waypoint,founder_count,aggregation_from_founders_csv,False,0.0,0
+22630,alba-orbital,founder_count,aggregation_from_founders_csv,False,0.0,0
+22902,verak,founder_count,aggregation_from_founders_csv,False,0.0,0
+23305,galaxy,founder_count,aggregation_from_founders_csv,False,0.0,0
+23276,codeball,founder_count,aggregation_from_founders_csv,False,0.0,0
+23084,taste,founder_count,aggregation_from_founders_csv,False,0.0,0
+23000,nimbus-3,founder_count,aggregation_from_founders_csv,False,0.0,0
+24840,vedabio,founder_count,aggregation_from_founders_csv,False,0.0,0
+24820,medium-biosciences,founder_count,aggregation_from_founders_csv,False,0.0,0
+24754,plai,founder_count,aggregation_from_founders_csv,False,0.0,0
+24727,output,founder_count,aggregation_from_founders_csv,False,0.0,0
+24669,ruth-health,founder_count,aggregation_from_founders_csv,False,0.0,0
+24624,luable,founder_count,aggregation_from_founders_csv,False,0.0,0
+24605,dime,founder_count,aggregation_from_founders_csv,False,0.0,0
+24555,rmfg,founder_count,aggregation_from_founders_csv,False,0.0,0
+24525,akute-health,founder_count,aggregation_from_founders_csv,False,0.0,0
+24450,astek-diagnostics-inc,founder_count,aggregation_from_founders_csv,False,0.0,0
+24416,zoios,founder_count,aggregation_from_founders_csv,False,0.0,0
+24379,formance,founder_count,aggregation_from_founders_csv,False,0.0,0
+24371,momo-medical,founder_count,aggregation_from_founders_csv,False,0.0,0
+24354,cartpanda,founder_count,aggregation_from_founders_csv,False,0.0,0
+24304,scratch-data,founder_count,aggregation_from_founders_csv,False,0.0,0
+24259,warpfy,founder_count,aggregation_from_founders_csv,False,0.0,0
+24192,kaya,founder_count,aggregation_from_founders_csv,False,0.0,0
+24188,pirouette-medical,founder_count,aggregation_from_founders_csv,False,0.0,0
+24169,fitia,founder_count,aggregation_from_founders_csv,False,0.0,0
+24166,safebeat,founder_count,aggregation_from_founders_csv,False,0.0,0
+24156,lariat-data,founder_count,aggregation_from_founders_csv,False,0.0,0
+24079,instacrops,founder_count,aggregation_from_founders_csv,False,0.0,0
+24055,atmana,founder_count,aggregation_from_founders_csv,False,0.0,0
+23950,pipekit,founder_count,aggregation_from_founders_csv,False,0.0,0
+23796,slope,founder_count,aggregation_from_founders_csv,False,0.0,0
+22694,elto,founder_count,aggregation_from_founders_csv,False,0.0,0
+24507,warrant,founder_count,aggregation_from_founders_csv,False,0.0,0
+24369,mable,founder_count,aggregation_from_founders_csv,False,0.0,0
+22763,hyper,founder_count,aggregation_from_founders_csv,False,0.0,0
+24600,algofi,founder_count,aggregation_from_founders_csv,False,0.0,0
+24351,hypercontext,founder_count,aggregation_from_founders_csv,False,0.0,0
+23963,gobillion,founder_count,aggregation_from_founders_csv,False,0.0,0
+26331,bby,founder_count,aggregation_from_founders_csv,False,0.0,0
+26139,revoy,founder_count,aggregation_from_founders_csv,False,0.0,0
+26121,cinapse,founder_count,aggregation_from_founders_csv,False,0.0,0
+26066,query-vary,founder_count,aggregation_from_founders_csv,False,0.0,0
+25995,workflow86,founder_count,aggregation_from_founders_csv,False,0.0,0
+25994,glow-energy,founder_count,aggregation_from_founders_csv,False,0.0,0
+25974,float-health,founder_count,aggregation_from_founders_csv,False,0.0,0
+25947,fogbender,founder_count,aggregation_from_founders_csv,False,0.0,0
+25924,better-opinions,founder_count,aggregation_from_founders_csv,False,0.0,0
+25835,kular,founder_count,aggregation_from_founders_csv,False,0.0,0
+25831,mutable-ai,founder_count,aggregation_from_founders_csv,False,0.0,0
+25726,vendy,founder_count,aggregation_from_founders_csv,False,0.0,0
+25714,strong-compute,founder_count,aggregation_from_founders_csv,False,0.0,0
+25694,paycrunch,founder_count,aggregation_from_founders_csv,False,0.0,0
+25685,boya,founder_count,aggregation_from_founders_csv,False,0.0,0
+25683,finflx,founder_count,aggregation_from_founders_csv,False,0.0,0
+25663,velt,founder_count,aggregation_from_founders_csv,False,0.0,0
+25654,imt-care,founder_count,aggregation_from_founders_csv,False,0.0,0
+25650,nearwave,founder_count,aggregation_from_founders_csv,False,0.0,0
+25613,gauss,founder_count,aggregation_from_founders_csv,False,0.0,0
+25561,lancedb,founder_count,aggregation_from_founders_csv,False,0.0,0
+25540,rehook-ai,founder_count,aggregation_from_founders_csv,False,0.0,0
+25537,cerebrium,founder_count,aggregation_from_founders_csv,False,0.0,0
+25447,myria,founder_count,aggregation_from_founders_csv,False,0.0,0
+25351,axross-pte-ltd,founder_count,aggregation_from_founders_csv,False,0.0,0
+25348,sei,founder_count,aggregation_from_founders_csv,False,0.0,0
+25340,loops,founder_count,aggregation_from_founders_csv,False,0.0,0
+25334,flowdeploy,founder_count,aggregation_from_founders_csv,False,0.0,0
+25333,shinkei-systems,founder_count,aggregation_from_founders_csv,False,0.0,0
+25275,strac,founder_count,aggregation_from_founders_csv,False,0.0,0
+24078,instalab,founder_count,aggregation_from_founders_csv,False,0.0,0
+25972,winter,founder_count,aggregation_from_founders_csv,False,0.0,0
+25722,fuell,founder_count,aggregation_from_founders_csv,False,0.0,0
+25912,vessel,founder_count,aggregation_from_founders_csv,False,0.0,0
+25723,aklimate,founder_count,aggregation_from_founders_csv,False,0.0,0
+25644,kable,founder_count,aggregation_from_founders_csv,False,0.0,0
+25569,bifrost,founder_count,aggregation_from_founders_csv,False,0.0,0
+25379,skillza,founder_count,aggregation_from_founders_csv,False,0.0,0
+27206,delfino-ai,founder_count,aggregation_from_founders_csv,False,0.0,0
+27176,slingshot,founder_count,aggregation_from_founders_csv,False,0.0,0
+27174,monterey-ai,founder_count,aggregation_from_founders_csv,False,0.0,0
+27166,wondercraft,founder_count,aggregation_from_founders_csv,False,0.0,0
+27078,wand-solar,founder_count,aggregation_from_founders_csv,False,0.0,0
+27046,accountable,founder_count,aggregation_from_founders_csv,False,0.0,0
+27041,oneloop,founder_count,aggregation_from_founders_csv,False,0.0,0
+26897,aviaryai,founder_count,aggregation_from_founders_csv,False,0.0,0
+26885,mintplex-labs,founder_count,aggregation_from_founders_csv,False,0.0,0
+26825,flair-labs,founder_count,aggregation_from_founders_csv,False,0.0,0
+26819,helperai,founder_count,aggregation_from_founders_csv,False,0.0,0
+26800,juicebox,founder_count,aggregation_from_founders_csv,False,0.0,0
+26793,windmill,founder_count,aggregation_from_founders_csv,False,0.0,0
+26756,ivycheck,founder_count,aggregation_from_founders_csv,False,0.0,0
+26736,array-labs,founder_count,aggregation_from_founders_csv,False,0.0,0
+26723,customeros,founder_count,aggregation_from_founders_csv,False,0.0,0
+26666,airtrain-ai,founder_count,aggregation_from_founders_csv,False,0.0,0
+26654,wolfia,founder_count,aggregation_from_founders_csv,False,0.0,0
+26505,layerup,founder_count,aggregation_from_founders_csv,False,0.0,0
+26899,manatee,founder_count,aggregation_from_founders_csv,False,0.0,0
+26726,ilumadata,founder_count,aggregation_from_founders_csv,False,0.0,0
+26681,alma,founder_count,aggregation_from_founders_csv,False,0.0,0
+26659,weltio,founder_count,aggregation_from_founders_csv,False,0.0,0
+28094,constant,founder_count,aggregation_from_founders_csv,False,0.0,0
+28073,playht,founder_count,aggregation_from_founders_csv,False,0.0,0
+28037,diffuse-bio,founder_count,aggregation_from_founders_csv,False,0.0,0
+27984,sirdab,founder_count,aggregation_from_founders_csv,False,0.0,0
+27965,odigos,founder_count,aggregation_from_founders_csv,False,0.0,0
+27956,hippo-scribe,founder_count,aggregation_from_founders_csv,False,0.0,0
+27899,goodcourse,founder_count,aggregation_from_founders_csv,False,0.0,0
+27876,propexo,founder_count,aggregation_from_founders_csv,False,0.0,0
+27875,iliad,founder_count,aggregation_from_founders_csv,False,0.0,0
+27669,laminate,founder_count,aggregation_from_founders_csv,False,0.0,0
+27823,overflux,founder_count,aggregation_from_founders_csv,False,0.0,0
+29154,catx,founder_count,aggregation_from_founders_csv,False,0.0,0
+29136,autotab,founder_count,aggregation_from_founders_csv,False,0.0,0
+29128,olio-labs,founder_count,aggregation_from_founders_csv,False,0.0,0
+29106,affinity,founder_count,aggregation_from_founders_csv,False,0.0,0
+29051,nanograb,founder_count,aggregation_from_founders_csv,False,0.0,0
+29002,envelope,founder_count,aggregation_from_founders_csv,False,0.0,0
+28997,glaze,founder_count,aggregation_from_founders_csv,False,0.0,0
+28996,sola,founder_count,aggregation_from_founders_csv,False,0.0,0
+28979,slicker,founder_count,aggregation_from_founders_csv,False,0.0,0
+28976,crew-2,founder_count,aggregation_from_founders_csv,False,0.0,0
+28974,gleam,founder_count,aggregation_from_founders_csv,False,0.0,0
+28959,sizeless,founder_count,aggregation_from_founders_csv,False,0.0,0
+28957,continue,founder_count,aggregation_from_founders_csv,False,0.0,0
+28900,epsilla,founder_count,aggregation_from_founders_csv,False,0.0,0
+28883,transformity,founder_count,aggregation_from_founders_csv,False,0.0,0
+28859,micsi,founder_count,aggregation_from_founders_csv,False,0.0,0
+28851,bronco-ai,founder_count,aggregation_from_founders_csv,False,0.0,0
+28845,campfire-2,founder_count,aggregation_from_founders_csv,False,0.0,0
+28844,alguna,founder_count,aggregation_from_founders_csv,False,0.0,0
+28835,synch,founder_count,aggregation_from_founders_csv,False,0.0,0
+28814,humanlike,founder_count,aggregation_from_founders_csv,False,0.0,0
+28811,cascading-ai,founder_count,aggregation_from_founders_csv,False,0.0,0
+28791,linc,founder_count,aggregation_from_founders_csv,False,0.0,0
+28743,leafpress,founder_count,aggregation_from_founders_csv,False,0.0,0
+28707,kino-ai,founder_count,aggregation_from_founders_csv,False,0.0,0
+28920,unhaze,founder_count,aggregation_from_founders_csv,False,0.0,0
+29503,dragoneye,founder_count,aggregation_from_founders_csv,False,0.0,0
+29484,haplotype-labs,founder_count,aggregation_from_founders_csv,False,0.0,0
+29476,junction-bioscience,founder_count,aggregation_from_founders_csv,False,0.0,0
+29465,goldenbasis,founder_count,aggregation_from_founders_csv,False,0.0,0
+29456,marblism,founder_count,aggregation_from_founders_csv,False,0.0,0
+29447,deepnight,founder_count,aggregation_from_founders_csv,False,0.0,0
+29436,titan-2,founder_count,aggregation_from_founders_csv,False,0.0,0
+29429,velorum-therapeutics,founder_count,aggregation_from_founders_csv,False,0.0,0
+29423,triply,founder_count,aggregation_from_founders_csv,False,0.0,0
+29422,amber-ai,founder_count,aggregation_from_founders_csv,False,0.0,0
+29418,sample,founder_count,aggregation_from_founders_csv,False,0.0,0
+29410,model-ml,founder_count,aggregation_from_founders_csv,False,0.0,0
+29405,risotto,founder_count,aggregation_from_founders_csv,False,0.0,0
+29401,dawn,founder_count,aggregation_from_founders_csv,False,0.0,0
+29391,abel,founder_count,aggregation_from_founders_csv,False,0.0,0
+29369,astro-mechanica,founder_count,aggregation_from_founders_csv,False,0.0,0
+29367,draftaid,founder_count,aggregation_from_founders_csv,False,0.0,0
+29366,metofico,founder_count,aggregation_from_founders_csv,False,0.0,0
+29353,resonance,founder_count,aggregation_from_founders_csv,False,0.0,0
+29350,aether-energy,founder_count,aggregation_from_founders_csv,False,0.0,0
+29335,toolify,founder_count,aggregation_from_founders_csv,False,0.0,0
+29328,guide-labs,founder_count,aggregation_from_founders_csv,False,0.0,0
+29313,selera-medical,founder_count,aggregation_from_founders_csv,False,0.0,0
+29312,onegrep,founder_count,aggregation_from_founders_csv,False,0.0,0
+29300,trellis,founder_count,aggregation_from_founders_csv,False,0.0,0
+29278,leaping,founder_count,aggregation_from_founders_csv,False,0.0,0
+29270,buster,founder_count,aggregation_from_founders_csv,False,0.0,0
+29269,garage-2,founder_count,aggregation_from_founders_csv,False,0.0,0
+29259,newton,founder_count,aggregation_from_founders_csv,False,0.0,0
+29184,drymerge,founder_count,aggregation_from_founders_csv,False,0.0,0
+29183,navier-ai,founder_count,aggregation_from_founders_csv,False,0.0,0
+29181,sciphi,founder_count,aggregation_from_founders_csv,False,0.0,0
+29989,melty,founder_count,aggregation_from_founders_csv,False,0.0,0
+29825,sepal-ai,founder_count,aggregation_from_founders_csv,False,0.0,0
+29821,polymet,founder_count,aggregation_from_founders_csv,False,0.0,0
+29815,propaya,founder_count,aggregation_from_founders_csv,False,0.0,0
+29814,vendra,founder_count,aggregation_from_founders_csv,False,0.0,0
+29809,corpdaq,founder_count,aggregation_from_founders_csv,False,0.0,0
+29796,finosu,founder_count,aggregation_from_founders_csv,False,0.0,0
+29794,baseline-ai,founder_count,aggregation_from_founders_csv,False,0.0,0
+29775,brighterway,founder_count,aggregation_from_founders_csv,False,0.0,0
+29773,soff,founder_count,aggregation_from_founders_csv,False,0.0,0
+29761,distro,founder_count,aggregation_from_founders_csv,False,0.0,0
+29759,david-ai,founder_count,aggregation_from_founders_csv,False,0.0,0
+29728,expand-ai,founder_count,aggregation_from_founders_csv,False,0.0,0
+29727,overstand-labs,founder_count,aggregation_from_founders_csv,False,0.0,0
+29721,panora,founder_count,aggregation_from_founders_csv,False,0.0,0
+29716,parity,founder_count,aggregation_from_founders_csv,False,0.0,0
+29714,kopra-bio,founder_count,aggregation_from_founders_csv,False,0.0,0
+29699,pulse-ai,founder_count,aggregation_from_founders_csv,False,0.0,0
+29692,weave-robotics,founder_count,aggregation_from_founders_csv,False,0.0,0
+29680,ares-industries,founder_count,aggregation_from_founders_csv,False,0.0,0
+29678,driftly,founder_count,aggregation_from_founders_csv,False,0.0,0
+29670,zuni,founder_count,aggregation_from_founders_csv,False,0.0,0
+29634,random-labs,founder_count,aggregation_from_founders_csv,False,0.0,0
+29627,codes-health,founder_count,aggregation_from_founders_csv,False,0.0,0
+29611,mdhub,founder_count,aggregation_from_founders_csv,False,0.0,0
+29573,undermind,founder_count,aggregation_from_founders_csv,False,0.0,0
+29571,apten,founder_count,aggregation_from_founders_csv,False,0.0,0
+29570,spherecast,founder_count,aggregation_from_founders_csv,False,0.0,0
+29524,coval,founder_count,aggregation_from_founders_csv,False,0.0,0
+29475,evolvere-biosciences,founder_count,aggregation_from_founders_csv,False,0.0,0
+29406,acx,founder_count,aggregation_from_founders_csv,False,0.0,0
+29349,fuse-2,founder_count,aggregation_from_founders_csv,False,0.0,0

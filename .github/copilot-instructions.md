@@ -9,7 +9,7 @@ Build a **Complexity Index** to quantify Y Combinator startup difficulty across 
 ```
 data/raw/*.csv (8 files)
   → scripts/analyze_raw_data.py (inventory)
-  → src/etl/clean.py (planned: normalization)
+  → src/etl/clean.py (✅ normalization complete)
   → src/etl/impute.py (planned: fill missing data)
   → src/etl/features.py (planned: extract complexity signals)
   → src/etl/score.py (planned: compute 0-100 complexity score)
@@ -20,7 +20,7 @@ data/raw/*.csv (8 files)
 - `data/raw/`: 8 CSVs with companies, founders, industries, tags, schools, prior_companies, regions, badges
 - `data/processed/`: Versioned outputs at each pipeline stage (step1_cleaned/, step2_imputed/, etc.)
 - `scripts/`: Standalone utilities (data analysis, todo management)
-- `src/etl/`: Core ETL pipeline modules (not yet created)
+- `src/etl/`: Core ETL pipeline modules (clean.py implemented)
 - `notebooks/`: Jupyter notebooks for exploration and validation
 - `documentation/`: Structured docs with single source of truth
 
@@ -36,7 +36,7 @@ data/raw/*.csv (8 files)
 ### 2. Task Tracking
 - Edit checkboxes directly in `ROADMAP.md` OR use: `python scripts/todo_cli.py toggle <N>`
 - CLI reads/writes to `ROADMAP.md` (not a separate todo file)
-- 10 phases defined, currently at Phase 2 complete (planning + inventory done)
+- 10 phases defined, currently at Phase 3 complete (data cleaning done)
 
 ### 3. Data Versioning Pattern
 Each pipeline stage outputs to `data/processed/stepN_<stage>/`:
@@ -52,17 +52,25 @@ Each pipeline stage outputs to `data/processed/stepN_<stage>/`:
 - Dependencies: pandas, numpy (minimal for now)
 - Version: Python 3.12+
 
-### 5. ETL Module Structure (Planned)
+### 5. ETL Module Structure
 ```python
 src/etl/
 ├── __init__.py
-├── clean.py      # Normalize IDs, standardize text, parse numerics
-├── impute.py     # oneLiner from longDescription, flag nulls
-├── enrich.py     # Optional web scraping (rate-limited)
-├── features.py   # Extract technical/practical signals
-├── score.py      # Apply weighted rubric (0-100 scale)
-└── pipeline.py   # Orchestrate all steps
+├── clean.py      # ✅ IMPLEMENTED: Normalize IDs, standardize text, parse numerics
+├── impute.py     # Planned: oneLiner from longDescription, flag nulls
+├── enrich.py     # Planned: Optional web scraping (rate-limited)
+├── features.py   # Planned: Extract technical/practical signals
+├── score.py      # Planned: Apply weighted rubric (0-100 scale)
+└── pipeline.py   # Planned: Orchestrate all steps
 ```
+
+**clean.py Implementation:**
+- 8 cleaning functions (one per CSV file)
+- `standardize_text()`: Strip whitespace, handle None values
+- `validate_cleaning()`: Row count preservation checks
+- `run_cleaning_pipeline()`: Main orchestration function
+- Outputs: 8 cleaned CSVs in `data/processed/step1_cleaned/`
+- All 130,561 rows validated and preserved
 
 ## Key Workflows
 
@@ -210,20 +218,28 @@ RAW_DIR = Path(__file__).resolve().parents[1] / "data" / "raw"
 - ML models (complexity as predictive feature)
 - Clustering / segmentation analysis
 
-## Current Status (Phase 2 Complete)
+## Current Status (Phase 3 Complete)
 
 ✅ Objectives & metrics defined  
 ✅ Data dictionary generated (8 CSVs analyzed)  
-🔲 Next: Data cleaning & normalization (Phase 3)
+✅ Data cleaning & normalization complete (Phase 3)
+🔲 Next: Missing data completion (Phase 4)
 
-**When implementing Phase 3:**
-1. Create `src/etl/clean.py` with functions for each CSV
-2. Handle company `id` as canonical primary key (not name/slug)
-3. Standardize batch format: `S05`, `W06` (uppercase, zero-padded)
-4. Output 8 cleaned CSVs to `data/processed/step1_cleaned/`
-5. Add validation: row count matches, no duplicate IDs, schema preserved
-6. **Update ROADMAP.md**: Mark Phase 3 checkbox as `[x]` and all sub-tasks
-7. **Update this file**: Change Phase 3 status from 🔲 to ✅, update "Next:" to Phase 4
+**Phase 3 Achievements:**
+1. ✅ Created `src/etl/clean.py` with 8 cleaning functions
+2. ✅ Normalized company `id` as integer primary key
+3. ✅ Standardized text fields (strip whitespace, handle nulls)
+4. ✅ Output 8 cleaned CSVs to `data/processed/step1_cleaned/`
+5. ✅ Validation: All 130,561 rows preserved, no data loss
+
+**When implementing Phase 4:**
+1. Create `src/etl/impute.py` with heuristic imputation functions
+2. Extract oneLiner from first sentence of longDescription
+3. Flag companies needing enrichment (missing critical fields)
+4. Output imputed CSVs to `data/processed/step2_imputed/`
+5. Generate `imputation_report.csv` with (company_id, field, method)
+6. **Update ROADMAP.md**: Mark Phase 4 checkbox as `[x]` and all sub-tasks
+7. **Update this file**: Change Phase 4 status from 🔲 to ✅, update "Next:" to Phase 5
 
 ## Keeping Documentation in Sync
 
