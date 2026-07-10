@@ -173,3 +173,24 @@ def merge_company_fields(company_row: Dict, scraped: Dict) -> Tuple[Dict, List[D
             updated[local_field] = value
         report_rows.append({"field": local_field, "success": success})
     return updated, report_rows
+
+
+def validate_enrichment(original_df: pd.DataFrame, enriched_df: pd.DataFrame) -> None:
+    """
+    Validate that enrichment didn't corrupt data.
+
+    Args:
+        original_df: companies_imputed.csv loaded as a DataFrame, before enrichment.
+        enriched_df: The enriched companies DataFrame, same row order.
+    """
+    assert len(original_df) == len(enriched_df), "Row count changed during enrichment!"
+
+    for field in ("oneLiner", "longDescription", "teamSize"):
+        had_value = original_df[field].notna().reset_index(drop=True)
+        original_values = original_df[field].reset_index(drop=True)
+        enriched_values = enriched_df[field].reset_index(drop=True)
+        assert (
+            original_values[had_value] == enriched_values[had_value]
+        ).all(), f"Existing {field} values were modified!"
+
+    print("Validation passed: No data corruption detected")

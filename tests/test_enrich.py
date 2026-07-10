@@ -267,3 +267,49 @@ def test_merge_company_fields_reports_failure_when_scraped_value_is_nan():
 
     assert math.isnan(updated["oneLiner"]) or updated["oneLiner"] is None
     assert report_rows == [{"field": "oneLiner", "success": False}]
+
+
+import pandas as pd
+
+from src.etl.enrich import validate_enrichment
+
+
+def test_validate_enrichment_passes_when_only_missing_fields_filled():
+    original = pd.DataFrame(
+        {
+            "id": [1, 2],
+            "oneLiner": ["Existing", None],
+            "longDescription": [None, "Existing desc"],
+            "teamSize": [5.0, float("nan")],
+        }
+    )
+    enriched = pd.DataFrame(
+        {
+            "id": [1, 2],
+            "oneLiner": ["Existing", "Filled in"],
+            "longDescription": ["Filled in desc", "Existing desc"],
+            "teamSize": [5.0, 10.0],
+        }
+    )
+
+    validate_enrichment(original, enriched)  # should not raise
+
+
+def test_validate_enrichment_raises_on_row_count_mismatch():
+    original = pd.DataFrame({"id": [1, 2], "oneLiner": ["a", "b"],
+                              "longDescription": ["a", "b"], "teamSize": [1.0, 2.0]})
+    enriched = pd.DataFrame({"id": [1], "oneLiner": ["a"],
+                              "longDescription": ["a"], "teamSize": [1.0]})
+
+    with pytest.raises(AssertionError, match="Row count"):
+        validate_enrichment(original, enriched)
+
+
+def test_validate_enrichment_raises_when_existing_value_overwritten():
+    original = pd.DataFrame({"id": [1], "oneLiner": ["Existing"],
+                              "longDescription": ["Existing"], "teamSize": [5.0]})
+    enriched = pd.DataFrame({"id": [1], "oneLiner": ["Changed!"],
+                              "longDescription": ["Existing"], "teamSize": [5.0]})
+
+    with pytest.raises(AssertionError, match="oneLiner"):
+        validate_enrichment(original, enriched)
