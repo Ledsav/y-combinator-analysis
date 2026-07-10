@@ -11,7 +11,7 @@ Checklist
 - [x] 4. Complete missing data
 - [x] 5. Scraping & enrichment
 - [x] 6. Feature engineering
-- [ ] 7. Design scoring rubric
+- [x] 7. Design scoring rubric
 - [ ] 8. Implement ETL pipeline
 - [ ] 9. Validate & analyze index
 - [ ] 10. Documentation & reproducibility

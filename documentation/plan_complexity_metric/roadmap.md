@@ -85,11 +85,11 @@
   - [x] Combine with founder/school/prior company data
   - [x] Output: `data/processed/features/complexity_features.parquet`
 
-- [ ] **7. Scoring rubric design**
-  - [ ] Design interpretable weighted rubric
-  - [ ] Calibrate weights with example companies
-  - [ ] Run sensitivity analysis
-  - [ ] Output: `notebooks/score_design.ipynb`
+- [x] **7. Scoring rubric design**
+  - [x] Design interpretable weighted rubric
+  - [x] Calibrate weights with example companies
+  - [x] Run sensitivity analysis
+  - [x] Output: `notebooks/score_design.ipynb`
 
 - [ ] **8. ETL pipeline implementation**
   - [ ] Create modular ETL scripts in `src/etl/`
@@ -282,11 +282,11 @@ python scripts/run_complexity_pipeline.py --steps clean,impute,features,score
 | 4. Imputation | 1 day | ✅ Complete |
 | 5. Enrichment | 2-7 days | ✅ Complete (scoped to score>=80) |
 | 6. Features | 2-3 days | ✅ Complete |
-| 7. Scoring | 1-2 days | 🔲 Not started |
+| 7. Scoring | 1-2 days | ✅ Complete |
 | 8. Pipeline | 2 days | 🔲 Not started |
 | 9. Validation | 1 day | 🔲 Not started |
 | 10. Documentation | 1 day | 🔲 Not started |
-| **Total** | **10-15 days** | **60% complete** |
+| **Total** | **10-15 days** | **70% complete** |
 
 ---
 
@@ -328,13 +328,12 @@ python scripts/run_complexity_pipeline.py --steps clean,impute,features,score
 
 ## Next Immediate Actions
 
-**Current Focus:** Phase 7 - Scoring Rubric Design
+**Current Focus:** Phase 8 - ETL Pipeline Implementation
 
 **Next Steps:**
-1. Design the interpretable weighted rubric per the Phase 7 spec above, using `data/processed/features/complexity_features.parquet` as input
-2. Calibrate weights with example companies (biotech should score high technical, fintech high practical)
-3. Run sensitivity analysis
-4. Output: `notebooks/score_design.ipynb`
-5. Update checklist item #7 accordingly
+1. Create modular ETL scripts in `src/etl/` (clean.py, impute.py, enrich.py, features.py, score.py already exist — this phase wires them into one orchestrator)
+2. Build a CLI runner (`scripts/run_complexity_pipeline.py`) with `--steps` and `--output-version` flags per the roadmap's Phase 8 spec
+3. Add automated validation checks across the full pipeline run
+4. Output: Complete pipeline + `complexity_index_v1.csv` regenerated end-to-end from raw data
 
 **To continue:** Mark this task complete and proceed to implementation.
