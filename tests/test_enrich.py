@@ -159,3 +159,98 @@ def test_fetch_company_json_does_not_retry_malformed_page(monkeypatch):
         fetch_company_json("https://example.com/companies/x")
 
     assert len(calls) == 1
+
+
+import math
+
+from src.etl.enrich import build_founder_row, merge_company_fields, split_full_name
+
+
+def test_split_full_name_splits_on_first_space():
+    assert split_full_name("Patrick Collison") == ("Patrick", "Collison")
+
+
+def test_split_full_name_handles_single_name():
+    assert split_full_name("Madonna") == ("Madonna", "")
+
+
+def test_split_full_name_handles_middle_names():
+    assert split_full_name("Mary Jane Watson") == ("Mary", "Jane Watson")
+
+
+def test_build_founder_row_maps_scraped_fields():
+    scraped_founder = {
+        "full_name": "Patrick Collison",
+        "title": "Founder/CEO",
+        "avatar_thumb_url": "https://example.com/avatar.jpg",
+    }
+
+    row = build_founder_row(scraped_founder, "stripe")
+
+    assert row == {
+        "first_name": "Patrick",
+        "last_name": "Collison",
+        "hnid": None,
+        "avatar_thumb": "https://example.com/avatar.jpg",
+        "current_company": None,
+        "current_title": "Founder/CEO",
+        "company_slug": "stripe",
+        "top_company": False,
+    }
+
+
+def test_merge_company_fields_fills_missing_fields_only():
+    company_row = {
+        "id": 1,
+        "oneLiner": math.nan,
+        "longDescription": math.nan,
+        "teamSize": math.nan,
+    }
+    scraped = {
+        "one_liner": "A one liner.",
+        "long_description": "A longer description.",
+        "team_size": 12,
+    }
+
+    updated, report_rows = merge_company_fields(company_row, scraped)
+
+    assert updated["oneLiner"] == "A one liner."
+    assert updated["longDescription"] == "A longer description."
+    assert updated["teamSize"] == 12
+    assert {r["field"]: r["success"] for r in report_rows} == {
+        "oneLiner": True,
+        "longDescription": True,
+        "teamSize": True,
+    }
+
+
+def test_merge_company_fields_never_overwrites_existing_value():
+    company_row = {
+        "id": 1,
+        "oneLiner": "Existing one liner.",
+        "longDescription": math.nan,
+        "teamSize": 5,
+    }
+    scraped = {
+        "one_liner": "Scraped one liner.",
+        "long_description": "Scraped description.",
+        "team_size": 12,
+    }
+
+    updated, report_rows = merge_company_fields(company_row, scraped)
+
+    assert updated["oneLiner"] == "Existing one liner."
+    assert updated["teamSize"] == 5
+    assert updated["longDescription"] == "Scraped description."
+    fields_reported = {r["field"] for r in report_rows}
+    assert fields_reported == {"longDescription"}
+
+
+def test_merge_company_fields_reports_failure_when_scraped_value_missing():
+    company_row = {"id": 1, "oneLiner": math.nan, "longDescription": "x", "teamSize": 5}
+    scraped = {"one_liner": None}
+
+    updated, report_rows = merge_company_fields(company_row, scraped)
+
+    assert math.isnan(updated["oneLiner"]) or updated["oneLiner"] is None
+    assert report_rows == [{"field": "oneLiner", "success": False}]

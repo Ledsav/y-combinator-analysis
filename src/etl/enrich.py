@@ -16,7 +16,9 @@ import time
 import urllib.error
 import urllib.request
 from html.parser import HTMLParser
-from typing import Dict, Optional
+from typing import Dict, List, Optional, Tuple
+
+import pandas as pd
 
 
 class _DataPageParser(HTMLParser):
@@ -113,3 +115,59 @@ def fetch_company_json(url: str, max_retries: int = MAX_RETRIES) -> Dict:
         if attempt < max_retries:
             time.sleep(1)
     raise RuntimeError(f"Failed to fetch {url}: {last_error}") from last_error
+
+
+def split_full_name(full_name: str) -> Tuple[str, str]:
+    """Split a scraped founder's full name into (first_name, last_name) on the first space."""
+    parts = full_name.strip().split(" ", 1)
+    if len(parts) == 1:
+        return parts[0], ""
+    return parts[0], parts[1]
+
+
+def build_founder_row(scraped_founder: Dict, company_slug: str) -> Dict:
+    """Build a founders_enriched.csv row from a scraped founder dict."""
+    first_name, last_name = split_full_name(scraped_founder.get("full_name", ""))
+    return {
+        "first_name": first_name,
+        "last_name": last_name,
+        "hnid": None,
+        "avatar_thumb": scraped_founder.get("avatar_thumb_url"),
+        "current_company": None,
+        "current_title": scraped_founder.get("title"),
+        "company_slug": company_slug,
+        "top_company": False,
+    }
+
+
+def merge_company_fields(company_row: Dict, scraped: Dict) -> Tuple[Dict, List[Dict]]:
+    """
+    Fill missing oneLiner/longDescription/teamSize on a company row from
+    scraped data. Never overwrites a non-null existing value.
+
+    Args:
+        company_row: A single company's data as a dict (e.g. from a
+            DataFrame row's .to_dict()).
+        scraped: The `props.company` dict from `extract_company_json`.
+
+    Returns:
+        (updated_row, report_rows) where report_rows is a list of
+        {"field": str, "success": bool} for each field that was missing
+        and attempted.
+    """
+    updated = dict(company_row)
+    report_rows = []
+    field_map = [
+        ("oneLiner", "one_liner"),
+        ("longDescription", "long_description"),
+        ("teamSize", "team_size"),
+    ]
+    for local_field, scraped_field in field_map:
+        if not pd.isna(updated.get(local_field)):
+            continue
+        value = scraped.get(scraped_field)
+        success = value is not None and value != ""
+        if success:
+            updated[local_field] = value
+        report_rows.append({"field": local_field, "success": success})
+    return updated, report_rows
