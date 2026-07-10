@@ -447,3 +447,61 @@ def validate_features(companies_df: pd.DataFrame, features_df: pd.DataFrame) -> 
     )
 
     print("Validation passed: No data corruption detected")
+
+
+def run_feature_engineering_pipeline(input_dir: Path = None, output_dir: Path = None) -> None:
+    """
+    Main feature engineering pipeline orchestrator.
+
+    Args:
+        input_dir: Path to step3_enriched/ directory.
+        output_dir: Path to features/ directory.
+    """
+    if input_dir is None:
+        input_dir = (
+            Path(__file__).resolve().parents[2] / "data" / "processed" / "step3_enriched"
+        )
+    if output_dir is None:
+        output_dir = Path(__file__).resolve().parents[2] / "data" / "processed" / "features"
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    print("=" * 60)
+    print("PHASE 6: FEATURE ENGINEERING")
+    print("=" * 60)
+
+    print("\n[1/4] Loading enriched data...")
+    companies_df = pd.read_csv(input_dir / "companies_enriched.csv")
+    tags_df = pd.read_csv(input_dir / "tags_enriched.csv")
+    industries_df = pd.read_csv(input_dir / "industries_enriched.csv")
+    regions_df = pd.read_csv(input_dir / "regions_enriched.csv")
+    founders_df = pd.read_csv(input_dir / "founders_enriched.csv")
+    schools_df = pd.read_csv(input_dir / "schools_enriched.csv")
+    prior_companies_df = pd.read_csv(input_dir / "prior_companies_enriched.csv")
+
+    print("\n[2/4] Building feature table...")
+    features_df = build_feature_table(
+        companies_df, tags_df, industries_df, regions_df,
+        founders_df, schools_df, prior_companies_df,
+    )
+    features_df = features_df[["id", "slug", "name", "batch", "status"] + FEATURE_COLUMNS]
+
+    print("\n[3/4] Validating features...")
+    validate_features(companies_df, features_df)
+
+    print("\n[4/4] Saving feature table...")
+    output_path = output_dir / "complexity_features.parquet"
+    features_df.to_parquet(output_path, index=False)
+    print(f"  ✓ {output_path}")
+
+    print("\n" + "=" * 60)
+    print("PHASE 6 COMPLETE")
+    print("=" * 60)
+    print(f"Companies: {len(features_df)}")
+    for col in FEATURE_COLUMNS:
+        nonzero = int((features_df[col] > 0).sum())
+        print(f"  {col}: {nonzero}/{len(features_df)} companies with value > 0")
+
+
+if __name__ == "__main__":
+    run_feature_engineering_pipeline()

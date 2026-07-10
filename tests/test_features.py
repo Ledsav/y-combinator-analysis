@@ -334,3 +334,49 @@ def test_validate_features_raises_on_missing_feature_values():
 
     with pytest.raises(AssertionError, match="deep_tech_tag_count"):
         validate_features(companies_df, features_df)
+
+
+from src.etl.features import run_feature_engineering_pipeline
+
+
+def test_run_feature_engineering_pipeline_end_to_end(tmp_path):
+    input_dir = tmp_path / "step3_enriched"
+    output_dir = tmp_path / "features"
+    input_dir.mkdir()
+
+    companies = pd.DataFrame(
+        [
+            {
+                "id": 1, "slug": "acme", "name": "Acme", "batch": "W24",
+                "status": "Active",
+                "longDescription": "Acme builds a proprietary machine learning platform.",
+            },
+            {
+                "id": 2, "slug": "beta", "name": "Beta", "batch": "S23",
+                "status": "Active", "longDescription": "Beta is a local bakery.",
+            },
+        ]
+    )
+    tags = pd.DataFrame({"id": [1], "tag": ["Artificial Intelligence"]})
+    industries = pd.DataFrame({"id": [1], "industry": ["Fintech"]})
+    regions = pd.DataFrame({"id": [1, 2], "country": ["United States of America", "India"]})
+    founders = pd.DataFrame({"hnid": ["a"], "company_slug": ["acme"]})
+    schools = pd.DataFrame({"hnid": ["a"], "field_of_study": ["Doctor Of Philosophy"]})
+    prior_companies = pd.DataFrame({"hnid": [], "company": []})
+
+    companies.to_csv(input_dir / "companies_enriched.csv", index=False)
+    tags.to_csv(input_dir / "tags_enriched.csv", index=False)
+    industries.to_csv(input_dir / "industries_enriched.csv", index=False)
+    regions.to_csv(input_dir / "regions_enriched.csv", index=False)
+    founders.to_csv(input_dir / "founders_enriched.csv", index=False)
+    schools.to_csv(input_dir / "schools_enriched.csv", index=False)
+    prior_companies.to_csv(input_dir / "prior_companies_enriched.csv", index=False)
+
+    run_feature_engineering_pipeline(input_dir=input_dir, output_dir=output_dir)
+
+    features_df = pd.read_parquet(output_dir / "complexity_features.parquet")
+    assert len(features_df) == 2
+    acme = features_df[features_df["slug"] == "acme"].iloc[0]
+    assert acme["deep_tech_tag_count"] == 1
+    assert acme["regulated_industry"] == 1
+    assert acme["founder_phd_count"] == 1
