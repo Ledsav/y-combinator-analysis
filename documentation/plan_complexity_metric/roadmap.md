@@ -90,6 +90,7 @@
   - [x] Calibrate weights with example companies
   - [x] Run sensitivity analysis
   - [x] Output: `notebooks/score_design.ipynb`
+  - **Known gap:** the mechanism (module, pipeline, output schema) is complete and correct, but calibration missed two objectives-doc success criteria by a wide margin: correlation with team size (Pearson r=0.035, Spearman r=0.050 vs. target r>0.2) and score-distribution spread (std=10.11 vs. target ≥15) — see `notebooks/score_design.ipynb` section 7 ("Findings") for the full numbers. Per `docs/superpowers/specs/2026-07-10-phase7-scoring-rubric-design.md`'s "Open Question," no formula changes were made to chase these targets; a follow-up brainstorming pass to revise the caps/weights is needed before this index is treated as validated for downstream use (e.g. as an ML feature or segmentation input in later phases).
 
 - [ ] **8. ETL pipeline implementation**
   - [ ] Create modular ETL scripts in `src/etl/`
