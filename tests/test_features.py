@@ -2,10 +2,12 @@ import pandas as pd
 
 from src.etl.features import (
     compute_deep_tech_tag_count,
+    compute_founder_phd_count,
     compute_international_operations,
     compute_market_type_score,
     compute_operational_intensity,
     compute_regulated_industry,
+    compute_research_company_experience,
     count_countries_mentioned,
     normalize_country_names,
     score_description_tech,
@@ -138,3 +140,54 @@ def test_compute_international_operations_counts_per_company():
 
     counts = dict(zip(result["id"], result["international_operations"]))
     assert counts == {1: 2, 2: 0}
+
+
+def test_compute_founder_phd_count_counts_distinct_founders_with_phd():
+    founders_df = pd.DataFrame(
+        {
+            "hnid": ["a", "b", "c", "d"],
+            "company_slug": ["acme", "acme", "beta", "beta"],
+        }
+    )
+    schools_df = pd.DataFrame(
+        {
+            "hnid": ["a", "a", "b", "c"],
+            "field_of_study": [
+                "Doctor Of Philosophy", "Computer Science", "Economics", "Phd",
+            ],
+        }
+    )
+
+    result = compute_founder_phd_count(founders_df, schools_df)
+
+    counts = dict(zip(result["company_slug"], result["founder_phd_count"]))
+    assert counts == {"acme": 1, "beta": 1}
+
+
+def test_compute_founder_phd_count_deduplicates_multiple_phd_school_rows():
+    founders_df = pd.DataFrame({"hnid": ["a"], "company_slug": ["acme"]})
+    schools_df = pd.DataFrame(
+        {"hnid": ["a", "a"], "field_of_study": ["Doctor Of Philosophy", "Ph.D."]}
+    )
+
+    result = compute_founder_phd_count(founders_df, schools_df)
+
+    counts = dict(zip(result["company_slug"], result["founder_phd_count"]))
+    assert counts == {"acme": 1}
+
+
+def test_compute_research_company_experience_counts_distinct_founders():
+    founders_df = pd.DataFrame(
+        {"hnid": ["a", "b", "c"], "company_slug": ["acme", "acme", "beta"]}
+    )
+    prior_companies_df = pd.DataFrame(
+        {
+            "hnid": ["a", "b", "c"],
+            "company": ["MIT Media Lab", "Acme Corp", "Stanford University"],
+        }
+    )
+
+    result = compute_research_company_experience(founders_df, prior_companies_df)
+
+    counts = dict(zip(result["company_slug"], result["research_company_experience"]))
+    assert counts == {"acme": 1, "beta": 1}

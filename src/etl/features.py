@@ -288,3 +288,65 @@ def compute_international_operations(
         lambda text: count_countries_mentioned(text, country_names)
     )
     return result[["id", "international_operations"]]
+
+
+PHD_PATTERN: str = r"\bdoctor of philosophy\b|\bphd\b|\bph\.\s?d\.?"
+
+RESEARCH_PATTERN: str = (
+    r"\buniversit(?:y|ies)\b|\binstitute\b|\blaborator(?:y|ies)\b|\blabs?\b"
+    r"|\bresearch\b|\bnasa\b|\bjpl\b|\bcern\b"
+)
+
+
+def compute_founder_phd_count(
+    founders_df: pd.DataFrame, schools_df: pd.DataFrame, phd_pattern: str = PHD_PATTERN
+) -> pd.DataFrame:
+    """
+    Count distinct founders per company with a PhD-like field_of_study
+    (technical founder pedigree signal).
+
+    Args:
+        founders_df: Founders dataframe with 'hnid' and 'company_slug'.
+        schools_df: Schools dataframe with 'hnid' and 'field_of_study'.
+        phd_pattern: Case-insensitive regex identifying PhD field_of_study values.
+
+    Returns:
+        DataFrame with columns ['company_slug', 'founder_phd_count'].
+        Companies with zero matches are absent (caller left-merges and fills 0).
+    """
+    schools = schools_df.dropna(subset=["field_of_study"])
+    is_phd = schools["field_of_study"].str.contains(phd_pattern, case=False, regex=True)
+    phd_hnids = set(schools.loc[is_phd, "hnid"])
+
+    founders = founders_df[founders_df["hnid"].isin(phd_hnids)]
+    matched = founders.drop_duplicates(["company_slug", "hnid"])
+    return matched.groupby("company_slug").size().reset_index(name="founder_phd_count")
+
+
+def compute_research_company_experience(
+    founders_df: pd.DataFrame,
+    prior_companies_df: pd.DataFrame,
+    research_pattern: str = RESEARCH_PATTERN,
+) -> pd.DataFrame:
+    """
+    Count distinct founders per company with prior experience at a
+    university, research lab, or similar research institution.
+
+    Args:
+        founders_df: Founders dataframe with 'hnid' and 'company_slug'.
+        prior_companies_df: Prior-companies dataframe with 'hnid' and 'company'.
+        research_pattern: Case-insensitive regex identifying research-institution names.
+
+    Returns:
+        DataFrame with columns ['company_slug', 'research_company_experience'].
+        Companies with zero matches are absent (caller left-merges and fills 0).
+    """
+    prior = prior_companies_df.dropna(subset=["company"])
+    is_research = prior["company"].str.contains(research_pattern, case=False, regex=True)
+    research_hnids = set(prior.loc[is_research, "hnid"])
+
+    founders = founders_df[founders_df["hnid"].isin(research_hnids)]
+    matched = founders.drop_duplicates(["company_slug", "hnid"])
+    return matched.groupby("company_slug").size().reset_index(
+        name="research_company_experience"
+    )
