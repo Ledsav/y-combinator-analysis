@@ -179,3 +179,105 @@ def compute_operational_intensity(
         ["id", "label"]
     )
     return matched.groupby("id").size().reset_index(name="operational_intensity")
+
+
+TECH_KEYWORD_PATTERNS: List[str] = [
+    r"\bresearch(?:ers?)?\b", r"\bpatents?\b", r"\bpatented\b", r"\bnovel\b",
+    r"\balgorithms?\b", r"\bproprietary\b", r"\bbreakthroughs?\b",
+    r"\blaborator(?:y|ies)\b", r"\bclinical trials?\b", r"\bpeer[- ]reviewed\b",
+    r"\bprototypes?\b", r"\bneural networks?\b", r"\bdeep learning\b",
+    r"\bmachine learning\b", r"\bartificial intelligence\b", r"\bquantum\b",
+    r"\bsemiconductors?\b", r"\bgenomes?\b", r"\bproteins?\b", r"\bmolecules?\b",
+    r"\bbiotechnology\b", r"\bautonomous\b", r"\brobotics?\b",
+]
+
+
+def score_description_tech(
+    text, keyword_patterns: List[str] = TECH_KEYWORD_PATTERNS
+) -> int:
+    """
+    Count technical-vocabulary keyword occurrences in a company description
+    (R&D intensity signal: research, patents, novel algorithms, etc.).
+
+    Args:
+        text: The longDescription value (may be None/NaN/non-string).
+        keyword_patterns: Lowercase regex patterns to search for.
+
+    Returns:
+        Total keyword match count (sum across all patterns). 0 for
+        missing/empty text.
+    """
+    if not isinstance(text, str) or not text.strip():
+        return 0
+    text_lower = text.lower()
+    return sum(len(re.findall(pattern, text_lower)) for pattern in keyword_patterns)
+
+
+def normalize_country_names(countries: Iterable[str]) -> List[str]:
+    """
+    Map raw region-country values to name forms more likely to appear in
+    prose (e.g. "United States of America" -> "United States"), dropping
+    non-country placeholder values and nulls.
+
+    Args:
+        countries: Raw country values (e.g. from regions_df["country"]).
+
+    Returns:
+        Sorted list of unique, normalized country names.
+    """
+    overrides = {"United States of America": "United States"}
+    excluded = {"Remote"}
+    result = []
+    for country in countries:
+        if pd.isna(country) or country in excluded:
+            continue
+        result.append(overrides.get(country, country))
+    return sorted(set(result))
+
+
+def count_countries_mentioned(text, country_names: Iterable[str]) -> int:
+    """
+    Count distinct countries (by name) mentioned in text — a proxy for
+    geographic/international operational complexity.
+
+    Args:
+        text: The longDescription value (may be None/NaN/non-string).
+        country_names: Country name strings to search for (whole-word,
+            case-insensitive).
+
+    Returns:
+        Count of distinct country names found. 0 for missing/empty text.
+    """
+    if not isinstance(text, str) or not text.strip():
+        return 0
+    text_lower = text.lower()
+    count = 0
+    for name in country_names:
+        pattern = r"\b" + re.escape(name.lower()) + r"\b"
+        if re.search(pattern, text_lower):
+            count += 1
+    return count
+
+
+def compute_international_operations(
+    companies_df: pd.DataFrame, regions_df: pd.DataFrame
+) -> pd.DataFrame:
+    """
+    Count distinct countries mentioned in each company's longDescription,
+    using the observed set of HQ countries (from regions_df) as the
+    matching vocabulary.
+
+    Args:
+        companies_df: Companies dataframe with 'id' and 'longDescription'.
+        regions_df: Regions dataframe with a 'country' column.
+
+    Returns:
+        DataFrame with columns ['id', 'international_operations'], one row
+        per company in companies_df.
+    """
+    country_names = normalize_country_names(regions_df["country"].unique())
+    result = companies_df[["id", "longDescription"]].copy()
+    result["international_operations"] = result["longDescription"].apply(
+        lambda text: count_countries_mentioned(text, country_names)
+    )
+    return result[["id", "international_operations"]]
