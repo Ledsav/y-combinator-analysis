@@ -1,6 +1,8 @@
 import pandas as pd
+import pytest
 
 from src.etl.features import (
+    build_feature_table,
     compute_deep_tech_tag_count,
     compute_founder_phd_count,
     compute_international_operations,
@@ -11,6 +13,7 @@ from src.etl.features import (
     count_countries_mentioned,
     normalize_country_names,
     score_description_tech,
+    validate_features,
 )
 
 
@@ -224,3 +227,110 @@ def test_compute_research_company_experience_uses_overridable_pattern():
 
     counts = dict(zip(result["company_slug"], result["research_company_experience"]))
     assert counts == {"acme": 1}
+
+
+def _minimal_inputs():
+    companies_df = pd.DataFrame(
+        {
+            "id": [1, 2],
+            "slug": ["acme", "beta"],
+            "name": ["Acme", "Beta"],
+            "batch": ["W24", "S23"],
+            "status": ["Active", "Active"],
+            "longDescription": [
+                "Acme builds a proprietary machine learning platform for India and Kenya.",
+                "Beta is a local bakery.",
+            ],
+        }
+    )
+    tags_df = pd.DataFrame(
+        {"id": [1, 1, 2], "tag": ["Artificial Intelligence", "B2B", "SaaS"]}
+    )
+    industries_df = pd.DataFrame({"id": [1], "industry": ["Fintech"]})
+    regions_df = pd.DataFrame(
+        {"id": [1, 2], "country": ["India", "United States of America"]}
+    )
+    founders_df = pd.DataFrame(
+        {"hnid": ["a", "b"], "company_slug": ["acme", "beta"]}
+    )
+    schools_df = pd.DataFrame(
+        {"hnid": ["a"], "field_of_study": ["Doctor Of Philosophy"]}
+    )
+    prior_companies_df = pd.DataFrame({"hnid": ["b"], "company": ["Acme Corp"]})
+    return (
+        companies_df, tags_df, industries_df, regions_df,
+        founders_df, schools_df, prior_companies_df,
+    )
+
+
+def test_build_feature_table_has_one_row_per_company_and_no_missing_values():
+    inputs = _minimal_inputs()
+
+    features_df = build_feature_table(*inputs)
+
+    assert len(features_df) == 2
+    assert set(features_df["id"]) == {1, 2}
+    feature_cols = [
+        "deep_tech_tag_count", "description_tech_score", "founder_phd_count",
+        "research_company_experience", "regulated_industry", "market_type_score",
+        "international_operations", "operational_intensity",
+    ]
+    for col in feature_cols:
+        assert features_df[col].notna().all()
+
+
+def test_build_feature_table_computes_expected_values_for_acme():
+    inputs = _minimal_inputs()
+
+    features_df = build_feature_table(*inputs)
+
+    acme = features_df[features_df["slug"] == "acme"].iloc[0]
+    assert acme["deep_tech_tag_count"] == 1  # Artificial Intelligence
+    assert acme["market_type_score"] == 3  # B2B
+    assert acme["regulated_industry"] == 1  # Fintech
+    assert acme["founder_phd_count"] == 1  # founder 'a' has a PhD
+    assert acme["international_operations"] == 1  # "India" mentioned
+
+    beta = features_df[features_df["slug"] == "beta"].iloc[0]
+    assert beta["deep_tech_tag_count"] == 0
+    assert beta["research_company_experience"] == 0  # "Acme Corp" isn't a research institution
+
+
+def test_validate_features_passes_on_valid_table():
+    inputs = _minimal_inputs()
+    companies_df = inputs[0]
+    features_df = build_feature_table(*inputs)
+
+    validate_features(companies_df, features_df)  # should not raise
+
+
+def test_validate_features_raises_on_row_count_mismatch():
+    companies_df = pd.DataFrame({"id": [1, 2]})
+    features_df = pd.DataFrame(
+        {
+            "id": [1],
+            "deep_tech_tag_count": [0], "description_tech_score": [0],
+            "founder_phd_count": [0], "research_company_experience": [0],
+            "regulated_industry": [0], "market_type_score": [0],
+            "international_operations": [0], "operational_intensity": [0],
+        }
+    )
+
+    with pytest.raises(AssertionError, match="Row count"):
+        validate_features(companies_df, features_df)
+
+
+def test_validate_features_raises_on_missing_feature_values():
+    companies_df = pd.DataFrame({"id": [1]})
+    features_df = pd.DataFrame(
+        {
+            "id": [1],
+            "deep_tech_tag_count": [None], "description_tech_score": [0],
+            "founder_phd_count": [0], "research_company_experience": [0],
+            "regulated_industry": [0], "market_type_score": [0],
+            "international_operations": [0], "operational_intensity": [0],
+        }
+    )
+
+    with pytest.raises(AssertionError, match="deep_tech_tag_count"):
+        validate_features(companies_df, features_df)

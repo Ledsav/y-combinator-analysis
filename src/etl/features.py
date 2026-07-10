@@ -350,3 +350,100 @@ def compute_research_company_experience(
     return matched.groupby("company_slug").size().reset_index(
         name="research_company_experience"
     )
+
+
+FEATURE_COLUMNS: List[str] = [
+    "deep_tech_tag_count",
+    "description_tech_score",
+    "founder_phd_count",
+    "research_company_experience",
+    "regulated_industry",
+    "market_type_score",
+    "international_operations",
+    "operational_intensity",
+]
+
+
+def build_feature_table(
+    companies_df: pd.DataFrame,
+    tags_df: pd.DataFrame,
+    industries_df: pd.DataFrame,
+    regions_df: pd.DataFrame,
+    founders_df: pd.DataFrame,
+    schools_df: pd.DataFrame,
+    prior_companies_df: pd.DataFrame,
+) -> pd.DataFrame:
+    """
+    Build the full per-company Phase 6 feature table by computing each raw
+    feature independently and left-merging them all onto the companies
+    identity columns.
+
+    Args:
+        companies_df: Enriched companies dataframe (id, slug, name, batch,
+            status, longDescription, ...).
+        tags_df, industries_df, regions_df: Long-format per-company dataframes.
+        founders_df: Founders dataframe (hnid, company_slug, ...).
+        schools_df, prior_companies_df: Long-format per-founder dataframes.
+
+    Returns:
+        DataFrame with columns ['id', 'slug', 'name', 'batch', 'status'] +
+        FEATURE_COLUMNS, one row per company in companies_df, no NaNs in
+        feature columns.
+    """
+    features = companies_df[["id", "slug", "name", "batch", "status"]].copy()
+
+    deep_tech = compute_deep_tech_tag_count(tags_df)
+    regulated = compute_regulated_industry(tags_df, industries_df)
+    market_type = compute_market_type_score(tags_df, industries_df)
+    op_intensity = compute_operational_intensity(tags_df, industries_df)
+    intl_ops = compute_international_operations(companies_df, regions_df)
+    phd = compute_founder_phd_count(founders_df, schools_df)
+    research_exp = compute_research_company_experience(founders_df, prior_companies_df)
+
+    tech_score = companies_df[["id", "longDescription"]].copy()
+    tech_score["description_tech_score"] = tech_score["longDescription"].apply(
+        score_description_tech
+    )
+
+    features = features.merge(deep_tech, on="id", how="left")
+    features = features.merge(tech_score[["id", "description_tech_score"]], on="id", how="left")
+    features = features.merge(regulated, on="id", how="left")
+    features = features.merge(market_type, on="id", how="left")
+    features = features.merge(intl_ops, on="id", how="left")
+    features = features.merge(op_intensity, on="id", how="left")
+    features = features.merge(
+        phd, left_on="slug", right_on="company_slug", how="left"
+    ).drop(columns=["company_slug"])
+    features = features.merge(
+        research_exp, left_on="slug", right_on="company_slug", how="left"
+    ).drop(columns=["company_slug"])
+
+    for col in FEATURE_COLUMNS:
+        features[col] = features[col].fillna(0).astype(int)
+
+    return features
+
+
+def validate_features(companies_df: pd.DataFrame, features_df: pd.DataFrame) -> None:
+    """
+    Validate the feature table before writing output.
+
+    Args:
+        companies_df: The source companies dataframe (post-enrichment).
+        features_df: The built feature table.
+    """
+    assert len(companies_df) == len(features_df), "Row count changed during feature engineering!"
+    assert set(companies_df["id"]) == set(features_df["id"]), "Company id set changed!"
+
+    for col in FEATURE_COLUMNS:
+        assert features_df[col].notna().all(), f"Missing values found in {col}!"
+        assert (features_df[col] >= 0).all(), f"Negative values found in {col}!"
+
+    assert features_df["regulated_industry"].isin([0, 1]).all(), (
+        "regulated_industry must be 0 or 1!"
+    )
+    assert features_df["market_type_score"].isin([0, 1, 2, 3]).all(), (
+        "market_type_score must be 0-3!"
+    )
+
+    print("Validation passed: No data corruption detected")
