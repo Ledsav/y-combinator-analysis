@@ -586,3 +586,83 @@ def test_run_enrichment_pipeline_fetch_failure_does_not_abort_batch(tmp_path):
     delta_rows = report[report["company_slug"] == "delta"]
     assert len(delta_rows) == 4
     assert delta_rows["success"].all()
+
+
+def test_run_enrichment_pipeline_resets_stale_founder_count_with_no_matching_rows(tmp_path):
+    input_dir = tmp_path / "step2_imputed"
+    output_dir = tmp_path / "step3_enriched"
+    cache_dir = tmp_path / "enrichment_cache"
+
+    companies = pd.DataFrame(
+        [
+            {
+                "id": 1,
+                "slug": "stale",
+                "name": "Stale Co",
+                "oneLiner": "Has one",
+                "longDescription": "Has description",
+                "teamSize": 8.0,
+                "founder_count": 5,  # stale value, no backing rows in founders_imputed.csv
+            },
+            {
+                "id": 2,
+                "slug": "eta",
+                "name": "Eta",
+                "oneLiner": None,
+                "longDescription": None,
+                "teamSize": float("nan"),
+                "founder_count": 0,
+            },
+        ]
+    )
+    # No rows for "stale" (or anyone) - "stale" has zero matching founder rows.
+    founders = pd.DataFrame(
+        columns=["first_name", "last_name", "hnid", "avatar_thumb",
+                 "current_company", "current_title", "company_slug", "top_company"]
+    )
+    priorities = pd.DataFrame(
+        [
+            # "stale" is below threshold and never scraped, but its founder_count must
+            # still be recomputed from founders_df (source of truth) on every run,
+            # not merely carried forward as-is.
+            {"id": 1, "slug": "stale", "name": "Stale Co", "enrichment_score": 10,
+             "missing_oneliner": False, "missing_description": False,
+             "missing_founders": False, "missing_teamsize": False,
+             "yc_url": "https://www.ycombinator.com/companies/stale"},
+            {"id": 2, "slug": "eta", "name": "Eta", "enrichment_score": 90,
+             "missing_oneliner": True, "missing_description": True,
+             "missing_founders": True, "missing_teamsize": True,
+             "yc_url": "https://www.ycombinator.com/companies/eta"},
+        ]
+    )
+    _write_enrichment_inputs(input_dir, companies, founders, priorities)
+
+    def fake_fetch(url):
+        assert "eta" in url
+        return {
+            "one_liner": "Eta does things.",
+            "long_description": "Eta is a company for things.",
+            "team_size": 6,
+            "founders": [{"full_name": "Erin Founder", "title": "CEO",
+                          "avatar_thumb_url": None}],
+        }
+
+    run_enrichment_pipeline(
+        input_dir=input_dir,
+        output_dir=output_dir,
+        cache_dir=cache_dir,
+        score_threshold=80,
+        fetch_fn=fake_fetch,
+        sleep_fn=lambda s: None,
+    )
+
+    enriched_companies = pd.read_csv(output_dir / "companies_enriched.csv")
+
+    # The buggy `.fillna(companies_df["founder_count"])` formula would have kept this
+    # at 5 (its stale input value). The fixed `.fillna(0)` formula correctly recomputes
+    # it from founders_df, where "stale" has zero matching rows, so it must come out 0.
+    stale = enriched_companies[enriched_companies["slug"] == "stale"].iloc[0]
+    assert stale["founder_count"] == 0
+
+    eta = enriched_companies[enriched_companies["slug"] == "eta"].iloc[0]
+    assert eta["founder_count"] == 1
