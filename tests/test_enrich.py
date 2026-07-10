@@ -416,3 +416,173 @@ def test_run_enrichment_pipeline_end_to_end(tmp_path):
     assert cached["team_size"] == 42
 
     assert sleep_calls == []  # only one target company - no inter-request sleep needed
+
+
+from src.etl.enrich import RATE_LIMIT_SECONDS
+
+
+def _write_enrichment_inputs(input_dir, companies_df, founders_df, priorities_df):
+    input_dir.mkdir(parents=True, exist_ok=True)
+    companies_df.to_csv(input_dir / "companies_imputed.csv", index=False)
+    founders_df.to_csv(input_dir / "founders_imputed.csv", index=False)
+    priorities_df.to_csv(input_dir / "enrichment_priorities.csv", index=False)
+    for name in ["industries", "tags", "schools", "prior_companies", "regions", "badges"]:
+        pd.DataFrame({"company_slug": []}).to_csv(
+            input_dir / f"{name}_imputed.csv", index=False
+        )
+
+
+def test_run_enrichment_pipeline_sleeps_between_but_not_after_multiple_targets(tmp_path):
+    input_dir = tmp_path / "step2_imputed"
+    output_dir = tmp_path / "step3_enriched"
+    cache_dir = tmp_path / "enrichment_cache"
+
+    companies = pd.DataFrame(
+        [
+            {"id": 1, "slug": "eps", "name": "Eps", "oneLiner": None,
+             "longDescription": None, "teamSize": float("nan"), "founder_count": 0},
+            {"id": 2, "slug": "zeta", "name": "Zeta", "oneLiner": None,
+             "longDescription": None, "teamSize": float("nan"), "founder_count": 0},
+        ]
+    )
+    founders = pd.DataFrame(
+        columns=["first_name", "last_name", "hnid", "avatar_thumb",
+                 "current_company", "current_title", "company_slug", "top_company"]
+    )
+    priorities = pd.DataFrame(
+        [
+            {"id": 1, "slug": "eps", "name": "Eps", "enrichment_score": 90,
+             "missing_oneliner": True, "missing_description": True,
+             "missing_founders": True, "missing_teamsize": True,
+             "yc_url": "https://www.ycombinator.com/companies/eps"},
+            {"id": 2, "slug": "zeta", "name": "Zeta", "enrichment_score": 85,
+             "missing_oneliner": True, "missing_description": True,
+             "missing_founders": True, "missing_teamsize": True,
+             "yc_url": "https://www.ycombinator.com/companies/zeta"},
+        ]
+    )
+    _write_enrichment_inputs(input_dir, companies, founders, priorities)
+
+    def fake_fetch(url):
+        return {
+            "one_liner": "A one liner.",
+            "long_description": "A longer description.",
+            "team_size": 5,
+            "founders": [],
+        }
+
+    sleep_calls = []
+
+    run_enrichment_pipeline(
+        input_dir=input_dir,
+        output_dir=output_dir,
+        cache_dir=cache_dir,
+        score_threshold=80,
+        fetch_fn=fake_fetch,
+        sleep_fn=sleep_calls.append,
+    )
+
+    # 2 targets -> exactly 1 inter-request sleep, never a trailing sleep after the last one.
+    assert sleep_calls == [RATE_LIMIT_SECONDS]
+
+
+def test_run_enrichment_pipeline_fetch_failure_does_not_abort_batch(tmp_path):
+    input_dir = tmp_path / "step2_imputed"
+    output_dir = tmp_path / "step3_enriched"
+    cache_dir = tmp_path / "enrichment_cache"
+
+    companies = pd.DataFrame(
+        [
+            {
+                "id": 1,
+                "slug": "gamma",
+                "name": "Gamma",
+                "oneLiner": "Existing one liner",
+                "longDescription": "Existing description",
+                "teamSize": 5.0,
+                "founder_count": 0,
+            },
+            {
+                "id": 2,
+                "slug": "delta",
+                "name": "Delta",
+                "oneLiner": None,
+                "longDescription": None,
+                "teamSize": float("nan"),
+                "founder_count": 0,
+            },
+        ]
+    )
+    founders = pd.DataFrame(
+        columns=["first_name", "last_name", "hnid", "avatar_thumb",
+                 "current_company", "current_title", "company_slug", "top_company"]
+    )
+    priorities = pd.DataFrame(
+        [
+            # gamma is targeted ONLY because it's missing founders - all other fields
+            # are already filled, so a fetch failure should log just one failed row.
+            {"id": 1, "slug": "gamma", "name": "Gamma", "enrichment_score": 95,
+             "missing_oneliner": False, "missing_description": False,
+             "missing_founders": True, "missing_teamsize": False,
+             "yc_url": "https://www.ycombinator.com/companies/gamma"},
+            {"id": 2, "slug": "delta", "name": "Delta", "enrichment_score": 85,
+             "missing_oneliner": True, "missing_description": True,
+             "missing_founders": True, "missing_teamsize": True,
+             "yc_url": "https://www.ycombinator.com/companies/delta"},
+        ]
+    )
+    _write_enrichment_inputs(input_dir, companies, founders, priorities)
+
+    def fake_fetch(url):
+        if "gamma" in url:
+            raise RuntimeError("simulated network failure")
+        return {
+            "one_liner": "Delta does things.",
+            "long_description": "Delta is a company for things.",
+            "team_size": 10,
+            "founders": [{"full_name": "Dana Founder", "title": "CEO",
+                          "avatar_thumb_url": None}],
+        }
+
+    run_enrichment_pipeline(
+        input_dir=input_dir,
+        output_dir=output_dir,
+        cache_dir=cache_dir,
+        score_threshold=80,
+        fetch_fn=fake_fetch,
+        sleep_fn=lambda s: None,
+    )
+
+    # Pipeline completed and wrote all outputs rather than crashing mid-batch.
+    assert (output_dir / "companies_enriched.csv").exists()
+    assert (output_dir / "founders_enriched.csv").exists()
+    assert (output_dir / "enrichment_report.csv").exists()
+
+    enriched_companies = pd.read_csv(output_dir / "companies_enriched.csv")
+
+    # gamma: fetch failed, so nothing changed and founder_count stays 0.
+    gamma = enriched_companies[enriched_companies["slug"] == "gamma"].iloc[0]
+    assert gamma["oneLiner"] == "Existing one liner"
+    assert gamma["longDescription"] == "Existing description"
+    assert gamma["teamSize"] == 5.0
+    assert gamma["founder_count"] == 0
+
+    # delta: the batch continued past gamma's failure and delta was fully enriched.
+    delta = enriched_companies[enriched_companies["slug"] == "delta"].iloc[0]
+    assert delta["oneLiner"] == "Delta does things."
+    assert delta["longDescription"] == "Delta is a company for things."
+    assert delta["teamSize"] == 10
+    assert delta["founder_count"] == 1
+
+    report = pd.read_csv(output_dir / "enrichment_report.csv")
+
+    # gamma was only ever targeted for "founders" - the failure-path report must not
+    # invent failed rows for oneLiner/longDescription/teamSize, which were never missing.
+    gamma_rows = report[report["company_slug"] == "gamma"]
+    assert len(gamma_rows) == 1
+    assert gamma_rows.iloc[0]["field"] == "founders"
+    assert gamma_rows.iloc[0]["success"] == False
+
+    delta_rows = report[report["company_slug"] == "delta"]
+    assert len(delta_rows) == 4
+    assert delta_rows["success"].all()

@@ -252,6 +252,11 @@ def run_enrichment_pipeline(
 
     print("\n[2/5] Scraping target companies...")
     target_list = list(targets.itertuples())
+    targeted_field_flags = [
+        ("oneLiner", "missing_oneliner"),
+        ("longDescription", "missing_description"),
+        ("teamSize", "missing_teamsize"),
+    ]
     for i, target in enumerate(target_list):
         company_id = target.id
         slug = target.slug
@@ -260,56 +265,65 @@ def run_enrichment_pipeline(
 
         try:
             scraped = fetch_fn(url)
-        except Exception as e:
-            print(f"    FAILED: {e}")
-            for field in ("oneLiner", "longDescription", "teamSize", "founders"):
+
+            cache_path = cache_dir / f"{slug}.json"
+            cache_path.write_text(json.dumps(scraped, indent=2), encoding="utf-8")
+
+            company_row = companies_df.loc[company_id].to_dict()
+            updated_row, field_reports = merge_company_fields(company_row, scraped)
+            for r in field_reports:
                 report_rows.append(
                     {
                         "company_id": company_id,
                         "company_slug": slug,
-                        "field": field,
+                        "field": r["field"],
+                        "method": "yc_page_scrape",
+                        "success": r["success"],
+                        "source_url": url,
+                    }
+                )
+            for col, val in updated_row.items():
+                companies_df.loc[company_id, col] = val
+
+            if bool(target.missing_founders):
+                scraped_founders = scraped.get("founders") or []
+                for f in scraped_founders:
+                    new_founder_rows.append(build_founder_row(f, slug))
+                report_rows.append(
+                    {
+                        "company_id": company_id,
+                        "company_slug": slug,
+                        "field": "founders",
+                        "method": "yc_page_scrape",
+                        "success": len(scraped_founders) > 0,
+                        "source_url": url,
+                    }
+                )
+        except Exception as e:
+            print(f"    FAILED: {e}")
+            for local_field, flag_name in targeted_field_flags:
+                if bool(getattr(target, flag_name)):
+                    report_rows.append(
+                        {
+                            "company_id": company_id,
+                            "company_slug": slug,
+                            "field": local_field,
+                            "method": "yc_page_scrape",
+                            "success": False,
+                            "source_url": url,
+                        }
+                    )
+            if bool(target.missing_founders):
+                report_rows.append(
+                    {
+                        "company_id": company_id,
+                        "company_slug": slug,
+                        "field": "founders",
                         "method": "yc_page_scrape",
                         "success": False,
                         "source_url": url,
                     }
                 )
-            if i < len(target_list) - 1:
-                sleep_fn(RATE_LIMIT_SECONDS)
-            continue
-
-        cache_path = cache_dir / f"{slug}.json"
-        cache_path.write_text(json.dumps(scraped, indent=2), encoding="utf-8")
-
-        company_row = companies_df.loc[company_id].to_dict()
-        updated_row, field_reports = merge_company_fields(company_row, scraped)
-        for r in field_reports:
-            report_rows.append(
-                {
-                    "company_id": company_id,
-                    "company_slug": slug,
-                    "field": r["field"],
-                    "method": "yc_page_scrape",
-                    "success": r["success"],
-                    "source_url": url,
-                }
-            )
-        for col, val in updated_row.items():
-            companies_df.loc[company_id, col] = val
-
-        if bool(target.missing_founders):
-            scraped_founders = scraped.get("founders") or []
-            for f in scraped_founders:
-                new_founder_rows.append(build_founder_row(f, slug))
-            report_rows.append(
-                {
-                    "company_id": company_id,
-                    "company_slug": slug,
-                    "field": "founders",
-                    "method": "yc_page_scrape",
-                    "success": len(scraped_founders) > 0,
-                    "source_url": url,
-                }
-            )
 
         if i < len(target_list) - 1:
             sleep_fn(RATE_LIMIT_SECONDS)
@@ -332,9 +346,7 @@ def run_enrichment_pipeline(
         founder_counts, left_on="slug", right_on="company_slug", how="left"
     )
     companies_df["founder_count"] = (
-        companies_df["_new_founder_count"]
-        .fillna(companies_df["founder_count"])
-        .astype(int)
+        companies_df["_new_founder_count"].fillna(0).astype(int)
     )
     companies_df.drop(columns=["company_slug", "_new_founder_count"], inplace=True)
 
