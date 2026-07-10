@@ -12,6 +12,9 @@ Strategy:
 """
 
 import json
+import time
+import urllib.error
+import urllib.request
 from html.parser import HTMLParser
 from typing import Dict, Optional
 
@@ -62,3 +65,47 @@ def extract_company_json(html_text: str) -> Dict:
     if not isinstance(company, dict):
         raise ValueError("props.company is not an object")
     return company
+
+
+RATE_LIMIT_SECONDS = 6.0  # 10 requests/minute
+REQUEST_TIMEOUT = 15
+MAX_RETRIES = 2
+USER_AGENT = "Mozilla/5.0 (compatible; YC-Complexity-Research/1.0)"
+
+
+def fetch_company_page(url: str) -> str:
+    """Fetch raw HTML for a YC company page."""
+    req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+    with urllib.request.urlopen(req, timeout=REQUEST_TIMEOUT) as response:
+        return response.read().decode("utf-8", errors="ignore")
+
+
+def fetch_company_json(url: str, max_retries: int = MAX_RETRIES) -> Dict:
+    """
+    Fetch and parse a YC company page's JSON data, retrying on transient
+    errors (timeout, 5xx). Does not retry on 404 or other 4xx errors.
+
+    Args:
+        url: Full YC company page URL.
+        max_retries: Number of retries after the first attempt.
+
+    Returns:
+        The parsed `props.company` dict.
+
+    Raises:
+        RuntimeError: if all attempts fail, wrapping the last exception.
+    """
+    last_error: Optional[Exception] = None
+    for attempt in range(max_retries + 1):
+        try:
+            html_text = fetch_company_page(url)
+            return extract_company_json(html_text)
+        except urllib.error.HTTPError as e:
+            last_error = e
+            if e.code < 500:
+                break  # permanent failure (404, etc.) - don't retry
+        except (urllib.error.URLError, TimeoutError, ValueError) as e:
+            last_error = e
+        if attempt < max_retries:
+            time.sleep(1)
+    raise RuntimeError(f"Failed to fetch {url}: {last_error}") from last_error
