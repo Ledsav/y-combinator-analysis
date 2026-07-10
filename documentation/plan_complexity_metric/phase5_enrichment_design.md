@@ -41,7 +41,7 @@ New module: `src/etl/enrich.py`, following the existing pattern in `src/etl/clea
    - `company_slug` set to the company's slug
    - `hnid`, `current_company`, `top_company` left null/`False` (not available from this source)
    - Write result to `data/processed/step3_enriched/founders_enriched.csv`
-   - Recompute `founder_count` on the enriched companies table for affected rows
+   - Recompute `founder_count` for **every** company (not just scraped ones) by grouping the full `founders_enriched.csv` by `company_slug` and filling non-matches with 0 — same "founders table is the source of truth" approach as `add_founder_count` in `impute.py`. This means any future change upstream that leaves a company's founder rows incomplete in `founders_imputed.csv` will show up as a `founder_count` drop the next time Phase 5 runs, even for companies that were never scrape targets.
 6. Copy through the remaining unchanged step2 files into `step3_enriched/` (same copy-through pattern `impute.py` uses for files it doesn't touch).
 7. Write `data/processed/step3_enriched/enrichment_report.csv` logging one row per (company, field) attempt: `company_id, company_slug, field, method="yc_page_scrape", success, source_url`.
 
