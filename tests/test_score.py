@@ -99,3 +99,78 @@ def test_compute_geo_ops_score_sums_independently_capped_sub_scores():
     assert scores[1] == 0
     assert scores[2] == 15  # intl: 1/2*10=5, ops: 2/2*10=10
     assert scores[3] == 10  # intl clipped: 2/2*10=10, ops: 0
+
+
+from src.etl.score import build_score_table, validate_scores
+
+
+def _minimal_score_inputs():
+    return pd.DataFrame(
+        {
+            "id": [1, 2],
+            "slug": ["acme", "beta"],
+            "name": ["Acme", "Beta"],
+            "batch": ["W24", "S23"],
+            "status": ["Active", "Active"],
+            "deep_tech_tag_count": [3, 0],
+            "description_tech_score": [3, 0],
+            "founder_phd_count": [1, 0],
+            "research_company_experience": [2, 0],
+            "regulated_industry": [1, 0],
+            "market_type_score": [3, 0],
+            "international_operations": [2, 0],
+            "operational_intensity": [2, 0],
+        }
+    )
+
+
+def test_build_score_table_has_one_row_per_company():
+    features_df = _minimal_score_inputs()
+
+    scores_df = build_score_table(features_df)
+
+    assert len(scores_df) == 2
+    assert set(scores_df["id"]) == {1, 2}
+
+
+def test_build_score_table_computes_expected_values_for_acme_and_beta():
+    features_df = _minimal_score_inputs()
+
+    scores_df = build_score_table(features_df)
+
+    acme = scores_df[scores_df["slug"] == "acme"].iloc[0]
+    assert acme["technical_score"] == 50  # 20 + 15 + 15 (all buckets at cap)
+    assert acme["practical_score"] == 50  # 15 + 15 + 20 (all buckets at cap)
+    assert acme["complexity_score"] == 100
+
+    beta = scores_df[scores_df["slug"] == "beta"].iloc[0]
+    assert beta["technical_score"] == 0
+    assert beta["practical_score"] == 0
+    assert beta["complexity_score"] == 0
+
+
+def test_validate_scores_passes_on_valid_table():
+    features_df = _minimal_score_inputs()
+    scores_df = build_score_table(features_df)
+
+    validate_scores(features_df, scores_df)  # should not raise
+
+
+def test_validate_scores_raises_on_row_count_mismatch():
+    features_df = pd.DataFrame({"id": [1, 2]})
+    scores_df = pd.DataFrame(
+        {"id": [1], "technical_score": [10.0], "practical_score": [10.0], "complexity_score": [20.0]}
+    )
+
+    with pytest.raises(AssertionError, match="Row count"):
+        validate_scores(features_df, scores_df)
+
+
+def test_validate_scores_raises_on_out_of_range_score():
+    features_df = pd.DataFrame({"id": [1]})
+    scores_df = pd.DataFrame(
+        {"id": [1], "technical_score": [60.0], "practical_score": [10.0], "complexity_score": [70.0]}
+    )
+
+    with pytest.raises(AssertionError, match="technical_score"):
+        validate_scores(features_df, scores_df)

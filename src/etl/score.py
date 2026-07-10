@@ -21,6 +21,7 @@ Strategy (see docs/superpowers/specs/2026-07-10-phase7-scoring-rubric-design.md)
 """
 
 from pathlib import Path
+from typing import List
 
 import pandas as pd
 
@@ -170,3 +171,79 @@ def compute_geo_ops_score(
     )
     result["geo_ops_score"] = intl_part + ops_part
     return result
+
+
+SCORE_COLUMNS: List[str] = [
+    "deep_tech_score",
+    "description_score",
+    "founder_background_score",
+    "regulated_score",
+    "market_type_pts",
+    "geo_ops_score",
+]
+
+
+def build_score_table(features_df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Build the full per-company Phase 7 score table: compute each sub-bucket
+    score independently, merge them onto the company identity columns, and
+    sum into technical_score (0-50), practical_score (0-50), and
+    complexity_score (0-100).
+
+    Args:
+        features_df: Phase 6 feature table (id, slug, name, batch, status,
+            plus the 8 raw feature columns).
+
+    Returns:
+        DataFrame with columns ['id', 'slug', 'name', 'batch', 'status'] +
+        SCORE_COLUMNS + ['technical_score', 'practical_score',
+        'complexity_score'], one row per company in features_df.
+    """
+    scores = features_df[["id", "slug", "name", "batch", "status"]].copy()
+
+    deep_tech = compute_deep_tech_score(features_df)
+    description = compute_description_score(features_df)
+    founder_bg = compute_founder_background_score(features_df)
+    regulated = compute_regulated_score(features_df)
+    market_type = compute_market_type_pts(features_df)
+    geo_ops = compute_geo_ops_score(features_df)
+
+    for part in (deep_tech, description, founder_bg, regulated, market_type, geo_ops):
+        scores = scores.merge(part, on="id", how="left")
+
+    scores["technical_score"] = (
+        scores["deep_tech_score"] + scores["description_score"] + scores["founder_background_score"]
+    ).round(1)
+    scores["practical_score"] = (
+        scores["regulated_score"] + scores["market_type_pts"] + scores["geo_ops_score"]
+    ).round(1)
+    scores["complexity_score"] = (scores["technical_score"] + scores["practical_score"]).round(1)
+
+    return scores
+
+
+def validate_scores(features_df: pd.DataFrame, scores_df: pd.DataFrame) -> None:
+    """
+    Validate the score table before writing output.
+
+    Args:
+        features_df: The source feature table.
+        scores_df: The built score table.
+    """
+    assert len(features_df) == len(scores_df), "Row count changed during scoring!"
+    assert set(features_df["id"]) == set(scores_df["id"]), "Company id set changed!"
+
+    for col in ["technical_score", "practical_score", "complexity_score"]:
+        assert scores_df[col].notna().all(), f"Missing values found in {col}!"
+
+    assert scores_df["technical_score"].between(0, 50).all(), (
+        "technical_score must be within [0, 50]!"
+    )
+    assert scores_df["practical_score"].between(0, 50).all(), (
+        "practical_score must be within [0, 50]!"
+    )
+    assert scores_df["complexity_score"].between(0, 100).all(), (
+        "complexity_score must be within [0, 100]!"
+    )
+
+    print("Validation passed: No scoring corruption detected")
