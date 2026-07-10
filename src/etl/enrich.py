@@ -16,6 +16,7 @@ import time
 import urllib.error
 import urllib.request
 from html.parser import HTMLParser
+from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 import pandas as pd
@@ -194,3 +195,178 @@ def validate_enrichment(original_df: pd.DataFrame, enriched_df: pd.DataFrame) ->
         ).all(), f"Existing {field} values were modified!"
 
     print("Validation passed: No data corruption detected")
+
+
+def run_enrichment_pipeline(
+    input_dir: Path = None,
+    output_dir: Path = None,
+    cache_dir: Path = None,
+    score_threshold: int = 80,
+    fetch_fn=fetch_company_json,
+    sleep_fn=time.sleep,
+) -> None:
+    """
+    Main enrichment pipeline orchestrator.
+
+    Args:
+        input_dir: Path to step2_imputed/ directory.
+        output_dir: Path to step3_enriched/ directory.
+        cache_dir: Path to the raw scraped-JSON cache directory.
+        score_threshold: Minimum enrichment_score to target for scraping.
+        fetch_fn: Injectable fetch function (url) -> company dict, defaults
+            to the real network fetcher. Overridden in tests.
+        sleep_fn: Injectable sleep function, defaults to time.sleep.
+            Overridden in tests to avoid real waits.
+    """
+    if input_dir is None:
+        input_dir = (
+            Path(__file__).resolve().parents[2] / "data" / "processed" / "step2_imputed"
+        )
+    if output_dir is None:
+        output_dir = (
+            Path(__file__).resolve().parents[2] / "data" / "processed" / "step3_enriched"
+        )
+    if cache_dir is None:
+        cache_dir = Path(__file__).resolve().parents[2] / "data" / "raw" / "enrichment_cache"
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    cache_dir.mkdir(parents=True, exist_ok=True)
+
+    print("=" * 60)
+    print("PHASE 5: DATA ENRICHMENT")
+    print("=" * 60)
+
+    print("\n[1/5] Loading imputed data...")
+    companies_df = pd.read_csv(input_dir / "companies_imputed.csv")
+    founders_df = pd.read_csv(input_dir / "founders_imputed.csv")
+    priorities_df = pd.read_csv(input_dir / "enrichment_priorities.csv")
+    original_companies = companies_df.copy()
+
+    targets = priorities_df[priorities_df["enrichment_score"] >= score_threshold]
+    print(f"Targeting {len(targets)} companies with enrichment_score >= {score_threshold}")
+
+    companies_df = companies_df.set_index("id", drop=False)
+
+    report_rows = []
+    new_founder_rows = []
+
+    print("\n[2/5] Scraping target companies...")
+    target_list = list(targets.itertuples())
+    for i, target in enumerate(target_list):
+        company_id = target.id
+        slug = target.slug
+        url = target.yc_url
+        print(f"  ({i + 1}/{len(target_list)}) {slug} ...")
+
+        try:
+            scraped = fetch_fn(url)
+        except Exception as e:
+            print(f"    FAILED: {e}")
+            for field in ("oneLiner", "longDescription", "teamSize", "founders"):
+                report_rows.append(
+                    {
+                        "company_id": company_id,
+                        "company_slug": slug,
+                        "field": field,
+                        "method": "yc_page_scrape",
+                        "success": False,
+                        "source_url": url,
+                    }
+                )
+            if i < len(target_list) - 1:
+                sleep_fn(RATE_LIMIT_SECONDS)
+            continue
+
+        cache_path = cache_dir / f"{slug}.json"
+        cache_path.write_text(json.dumps(scraped, indent=2), encoding="utf-8")
+
+        company_row = companies_df.loc[company_id].to_dict()
+        updated_row, field_reports = merge_company_fields(company_row, scraped)
+        for r in field_reports:
+            report_rows.append(
+                {
+                    "company_id": company_id,
+                    "company_slug": slug,
+                    "field": r["field"],
+                    "method": "yc_page_scrape",
+                    "success": r["success"],
+                    "source_url": url,
+                }
+            )
+        for col, val in updated_row.items():
+            companies_df.loc[company_id, col] = val
+
+        if bool(target.missing_founders):
+            scraped_founders = scraped.get("founders") or []
+            for f in scraped_founders:
+                new_founder_rows.append(build_founder_row(f, slug))
+            report_rows.append(
+                {
+                    "company_id": company_id,
+                    "company_slug": slug,
+                    "field": "founders",
+                    "method": "yc_page_scrape",
+                    "success": len(scraped_founders) > 0,
+                    "source_url": url,
+                }
+            )
+
+        if i < len(target_list) - 1:
+            sleep_fn(RATE_LIMIT_SECONDS)
+
+    companies_df = companies_df.reset_index(drop=True)
+
+    print("\n[3/5] Validating enrichment...")
+    validate_enrichment(original_companies, companies_df)
+
+    print("\n[4/5] Merging founders and writing outputs...")
+    if new_founder_rows:
+        founders_df = pd.concat(
+            [founders_df, pd.DataFrame(new_founder_rows)], ignore_index=True
+        )
+
+    founder_counts = (
+        founders_df.groupby("company_slug").size().reset_index(name="_new_founder_count")
+    )
+    companies_df = companies_df.merge(
+        founder_counts, left_on="slug", right_on="company_slug", how="left"
+    )
+    companies_df["founder_count"] = (
+        companies_df["_new_founder_count"]
+        .fillna(companies_df["founder_count"])
+        .astype(int)
+    )
+    companies_df.drop(columns=["company_slug", "_new_founder_count"], inplace=True)
+
+    companies_df.to_csv(output_dir / "companies_enriched.csv", index=False)
+    print(f"  ✓ {output_dir / 'companies_enriched.csv'}")
+    founders_df.to_csv(output_dir / "founders_enriched.csv", index=False)
+    print(f"  ✓ {output_dir / 'founders_enriched.csv'}")
+
+    for filename in [
+        "industries_imputed.csv",
+        "tags_imputed.csv",
+        "schools_imputed.csv",
+        "prior_companies_imputed.csv",
+        "regions_imputed.csv",
+        "badges_imputed.csv",
+    ]:
+        src = input_dir / filename
+        dst = output_dir / filename.replace("_imputed", "_enriched")
+        pd.read_csv(src).to_csv(dst, index=False)
+        print(f"  ✓ {dst}")
+
+    report_df = pd.DataFrame(report_rows)
+    report_df.to_csv(output_dir / "enrichment_report.csv", index=False)
+    print(f"  ✓ {output_dir / 'enrichment_report.csv'}")
+
+    print("\n" + "=" * 60)
+    print("PHASE 5 COMPLETE")
+    print("=" * 60)
+    print(f"Companies attempted: {len(target_list)}")
+    if len(report_df):
+        print(f"Fields successfully filled: {report_df['success'].sum()}/{len(report_df)}")
+
+
+if __name__ == "__main__":
+    run_enrichment_pipeline()

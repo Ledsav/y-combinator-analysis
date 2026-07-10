@@ -313,3 +313,106 @@ def test_validate_enrichment_raises_when_existing_value_overwritten():
 
     with pytest.raises(AssertionError, match="oneLiner"):
         validate_enrichment(original, enriched)
+
+
+import json as json_module
+
+from src.etl.enrich import run_enrichment_pipeline
+
+
+def test_run_enrichment_pipeline_end_to_end(tmp_path):
+    input_dir = tmp_path / "step2_imputed"
+    output_dir = tmp_path / "step3_enriched"
+    cache_dir = tmp_path / "enrichment_cache"
+    input_dir.mkdir()
+
+    companies = pd.DataFrame(
+        [
+            {
+                "id": 1,
+                "slug": "acme",
+                "name": "Acme",
+                "oneLiner": None,
+                "longDescription": None,
+                "teamSize": float("nan"),
+                "founder_count": 0,
+            },
+            {
+                "id": 2,
+                "slug": "beta",
+                "name": "Beta",
+                "oneLiner": "Already has one",
+                "longDescription": "Already has a description",
+                "teamSize": 3.0,
+                "founder_count": 1,
+            },
+        ]
+    )
+    founders = pd.DataFrame(
+        [{"first_name": "Bea", "last_name": "Founder", "hnid": "1", "avatar_thumb": None,
+          "current_company": None, "current_title": None, "company_slug": "beta",
+          "top_company": False}]
+    )
+    priorities = pd.DataFrame(
+        [
+            {"id": 1, "slug": "acme", "name": "Acme", "enrichment_score": 90,
+             "missing_oneliner": True, "missing_description": True,
+             "missing_founders": True, "missing_teamsize": True,
+             "yc_url": "https://www.ycombinator.com/companies/acme"},
+            {"id": 2, "slug": "beta", "name": "Beta", "enrichment_score": 20,
+             "missing_oneliner": False, "missing_description": False,
+             "missing_founders": False, "missing_teamsize": False,
+             "yc_url": "https://www.ycombinator.com/companies/beta"},
+        ]
+    )
+    companies.to_csv(input_dir / "companies_imputed.csv", index=False)
+    founders.to_csv(input_dir / "founders_imputed.csv", index=False)
+    priorities.to_csv(input_dir / "enrichment_priorities.csv", index=False)
+    for name in ["industries", "tags", "schools", "prior_companies", "regions", "badges"]:
+        pd.DataFrame({"company_slug": []}).to_csv(
+            input_dir / f"{name}_imputed.csv", index=False
+        )
+
+    def fake_fetch(url):
+        assert "acme" in url
+        return {
+            "one_liner": "Acme makes everything.",
+            "long_description": "Acme is a company that makes everything you need.",
+            "team_size": 42,
+            "founders": [{"full_name": "Ada Founder", "title": "CEO",
+                          "avatar_thumb_url": "https://example.com/a.jpg"}],
+        }
+
+    sleep_calls = []
+
+    run_enrichment_pipeline(
+        input_dir=input_dir,
+        output_dir=output_dir,
+        cache_dir=cache_dir,
+        score_threshold=80,
+        fetch_fn=fake_fetch,
+        sleep_fn=sleep_calls.append,
+    )
+
+    enriched_companies = pd.read_csv(output_dir / "companies_enriched.csv")
+    acme = enriched_companies[enriched_companies["slug"] == "acme"].iloc[0]
+    assert acme["oneLiner"] == "Acme makes everything."
+    assert acme["teamSize"] == 42
+    assert acme["founder_count"] == 1
+
+    beta = enriched_companies[enriched_companies["slug"] == "beta"].iloc[0]
+    assert beta["oneLiner"] == "Already has one"  # untouched, below threshold
+
+    enriched_founders = pd.read_csv(output_dir / "founders_enriched.csv")
+    assert "Ada" in enriched_founders["first_name"].values
+
+    report = pd.read_csv(output_dir / "enrichment_report.csv")
+    assert (report["company_slug"] == "acme").all()
+    assert report["success"].all()
+
+    cache_file = cache_dir / "acme.json"
+    assert cache_file.exists()
+    cached = json_module.loads(cache_file.read_text(encoding="utf-8"))
+    assert cached["team_size"] == 42
+
+    assert sleep_calls == []  # only one target company - no inter-request sleep needed
