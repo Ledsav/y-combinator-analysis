@@ -278,15 +278,15 @@ python scripts/run_complexity_pipeline.py --steps clean,impute,features,score
 | Phase | Duration | Status |
 |-------|----------|--------|
 | 1-2. Planning & Inventory | 1-2 days | ✅ Complete |
-| 3. Cleaning | 2 days | 🔲 Not started |
-| 4. Imputation | 1 day | 🔲 Not started |
+| 3. Cleaning | 2 days | ✅ Complete |
+| 4. Imputation | 1 day | ✅ Complete |
 | 5. Enrichment | 2-7 days | 🔲 Optional |
 | 6. Features | 2-3 days | 🔲 Not started |
 | 7. Scoring | 1-2 days | 🔲 Not started |
 | 8. Pipeline | 2 days | 🔲 Not started |
 | 9. Validation | 1 day | 🔲 Not started |
 | 10. Documentation | 1 day | 🔲 Not started |
-| **Total** | **10-15 days** | **20% complete** |
+| **Total** | **10-15 days** | **40% complete** |
 
 ---
 
@@ -328,13 +328,12 @@ python scripts/run_complexity_pipeline.py --steps clean,impute,features,score
 
 ## Next Immediate Actions
 
-**Current Focus:** Phase 3 - Data Cleaning & Normalization
+**Current Focus:** Phase 5 (optional) or Phase 6 - Feature Engineering
 
 **Next Steps:**
-1. Create cleaning scripts in `src/etl/clean.py`
-2. Process all 8 CSV files
-3. Output to `data/processed/step1_cleaned/`
-4. Run validation checks (row counts, schema)
-5. Update checklist item #3
+1. Decide scope of Phase 5 enrichment (or skip straight to Phase 6 using `step2_imputed/` as-is)
+2. Extract technical/practical complexity features per the Phase 6 spec above
+3. Output to `data/processed/features/complexity_features.parquet`
+4. Update checklist item #5 or #6 accordingly
 
-**To continue:** Mark this task complete and proceed to implementation.
+**To continue:** Resolve the "Enrichment scope" open question below, then proceed to implementation.

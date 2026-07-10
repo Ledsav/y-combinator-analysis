@@ -12,11 +12,10 @@
 
 ## Data Sources
 
-Add information about your Y Combinator dataset sources here:
-- Source URL
-- Download date
-- Dataset description
-- Data format (CSV, JSON, etc.)
+- **Source URL**: [2024 YCombinator All Companies Dataset](https://www.kaggle.com/datasets/sashakorovkina/ycombinator-all-funded-companies-dataset) (Kaggle, sashakorovkina)
+- **Download date**: Unknown — not recorded at the time of import.
+- **Dataset description**: Y Combinator company directory data scraped from YC's public listings (companies, founders, industries, badges, regions, schools, tags, prior companies).
+- **Data format**: CSV (8 files, raw in `data/raw/`, gitignored).
 
 ## Data Dictionary
 

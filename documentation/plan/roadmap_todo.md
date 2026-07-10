@@ -7,8 +7,8 @@ Instructions
 Checklist
 - [x] 1. Define objectives & metrics
 - [x] 2. Inventory raw datasets
-- [ ] 3. Data cleaning & normalization
-- [ ] 4. Complete missing data
+- [x] 3. Data cleaning & normalization
+- [x] 4. Complete missing data
 - [ ] 5. Scraping & enrichment
 - [ ] 6. Feature engineering
 - [ ] 7. Design scoring rubric
