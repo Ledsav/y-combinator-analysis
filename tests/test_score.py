@@ -174,3 +174,23 @@ def test_validate_scores_raises_on_out_of_range_score():
 
     with pytest.raises(AssertionError, match="technical_score"):
         validate_scores(features_df, scores_df)
+
+
+from src.etl.score import run_scoring_pipeline
+
+
+def test_run_scoring_pipeline_end_to_end(tmp_path):
+    input_path = tmp_path / "complexity_features.parquet"
+    output_path = tmp_path / "scores" / "complexity_index_v1.csv"
+
+    features_df = _minimal_score_inputs()
+    features_df.to_parquet(input_path, index=False)
+
+    run_scoring_pipeline(input_path=input_path, output_path=output_path)
+
+    scores_df = pd.read_csv(output_path)
+    assert len(scores_df) == 2
+    acme = scores_df[scores_df["slug"] == "acme"].iloc[0]
+    assert acme["complexity_score"] == 100
+    beta = scores_df[scores_df["slug"] == "beta"].iloc[0]
+    assert beta["complexity_score"] == 0

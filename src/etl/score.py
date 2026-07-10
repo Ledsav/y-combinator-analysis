@@ -247,3 +247,50 @@ def validate_scores(features_df: pd.DataFrame, scores_df: pd.DataFrame) -> None:
     )
 
     print("Validation passed: No scoring corruption detected")
+
+
+def run_scoring_pipeline(input_path: Path = None, output_path: Path = None) -> None:
+    """
+    Main scoring pipeline orchestrator.
+
+    Args:
+        input_path: Path to complexity_features.parquet.
+        output_path: Path to write the complexity index CSV.
+    """
+    if input_path is None:
+        input_path = (
+            Path(__file__).resolve().parents[2]
+            / "data" / "processed" / "features" / "complexity_features.parquet"
+        )
+    if output_path is None:
+        output_path = (
+            Path(__file__).resolve().parents[2]
+            / "data" / "processed" / "scores" / "complexity_index_v1.csv"
+        )
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    print("=" * 60)
+    print("PHASE 7: SCORING RUBRIC")
+    print("=" * 60)
+
+    print("\n[1/3] Loading feature table...")
+    features_df = pd.read_parquet(input_path)
+
+    print("\n[2/3] Building score table...")
+    scores_df = build_score_table(features_df)
+
+    print("\n[3/3] Validating and saving scores...")
+    validate_scores(features_df, scores_df)
+    scores_df.to_csv(output_path, index=False)
+    print(f"  [OK] {output_path}")
+
+    print("\n" + "=" * 60)
+    print("PHASE 7 COMPLETE")
+    print("=" * 60)
+    print(f"Companies: {len(scores_df)}")
+    print(scores_df[["technical_score", "practical_score", "complexity_score"]].describe())
+
+
+if __name__ == "__main__":
+    run_scoring_pipeline()
