@@ -191,3 +191,36 @@ def test_compute_research_company_experience_counts_distinct_founders():
 
     counts = dict(zip(result["company_slug"], result["research_company_experience"]))
     assert counts == {"acme": 1, "beta": 1}
+
+
+def test_compute_founder_phd_count_uses_overridable_pattern():
+    founders_df = pd.DataFrame({"hnid": ["a", "b"], "company_slug": ["acme", "acme"]})
+    schools_df = pd.DataFrame(
+        {"hnid": ["a", "b"], "field_of_study": ["Custom Doctorate", "Computer Science"]}
+    )
+
+    result = compute_founder_phd_count(
+        founders_df, schools_df, phd_pattern=r"\bcustom doctorate\b"
+    )
+
+    counts = dict(zip(result["company_slug"], result["founder_phd_count"]))
+    assert counts == {"acme": 1}
+
+
+def test_compute_research_company_experience_uses_overridable_pattern():
+    # "Widget Corp" / "Acme Ltd" deliberately avoid every keyword in the real
+    # RESEARCH_PATTERN (university, institute, laboratory, lab, research,
+    # nasa, jpl, cern) so this test only passes if the override is actually
+    # used -- it would fail if research_pattern were silently ignored in
+    # favor of the production default.
+    founders_df = pd.DataFrame({"hnid": ["a", "b"], "company_slug": ["acme", "acme"]})
+    prior_companies_df = pd.DataFrame(
+        {"hnid": ["a", "b"], "company": ["Widget Corp", "Acme Ltd"]}
+    )
+
+    result = compute_research_company_experience(
+        founders_df, prior_companies_df, research_pattern=r"\bwidget corp\b"
+    )
+
+    counts = dict(zip(result["company_slug"], result["research_company_experience"]))
+    assert counts == {"acme": 1}
