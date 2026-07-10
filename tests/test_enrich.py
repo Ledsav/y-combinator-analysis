@@ -178,6 +178,10 @@ def test_split_full_name_handles_middle_names():
     assert split_full_name("Mary Jane Watson") == ("Mary", "Jane Watson")
 
 
+def test_split_full_name_collapses_internal_whitespace():
+    assert split_full_name("Patrick  Collison") == ("Patrick", "Collison")
+
+
 def test_build_founder_row_maps_scraped_fields():
     scraped_founder = {
         "full_name": "Patrick Collison",
@@ -228,7 +232,7 @@ def test_merge_company_fields_never_overwrites_existing_value():
     company_row = {
         "id": 1,
         "oneLiner": "Existing one liner.",
-        "longDescription": math.nan,
+        "longDescription": "Existing long description.",
         "teamSize": 5,
     }
     scraped = {
@@ -240,15 +244,24 @@ def test_merge_company_fields_never_overwrites_existing_value():
     updated, report_rows = merge_company_fields(company_row, scraped)
 
     assert updated["oneLiner"] == "Existing one liner."
+    assert updated["longDescription"] == "Existing long description."
     assert updated["teamSize"] == 5
-    assert updated["longDescription"] == "Scraped description."
-    fields_reported = {r["field"] for r in report_rows}
-    assert fields_reported == {"longDescription"}
+    assert report_rows == []
 
 
 def test_merge_company_fields_reports_failure_when_scraped_value_missing():
     company_row = {"id": 1, "oneLiner": math.nan, "longDescription": "x", "teamSize": 5}
     scraped = {"one_liner": None}
+
+    updated, report_rows = merge_company_fields(company_row, scraped)
+
+    assert math.isnan(updated["oneLiner"]) or updated["oneLiner"] is None
+    assert report_rows == [{"field": "oneLiner", "success": False}]
+
+
+def test_merge_company_fields_reports_failure_when_scraped_value_is_nan():
+    company_row = {"id": 1, "oneLiner": math.nan, "longDescription": "x", "teamSize": 5}
+    scraped = {"one_liner": math.nan}
 
     updated, report_rows = merge_company_fields(company_row, scraped)
 

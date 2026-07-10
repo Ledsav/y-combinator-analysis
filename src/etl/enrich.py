@@ -119,10 +119,12 @@ def fetch_company_json(url: str, max_retries: int = MAX_RETRIES) -> Dict:
 
 def split_full_name(full_name: str) -> Tuple[str, str]:
     """Split a scraped founder's full name into (first_name, last_name) on the first space."""
-    parts = full_name.strip().split(" ", 1)
+    parts = full_name.split()
+    if len(parts) == 0:
+        return "", ""
     if len(parts) == 1:
         return parts[0], ""
-    return parts[0], parts[1]
+    return parts[0], " ".join(parts[1:])
 
 
 def build_founder_row(scraped_founder: Dict, company_slug: str) -> Dict:
@@ -166,7 +168,7 @@ def merge_company_fields(company_row: Dict, scraped: Dict) -> Tuple[Dict, List[D
         if not pd.isna(updated.get(local_field)):
             continue
         value = scraped.get(scraped_field)
-        success = value is not None and value != ""
+        success = not pd.isna(value) and value != ""
         if success:
             updated[local_field] = value
         report_rows.append({"field": local_field, "success": success})
