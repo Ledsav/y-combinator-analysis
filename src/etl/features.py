@@ -191,6 +191,9 @@ TECH_KEYWORD_PATTERNS: List[str] = [
     r"\bbiotechnology\b", r"\bautonomous\b", r"\brobotics?\b",
 ]
 
+COUNTRY_NAME_OVERRIDES: dict = {"United States of America": "United States"}
+EXCLUDED_COUNTRY_VALUES: Set[str] = {"Remote"}
+
 
 def score_description_tech(
     text, keyword_patterns: List[str] = TECH_KEYWORD_PATTERNS
@@ -213,7 +216,11 @@ def score_description_tech(
     return sum(len(re.findall(pattern, text_lower)) for pattern in keyword_patterns)
 
 
-def normalize_country_names(countries: Iterable[str]) -> List[str]:
+def normalize_country_names(
+    countries: Iterable[str],
+    overrides: dict = COUNTRY_NAME_OVERRIDES,
+    excluded: Set[str] = EXCLUDED_COUNTRY_VALUES,
+) -> List[str]:
     """
     Map raw region-country values to name forms more likely to appear in
     prose (e.g. "United States of America" -> "United States"), dropping
@@ -221,12 +228,12 @@ def normalize_country_names(countries: Iterable[str]) -> List[str]:
 
     Args:
         countries: Raw country values (e.g. from regions_df["country"]).
+        overrides: Mapping of raw country name -> prose-friendly name.
+        excluded: Non-country placeholder values to drop.
 
     Returns:
         Sorted list of unique, normalized country names.
     """
-    overrides = {"United States of America": "United States"}
-    excluded = {"Remote"}
     result = []
     for country in countries:
         if pd.isna(country) or country in excluded:
