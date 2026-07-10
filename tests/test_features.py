@@ -2,6 +2,7 @@ import pandas as pd
 import pytest
 
 from src.etl.features import (
+    FEATURE_COLUMNS,
     build_feature_table,
     compute_deep_tech_tag_count,
     compute_founder_phd_count,
@@ -294,6 +295,15 @@ def test_build_feature_table_computes_expected_values_for_acme():
     beta = features_df[features_df["slug"] == "beta"].iloc[0]
     assert beta["deep_tech_tag_count"] == 0
     assert beta["research_company_experience"] == 0  # "Acme Corp" isn't a research institution
+
+
+def test_build_feature_table_returns_columns_in_spec_order():
+    inputs = _minimal_inputs()
+
+    features_df = build_feature_table(*inputs)
+
+    expected_columns = ["id", "slug", "name", "batch", "status"] + FEATURE_COLUMNS
+    assert list(features_df.columns) == expected_columns
 
 
 def test_validate_features_passes_on_valid_table():

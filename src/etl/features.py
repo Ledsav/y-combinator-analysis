@@ -421,6 +421,8 @@ def build_feature_table(
     for col in FEATURE_COLUMNS:
         features[col] = features[col].fillna(0).astype(int)
 
+    features = features[["id", "slug", "name", "batch", "status"] + FEATURE_COLUMNS]
+
     return features
 
 
@@ -484,7 +486,6 @@ def run_feature_engineering_pipeline(input_dir: Path = None, output_dir: Path = 
         companies_df, tags_df, industries_df, regions_df,
         founders_df, schools_df, prior_companies_df,
     )
-    features_df = features_df[["id", "slug", "name", "batch", "status"] + FEATURE_COLUMNS]
 
     print("\n[3/4] Validating features...")
     validate_features(companies_df, features_df)
