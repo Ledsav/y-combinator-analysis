@@ -492,7 +492,7 @@ def run_feature_engineering_pipeline(input_dir: Path = None, output_dir: Path = 
     print("\n[4/4] Saving feature table...")
     output_path = output_dir / "complexity_features.parquet"
     features_df.to_parquet(output_path, index=False)
-    print(f"  ✓ {output_path}")
+    print(f"  [OK] {output_path}")
 
     print("\n" + "=" * 60)
     print("PHASE 6 COMPLETE")

@@ -79,11 +79,11 @@
   - [x] Store raw enrichment logs
   - [x] Output: `data/processed/step3_enriched/`
 
-- [ ] **6. Feature engineering**
-  - [ ] Extract technical complexity features
-  - [ ] Extract practical complexity features
-  - [ ] Combine with founder/school/prior company data
-  - [ ] Output: `data/processed/features/complexity_features.parquet`
+- [x] **6. Feature engineering**
+  - [x] Extract technical complexity features
+  - [x] Extract practical complexity features
+  - [x] Combine with founder/school/prior company data
+  - [x] Output: `data/processed/features/complexity_features.parquet`
 
 - [ ] **7. Scoring rubric design**
   - [ ] Design interpretable weighted rubric
@@ -281,12 +281,12 @@ python scripts/run_complexity_pipeline.py --steps clean,impute,features,score
 | 3. Cleaning | 2 days | ✅ Complete |
 | 4. Imputation | 1 day | ✅ Complete |
 | 5. Enrichment | 2-7 days | ✅ Complete (scoped to score>=80) |
-| 6. Features | 2-3 days | 🔲 Not started |
+| 6. Features | 2-3 days | ✅ Complete |
 | 7. Scoring | 1-2 days | 🔲 Not started |
 | 8. Pipeline | 2 days | 🔲 Not started |
 | 9. Validation | 1 day | 🔲 Not started |
 | 10. Documentation | 1 day | 🔲 Not started |
-| **Total** | **10-15 days** | **50% complete** |
+| **Total** | **10-15 days** | **60% complete** |
 
 ---
 
@@ -328,11 +328,13 @@ python scripts/run_complexity_pipeline.py --steps clean,impute,features,score
 
 ## Next Immediate Actions
 
-**Current Focus:** Phase 6 - Feature Engineering
+**Current Focus:** Phase 7 - Scoring Rubric Design
 
 **Next Steps:**
-1. Extract technical/practical complexity features per the Phase 6 spec above, using `data/processed/step3_enriched/` as input
-2. Output to `data/processed/features/complexity_features.parquet`
-3. Update checklist item #6 accordingly
+1. Design the interpretable weighted rubric per the Phase 7 spec above, using `data/processed/features/complexity_features.parquet` as input
+2. Calibrate weights with example companies (biotech should score high technical, fintech high practical)
+3. Run sensitivity analysis
+4. Output: `notebooks/score_design.ipynb`
+5. Update checklist item #7 accordingly
 
 **To continue:** Mark this task complete and proceed to implementation.

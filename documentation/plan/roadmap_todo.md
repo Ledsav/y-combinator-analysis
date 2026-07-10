@@ -10,7 +10,7 @@ Checklist
 - [x] 3. Data cleaning & normalization
 - [x] 4. Complete missing data
 - [x] 5. Scraping & enrichment
-- [ ] 6. Feature engineering
+- [x] 6. Feature engineering
 - [ ] 7. Design scoring rubric
 - [ ] 8. Implement ETL pipeline
 - [ ] 9. Validate & analyze index
