@@ -85,6 +85,28 @@ def test_fetch_company_json_retries_on_timeout_then_succeeds(monkeypatch):
     assert len(calls) == 2
 
 
+def test_fetch_company_json_retries_on_5xx_then_succeeds(monkeypatch):
+    calls = []
+
+    def fake_fetch_company_page(url):
+        calls.append(url)
+        if len(calls) < 2:
+            raise urllib.error.HTTPError(url, 500, "Server Error", {}, None)
+        return "<div data-page='{}'></div>".replace(
+            "{}", '{&quot;props&quot;:{&quot;company&quot;:{&quot;slug&quot;:&quot;x&quot;}}}'
+        )
+
+    monkeypatch.setattr(
+        "src.etl.enrich.fetch_company_page", fake_fetch_company_page
+    )
+    monkeypatch.setattr("src.etl.enrich.time.sleep", lambda s: None)
+
+    result = fetch_company_json("https://example.com/companies/x")
+
+    assert result == {"slug": "x"}
+    assert len(calls) == 2
+
+
 def test_fetch_company_json_does_not_retry_404(monkeypatch):
     calls = []
 
@@ -119,3 +141,21 @@ def test_fetch_company_json_gives_up_after_max_retries(monkeypatch):
         fetch_company_json("https://example.com/companies/x", max_retries=2)
 
     assert len(calls) == 3  # initial attempt + 2 retries
+
+
+def test_fetch_company_json_does_not_retry_malformed_page(monkeypatch):
+    calls = []
+
+    def fake_fetch_company_page(url):
+        calls.append(url)
+        return "<html><body>no data-page here</body></html>"
+
+    monkeypatch.setattr(
+        "src.etl.enrich.fetch_company_page", fake_fetch_company_page
+    )
+    monkeypatch.setattr("src.etl.enrich.time.sleep", lambda s: None)
+
+    with pytest.raises(ValueError):
+        fetch_company_json("https://example.com/companies/x")
+
+    assert len(calls) == 1

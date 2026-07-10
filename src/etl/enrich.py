@@ -83,7 +83,9 @@ def fetch_company_page(url: str) -> str:
 def fetch_company_json(url: str, max_retries: int = MAX_RETRIES) -> Dict:
     """
     Fetch and parse a YC company page's JSON data, retrying on transient
-    errors (timeout, 5xx). Does not retry on 404 or other 4xx errors.
+    network errors (timeout, 5xx). Does not retry on 404/other 4xx errors,
+    nor on malformed/missing page JSON (extract_company_json's ValueError),
+    since those are permanent failures that a retry won't fix.
 
     Args:
         url: Full YC company page URL.
@@ -93,7 +95,9 @@ def fetch_company_json(url: str, max_retries: int = MAX_RETRIES) -> Dict:
         The parsed `props.company` dict.
 
     Raises:
-        RuntimeError: if all attempts fail, wrapping the last exception.
+        RuntimeError: if all fetch attempts fail, wrapping the last exception.
+        ValueError: propagated immediately if the fetched page's JSON is
+            malformed or missing expected fields (not retried).
     """
     last_error: Optional[Exception] = None
     for attempt in range(max_retries + 1):
@@ -104,7 +108,7 @@ def fetch_company_json(url: str, max_retries: int = MAX_RETRIES) -> Dict:
             last_error = e
             if e.code < 500:
                 break  # permanent failure (404, etc.) - don't retry
-        except (urllib.error.URLError, TimeoutError, ValueError) as e:
+        except (urllib.error.URLError, TimeoutError) as e:
             last_error = e
         if attempt < max_retries:
             time.sleep(1)
