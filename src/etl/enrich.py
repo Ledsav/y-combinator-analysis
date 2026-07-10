@@ -56,6 +56,9 @@ def extract_company_json(html_text: str) -> Dict:
     except json.JSONDecodeError as e:
         raise ValueError(f"Malformed data-page JSON: {e}") from e
     try:
-        return data["props"]["company"]
+        company = data["props"]["company"]
     except (KeyError, TypeError) as e:
         raise ValueError("data-page JSON missing props.company") from e
+    if not isinstance(company, dict):
+        raise ValueError("props.company is not an object")
+    return company

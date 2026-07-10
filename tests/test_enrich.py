@@ -54,3 +54,9 @@ def test_extract_company_json_raises_when_props_company_missing():
     html_text = '<div data-page="{&quot;props&quot;:{}}"></div>'
     with pytest.raises(ValueError, match="missing props.company"):
         extract_company_json(html_text)
+
+
+def test_extract_company_json_raises_when_props_company_is_not_a_dict():
+    html_text = '<div data-page="{&quot;props&quot;:{&quot;company&quot;:null}}"></div>'
+    with pytest.raises(ValueError):
+        extract_company_json(html_text)
