@@ -32,7 +32,7 @@ env/
 
 # Data files (you may want to adjust this based on your needs)
 data/raw/*.csv
-data/raw/*.json
+data/raw/**/*.json
 data/raw/*.xlsx
 data/processed/*.csv
 data/processed/*.json

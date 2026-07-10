@@ -351,9 +351,9 @@ def run_enrichment_pipeline(
     companies_df.drop(columns=["company_slug", "_new_founder_count"], inplace=True)
 
     companies_df.to_csv(output_dir / "companies_enriched.csv", index=False)
-    print(f"  ✓ {output_dir / 'companies_enriched.csv'}")
+    print(f"  [OK] {output_dir / 'companies_enriched.csv'}")
     founders_df.to_csv(output_dir / "founders_enriched.csv", index=False)
-    print(f"  ✓ {output_dir / 'founders_enriched.csv'}")
+    print(f"  [OK] {output_dir / 'founders_enriched.csv'}")
 
     for filename in [
         "industries_imputed.csv",
@@ -366,11 +366,11 @@ def run_enrichment_pipeline(
         src = input_dir / filename
         dst = output_dir / filename.replace("_imputed", "_enriched")
         pd.read_csv(src).to_csv(dst, index=False)
-        print(f"  ✓ {dst}")
+        print(f"  [OK] {dst}")
 
     report_df = pd.DataFrame(report_rows)
     report_df.to_csv(output_dir / "enrichment_report.csv", index=False)
-    print(f"  ✓ {output_dir / 'enrichment_report.csv'}")
+    print(f"  [OK] {output_dir / 'enrichment_report.csv'}")
 
     print("\n" + "=" * 60)
     print("PHASE 5 COMPLETE")
