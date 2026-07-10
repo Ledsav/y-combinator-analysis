@@ -73,11 +73,11 @@
   - [x] Flag companies needing enrichment
   - [x] Output: `data/processed/step2_imputed/` + report
 
-- [ ] **5. Data enrichment (optional)**
-  - [ ] Define enrichment strategy & scope
-  - [ ] Implement web scraping (rate-limited)
-  - [ ] Store raw enrichment logs
-  - [ ] Output: `data/processed/step3_enriched/`
+- [x] **5. Data enrichment (optional)**
+  - [x] Define enrichment strategy & scope
+  - [x] Implement web scraping (rate-limited)
+  - [x] Store raw enrichment logs
+  - [x] Output: `data/processed/step3_enriched/`
 
 - [ ] **6. Feature engineering**
   - [ ] Extract technical complexity features
@@ -280,13 +280,13 @@ python scripts/run_complexity_pipeline.py --steps clean,impute,features,score
 | 1-2. Planning & Inventory | 1-2 days | ✅ Complete |
 | 3. Cleaning | 2 days | ✅ Complete |
 | 4. Imputation | 1 day | ✅ Complete |
-| 5. Enrichment | 2-7 days | 🔲 Optional |
+| 5. Enrichment | 2-7 days | ✅ Complete (scoped to score>=80) |
 | 6. Features | 2-3 days | 🔲 Not started |
 | 7. Scoring | 1-2 days | 🔲 Not started |
 | 8. Pipeline | 2 days | 🔲 Not started |
 | 9. Validation | 1 day | 🔲 Not started |
 | 10. Documentation | 1 day | 🔲 Not started |
-| **Total** | **10-15 days** | **40% complete** |
+| **Total** | **10-15 days** | **50% complete** |
 
 ---
 
@@ -328,12 +328,11 @@ python scripts/run_complexity_pipeline.py --steps clean,impute,features,score
 
 ## Next Immediate Actions
 
-**Current Focus:** Phase 5 (optional) or Phase 6 - Feature Engineering
+**Current Focus:** Phase 6 - Feature Engineering
 
 **Next Steps:**
-1. Decide scope of Phase 5 enrichment (or skip straight to Phase 6 using `step2_imputed/` as-is)
-2. Extract technical/practical complexity features per the Phase 6 spec above
-3. Output to `data/processed/features/complexity_features.parquet`
-4. Update checklist item #5 or #6 accordingly
+1. Extract technical/practical complexity features per the Phase 6 spec above, using `data/processed/step3_enriched/` as input
+2. Output to `data/processed/features/complexity_features.parquet`
+3. Update checklist item #6 accordingly
 
-**To continue:** Resolve the "Enrichment scope" open question below, then proceed to implementation.
+**To continue:** Mark this task complete and proceed to implementation.
