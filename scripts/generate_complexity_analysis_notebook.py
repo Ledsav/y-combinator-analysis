@@ -69,6 +69,30 @@ CELLS = [
         "\n"
         "merged.shape, industry_merged.shape"
     ),
+    markdown_cell(
+        "## 1. Score Distribution\n"
+        "\n"
+        "Objectives doc target: standard deviation ≥ 15 points (avoid clustering)."
+    ),
+    code_cell(
+        "merged[[\"complexity_score\", \"technical_score\", \"practical_score\"]].hist(bins=30, figsize=(12, 4), layout=(1, 3))"
+    ),
+    code_cell(
+        "std = merged[\"complexity_score\"].std()\n"
+        "print(f\"complexity_score std: {std:.2f} (target: >= 15)\")\n"
+        "merged[\"complexity_score\"].describe()"
+    ),
+    markdown_cell(
+        "## 2. Technical vs Practical\n"
+        "\n"
+        "Checks whether the two 0-50 sub-scores move together or measure "
+        "independent dimensions of complexity, as the rubric intends."
+    ),
+    code_cell(
+        "merged.plot(kind=\"scatter\", x=\"technical_score\", y=\"practical_score\", alpha=0.3, title=\"Technical vs Practical\")\n"
+        "tp_corr = merged[\"technical_score\"].corr(merged[\"practical_score\"])\n"
+        "print(f\"Correlation between technical_score and practical_score: {tp_corr:.3f}\")"
+    ),
 ]
 
 
