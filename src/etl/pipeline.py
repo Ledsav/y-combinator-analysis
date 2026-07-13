@@ -15,6 +15,12 @@ from typing import Dict, List, Optional
 
 import pandas as pd
 
+from src.etl.clean import run_cleaning_pipeline
+from src.etl.enrich import run_enrichment_pipeline
+from src.etl.features import run_feature_engineering_pipeline
+from src.etl.impute import run_imputation_pipeline
+from src.etl.score import run_scoring_pipeline
+
 STEP_ORDER: List[str] = ["clean", "impute", "enrich", "features", "score"]
 DEFAULT_STEPS: List[str] = ["clean", "impute", "features", "score"]
 
@@ -121,3 +127,49 @@ def check_step_prerequisite(step: str, required_input: Path) -> None:
         f"Cannot run '{step}': missing {required_input} — "
         f"ensure raw data is present in data/raw/."
     )
+
+
+def _run_clean_step(kwargs: dict) -> None:
+    success, message = run_cleaning_pipeline(**kwargs)
+    if not success:
+        raise RuntimeError(message)
+
+
+STEP_RUNNERS = {
+    "clean": _run_clean_step,
+    "impute": lambda kwargs: run_imputation_pipeline(**kwargs),
+    "enrich": lambda kwargs: run_enrichment_pipeline(**kwargs),
+    "features": lambda kwargs: run_feature_engineering_pipeline(**kwargs),
+    "score": lambda kwargs: run_scoring_pipeline(**kwargs),
+}
+
+
+def run_pipeline(
+    steps: Optional[List[str]] = None,
+    output_version: str = "v1",
+    data_root: Optional[Path] = None,
+) -> None:
+    """
+    Run the requested ETL steps in canonical order.
+
+    Args:
+        steps: Step names to run, or None/["all"] for DEFAULT_STEPS
+            (clean, impute, features, score — enrich is opt-in).
+        output_version: Version suffix for the final score CSV filename.
+        data_root: Root data directory. Defaults to the real project's
+            data/ directory; overridden in tests to isolate I/O. Not
+            exposed via the CLI.
+    """
+    resolved_steps = normalize_steps(steps)
+
+    if data_root is None:
+        data_root = Path(__file__).resolve().parents[2] / "data"
+
+    paths = _default_paths(data_root, output_version)
+
+    for step in resolved_steps:
+        check_step_prerequisite(step, paths[step]["required_input"])
+        print(f"\n{'#' * 60}")
+        print(f"PIPELINE STEP: {step}")
+        print(f"{'#' * 60}")
+        STEP_RUNNERS[step](paths[step]["kwargs"])

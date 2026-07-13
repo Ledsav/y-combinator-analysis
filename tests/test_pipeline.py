@@ -88,3 +88,36 @@ def test_check_step_prerequisite_raises_without_producer_hint_for_clean(tmp_path
 
     with pytest.raises(FileNotFoundError, match="ensure raw data is present"):
         check_step_prerequisite("clean", required)
+
+
+from src.etl import pipeline
+from src.etl.pipeline import run_pipeline
+
+
+def test_run_pipeline_invokes_requested_steps_in_canonical_order(tmp_path, monkeypatch):
+    calls = []
+
+    monkeypatch.setattr(
+        pipeline, "run_cleaning_pipeline", lambda **kwargs: (calls.append("clean"), (True, "ok"))[1]
+    )
+    monkeypatch.setattr(
+        pipeline, "run_imputation_pipeline", lambda **kwargs: calls.append("impute")
+    )
+    monkeypatch.setattr(pipeline, "check_step_prerequisite", lambda step, path: None)
+
+    run_pipeline(steps=["impute", "clean"], data_root=tmp_path)
+
+    assert calls == ["clean", "impute"]
+
+
+def test_run_pipeline_raises_runtime_error_when_clean_step_fails(tmp_path, monkeypatch):
+    monkeypatch.setattr(pipeline, "run_cleaning_pipeline", lambda **kwargs: (False, "boom"))
+    monkeypatch.setattr(pipeline, "check_step_prerequisite", lambda step, path: None)
+
+    with pytest.raises(RuntimeError, match="boom"):
+        run_pipeline(steps=["clean"], data_root=tmp_path)
+
+
+def test_run_pipeline_raises_file_not_found_when_prerequisite_missing(tmp_path):
+    with pytest.raises(FileNotFoundError, match="run 'clean' first"):
+        run_pipeline(steps=["impute"], data_root=tmp_path)
