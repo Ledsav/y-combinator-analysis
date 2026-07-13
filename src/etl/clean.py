@@ -363,20 +363,30 @@ def validate_cleaning(
     return all_valid
 
 
-def run_cleaning_pipeline() -> Tuple[bool, str]:
+def run_cleaning_pipeline(
+    input_dir: Path = None, output_dir: Path = None
+) -> Tuple[bool, str]:
     """
     Execute the complete data cleaning pipeline.
 
-    Reads all raw CSVs, applies cleaning functions, validates, and saves to
-    data/processed/step1_cleaned/
+    Reads all raw CSVs, applies cleaning functions, validates, and saves.
+
+    Args:
+        input_dir: Path to raw CSVs directory. Defaults to RAW_DIR.
+        output_dir: Path to write cleaned CSVs. Defaults to CLEANED_DIR.
 
     Returns:
         Tuple of (success: bool, message: str)
     """
+    if input_dir is None:
+        input_dir = RAW_DIR
+    if output_dir is None:
+        output_dir = CLEANED_DIR
+
     logger.info("Starting data cleaning pipeline...")
 
     # Ensure output directory exists
-    CLEANED_DIR.mkdir(parents=True, exist_ok=True)
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     # Define cleaning functions for each file
     cleaning_functions = {
@@ -396,8 +406,8 @@ def run_cleaning_pipeline() -> Tuple[bool, str]:
     try:
         # Process each file
         for filename, clean_func in cleaning_functions.items():
-            input_path = RAW_DIR / filename
-            output_path = CLEANED_DIR / filename.replace(".csv", "_cleaned.csv")
+            input_path = input_dir / filename
+            output_path = output_dir / filename.replace(".csv", "_cleaned.csv")
 
             logger.info(f"\nProcessing {filename}...")
 
@@ -411,7 +421,7 @@ def run_cleaning_pipeline() -> Tuple[bool, str]:
 
             # Save cleaned data
             df_clean.to_csv(output_path, index=False)
-            logger.info(f"Saved to {output_path.relative_to(PROJECT_ROOT)}")
+            logger.info(f"Saved to {output_path}")
 
         # Validate results
         if validate_cleaning(original_counts, cleaned_counts):
