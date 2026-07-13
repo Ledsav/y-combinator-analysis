@@ -93,6 +93,60 @@ CELLS = [
         "tp_corr = merged[\"technical_score\"].corr(merged[\"practical_score\"])\n"
         "print(f\"Correlation between technical_score and practical_score: {tp_corr:.3f}\")"
     ),
+    markdown_cell(
+        "## 3. Complexity by Batch\n"
+        "\n"
+        "Mean/median `complexity_score` per batch, ordered chronologically "
+        "(Winter before Summer within the same year), not alphabetically."
+    ),
+    code_cell(
+        "def batch_sort_key(batch: str) -> tuple:\n"
+        "    year = int(batch[1:])\n"
+        "    season_order = 0 if batch[0] == \"W\" else 1\n"
+        "    return (year, season_order)\n"
+        "\n"
+        "batch_summary = merged.groupby(\"batch\")[\"complexity_score\"].agg([\"mean\", \"median\", \"count\"]).reset_index()\n"
+        "batch_summary[\"sort_key\"] = batch_summary[\"batch\"].apply(batch_sort_key)\n"
+        "batch_summary = batch_summary.sort_values(\"sort_key\").drop(columns=\"sort_key\")\n"
+        "\n"
+        "batch_summary.plot(\n"
+        "    x=\"batch\", y=\"mean\", kind=\"line\", marker=\"o\", figsize=(14, 4),\n"
+        "    title=\"Mean Complexity Score by Batch (chronological)\", rot=90,\n"
+        ")\n"
+        "batch_summary"
+    ),
+    markdown_cell(
+        "## 4. Complexity by Status\n"
+        "\n"
+        "Validation question: are Public companies more complex than average?"
+    ),
+    code_cell(
+        "status_summary = merged.groupby(\"status\")[\"complexity_score\"].agg([\"mean\", \"median\", \"count\"]).sort_values(\"mean\", ascending=False)\n"
+        "overall_mean = merged[\"complexity_score\"].mean()\n"
+        "print(f\"Overall mean complexity_score: {overall_mean:.2f}\")\n"
+        "status_summary"
+    ),
+    markdown_cell(
+        "## 5. Complexity by Industry\n"
+        "\n"
+        "Each company contributes its `complexity_score` to every industry it's "
+        "tagged with (explode, not a single primary industry). Filtered to "
+        "industries with >= 20 tagged companies to avoid noisy single-company "
+        "averages."
+    ),
+    code_cell(
+        "industry_summary = (\n"
+        "    industry_merged.groupby(\"industry\")[\"complexity_score\"]\n"
+        "    .agg([\"mean\", \"count\"])\n"
+        "    .query(\"count >= 20\")\n"
+        "    .sort_values(\"mean\", ascending=False)\n"
+        ")\n"
+        "industry_summary.plot(\n"
+        "    kind=\"barh\", y=\"mean\", figsize=(8, 10),\n"
+        "    title=\"Mean Complexity Score by Industry (>=20 companies)\", legend=False,\n"
+        ")\n"
+        "industry_summary"
+    ),
 ]
 
 
