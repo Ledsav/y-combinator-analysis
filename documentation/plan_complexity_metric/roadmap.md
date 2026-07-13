@@ -97,6 +97,7 @@
   - [x] Build CLI runner with versioning
   - [x] Add automated validation checks
   - [x] Output: Complete pipeline + `complexity_index_v1.csv`
+  - **Known gap:** `DEFAULT_STEPS` in `src/etl/pipeline.py` (what `--steps all` resolves to) deliberately excludes `enrich`, but `run_feature_engineering_pipeline` in `src/etl/features.py` always reads its input from `data/processed/step3_enriched/` — `enrich`'s output directory, not `impute`'s (`step2_imputed/`). So a default `--steps all` run regenerates `step1_cleaned/` and `step2_imputed/` but then `features` reads the untouched, pre-existing `step3_enriched/`, meaning fresh clean/impute output never reaches the final `complexity_index` CSV unless `enrich` is explicitly included in `--steps`. No behavior change was made; this is documented only (see the `--steps` help text in `scripts/run_complexity_pipeline.py`).
 
 - [ ] **9. Validation & analysis**
   - [ ] Score distribution analysis

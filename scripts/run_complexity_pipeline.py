@@ -25,7 +25,14 @@ def build_arg_parser() -> argparse.ArgumentParser:
         default="all",
         help=(
             f"Comma-separated step names ({', '.join(STEP_ORDER)}), or 'all' "
-            f"(default: all steps except enrich)."
+            f"(default: all steps except enrich). CAVEAT: 'features' always reads "
+            f"its input from data/processed/step3_enriched/ (enrich's output "
+            f"directory), never from step2_imputed/. Since 'all' excludes enrich, "
+            f"a default run regenerates step1_cleaned/ and step2_imputed/ but then "
+            f"'features' silently reads the stale, pre-existing step3_enriched/ "
+            f"-- fresh clean/impute output does NOT propagate to the final "
+            f"complexity_index CSV. To truly regenerate from raw data, "
+            f"explicitly include enrich, e.g. --steps clean,impute,enrich,features,score."
         ),
     )
     parser.add_argument(
