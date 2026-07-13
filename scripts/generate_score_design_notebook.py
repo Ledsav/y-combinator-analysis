@@ -158,7 +158,7 @@ CELLS = [
     markdown_cell(
         "## 6. Manual review\n"
         "\n"
-        "Objectives doc target: top/bottom 50 companies should make sense on "
+        "Objectives doc target: top/bottom 25 companies should make sense on "
         "manual inspection."
     ),
     code_cell(

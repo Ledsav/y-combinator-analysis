@@ -2,9 +2,15 @@ import pytest
 import pandas as pd
 
 from src.etl.score import (
+    build_score_table,
     compute_deep_tech_score,
     compute_description_score,
     compute_founder_background_score,
+    compute_geo_ops_score,
+    compute_market_type_pts,
+    compute_regulated_score,
+    run_scoring_pipeline,
+    validate_scores,
 )
 
 
@@ -57,13 +63,6 @@ def test_compute_founder_background_score_weights_phd_and_research():
     assert scores[3] == 15  # raw = 4, at cap
 
 
-from src.etl.score import (
-    compute_geo_ops_score,
-    compute_market_type_pts,
-    compute_regulated_score,
-)
-
-
 def test_compute_regulated_score_multiplies_binary_flag():
     features_df = pd.DataFrame({"id": [1, 2], "regulated_industry": [0, 1]})
 
@@ -99,9 +98,6 @@ def test_compute_geo_ops_score_sums_independently_capped_sub_scores():
     assert scores[1] == 0
     assert scores[2] == 15  # intl: 1/2*10=5, ops: 2/2*10=10
     assert scores[3] == 10  # intl clipped: 2/2*10=10, ops: 0
-
-
-from src.etl.score import build_score_table, validate_scores
 
 
 def _minimal_score_inputs():
@@ -176,7 +172,54 @@ def test_validate_scores_raises_on_out_of_range_score():
         validate_scores(features_df, scores_df)
 
 
-from src.etl.score import run_scoring_pipeline
+def test_validate_scores_raises_on_id_set_mismatch():
+    features_df = pd.DataFrame({"id": [1, 2]})
+    scores_df = pd.DataFrame(
+        {
+            "id": [1, 3],
+            "technical_score": [10.0, 10.0],
+            "practical_score": [10.0, 10.0],
+            "complexity_score": [20.0, 20.0],
+        }
+    )
+
+    with pytest.raises(AssertionError, match="id set"):
+        validate_scores(features_df, scores_df)
+
+
+def test_validate_scores_raises_on_missing_values():
+    features_df = pd.DataFrame({"id": [1, 2]})
+    scores_df = pd.DataFrame(
+        {
+            "id": [1, 2],
+            "technical_score": [10.0, None],
+            "practical_score": [10.0, 10.0],
+            "complexity_score": [20.0, None],
+        }
+    )
+
+    with pytest.raises(AssertionError, match="Missing values"):
+        validate_scores(features_df, scores_df)
+
+
+def test_validate_scores_raises_on_out_of_range_practical_score():
+    features_df = pd.DataFrame({"id": [1]})
+    scores_df = pd.DataFrame(
+        {"id": [1], "technical_score": [10.0], "practical_score": [55.0], "complexity_score": [65.0]}
+    )
+
+    with pytest.raises(AssertionError, match="practical_score"):
+        validate_scores(features_df, scores_df)
+
+
+def test_validate_scores_raises_on_out_of_range_complexity_score():
+    features_df = pd.DataFrame({"id": [1]})
+    scores_df = pd.DataFrame(
+        {"id": [1], "technical_score": [45.0], "practical_score": [45.0], "complexity_score": [110.0]}
+    )
+
+    with pytest.raises(AssertionError, match="complexity_score"):
+        validate_scores(features_df, scores_df)
 
 
 def test_run_scoring_pipeline_end_to_end(tmp_path):
