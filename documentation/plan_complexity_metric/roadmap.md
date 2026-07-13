@@ -92,11 +92,11 @@
   - [x] Output: `notebooks/score_design.ipynb`
   - **Known gap:** the mechanism (module, pipeline, output schema) is complete and correct, but calibration missed two objectives-doc success criteria by a wide margin: correlation with team size (Pearson r=0.035, Spearman r=0.050 vs. target r>0.2) and score-distribution spread (std=10.11 vs. target ≥15) — see `notebooks/score_design.ipynb` section 7 ("Findings") for the full numbers. Per `docs/superpowers/specs/2026-07-10-phase7-scoring-rubric-design.md`'s "Open Question," no formula changes were made to chase these targets; a follow-up brainstorming pass to revise the caps/weights is needed before this index is treated as validated for downstream use (e.g. as an ML feature or segmentation input in later phases).
 
-- [ ] **8. ETL pipeline implementation**
-  - [ ] Create modular ETL scripts in `src/etl/`
-  - [ ] Build CLI runner with versioning
-  - [ ] Add automated validation checks
-  - [ ] Output: Complete pipeline + `complexity_index_v1.csv`
+- [x] **8. ETL pipeline implementation**
+  - [x] Create modular ETL scripts in `src/etl/`
+  - [x] Build CLI runner with versioning
+  - [x] Add automated validation checks
+  - [x] Output: Complete pipeline + `complexity_index_v1.csv`
 
 - [ ] **9. Validation & analysis**
   - [ ] Score distribution analysis
@@ -284,10 +284,10 @@ python scripts/run_complexity_pipeline.py --steps clean,impute,features,score
 | 5. Enrichment | 2-7 days | ✅ Complete (scoped to score>=80) |
 | 6. Features | 2-3 days | ✅ Complete |
 | 7. Scoring | 1-2 days | ✅ Complete |
-| 8. Pipeline | 2 days | 🔲 Not started |
+| 8. Pipeline | 2 days | ✅ Complete |
 | 9. Validation | 1 day | 🔲 Not started |
 | 10. Documentation | 1 day | 🔲 Not started |
-| **Total** | **10-15 days** | **70% complete** |
+| **Total** | **10-15 days** | **80% complete** |
 
 ---
 
@@ -329,12 +329,12 @@ python scripts/run_complexity_pipeline.py --steps clean,impute,features,score
 
 ## Next Immediate Actions
 
-**Current Focus:** Phase 8 - ETL Pipeline Implementation
+**Current Focus:** Phase 9 - Validation & Analysis
 
 **Next Steps:**
-1. Create modular ETL scripts in `src/etl/` (clean.py, impute.py, enrich.py, features.py, score.py already exist — this phase wires them into one orchestrator)
-2. Build a CLI runner (`scripts/run_complexity_pipeline.py`) with `--steps` and `--output-version` flags per the roadmap's Phase 8 spec
-3. Add automated validation checks across the full pipeline run
-4. Output: Complete pipeline + `complexity_index_v1.csv` regenerated end-to-end from raw data
+1. Build `notebooks/complexity_analysis.ipynb`: score distribution, technical vs practical scatter, complexity by batch/status/industry, correlation heatmap
+2. Manual review of top/bottom outliers
+3. Revisit the Phase 7 calibration gap (team-size correlation r=0.035 vs target >0.2; score spread σ=10.11 vs target ≥15) — this is the natural point to decide whether to fix it before treating the index as validated, since Phase 9 is the first phase that actually analyzes/uses the scores rather than just producing them
+4. Output: `notebooks/complexity_analysis.ipynb`
 
 **To continue:** Mark this task complete and proceed to implementation.
