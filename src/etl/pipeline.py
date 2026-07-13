@@ -47,3 +47,77 @@ def normalize_steps(requested: Optional[List[str]]) -> List[str]:
 
     requested_set = set(requested)
     return [step for step in STEP_ORDER if step in requested_set]
+
+
+def _default_paths(data_root: Path, output_version: str) -> Dict[str, dict]:
+    """
+    Compute each step's required input (for prerequisite checks) and the
+    kwargs to pass to its run_*_pipeline() function.
+
+    Args:
+        data_root: Root data directory (real project data/ or a tmp_path
+            for tests).
+        output_version: Version suffix for the final score CSV filename.
+
+    Returns:
+        Dict keyed by step name, each value {"required_input": Path,
+        "kwargs": dict} where kwargs matches that step's own
+        run_*_pipeline() parameter names.
+    """
+    raw_dir = data_root / "raw"
+    processed_dir = data_root / "processed"
+    step1_dir = processed_dir / "step1_cleaned"
+    step2_dir = processed_dir / "step2_imputed"
+    step3_dir = processed_dir / "step3_enriched"
+    features_dir = processed_dir / "features"
+    scores_dir = processed_dir / "scores"
+    features_path = features_dir / "complexity_features.parquet"
+
+    return {
+        "clean": {
+            "required_input": raw_dir / "companies.csv",
+            "kwargs": {"input_dir": raw_dir, "output_dir": step1_dir},
+        },
+        "impute": {
+            "required_input": step1_dir / "companies_cleaned.csv",
+            "kwargs": {"input_dir": step1_dir, "output_dir": step2_dir},
+        },
+        "enrich": {
+            "required_input": step2_dir / "companies_imputed.csv",
+            "kwargs": {"input_dir": step2_dir, "output_dir": step3_dir},
+        },
+        "features": {
+            "required_input": step3_dir / "companies_enriched.csv",
+            "kwargs": {"input_dir": step3_dir, "output_dir": features_dir},
+        },
+        "score": {
+            "required_input": features_path,
+            "kwargs": {
+                "input_path": features_path,
+                "output_path": scores_dir / f"complexity_index_{output_version}.csv",
+            },
+        },
+    }
+
+
+def check_step_prerequisite(step: str, required_input: Path) -> None:
+    """
+    Raise FileNotFoundError with a clear message if a step's required input
+    is missing from disk.
+
+    Args:
+        step: Step name (for the error message).
+        required_input: Path that must exist before this step can run.
+    """
+    if required_input.exists():
+        return
+
+    producer = PRODUCER_STEP.get(step)
+    if producer:
+        raise FileNotFoundError(
+            f"Cannot run '{step}': missing {required_input} — run '{producer}' first."
+        )
+    raise FileNotFoundError(
+        f"Cannot run '{step}': missing {required_input} — "
+        f"ensure raw data is present in data/raw/."
+    )
