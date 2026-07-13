@@ -144,6 +144,39 @@ STEP_RUNNERS = {
 }
 
 
+def validate_pipeline_output(output_path: Path, reference_input_path: Path) -> None:
+    """
+    End-to-end validation of the final score CSV, on top of each step's own
+    internal validate_* checks. Compares row count against
+    reference_input_path — the required input of the first step that
+    actually ran in this invocation — to catch cross-step row-loss bugs
+    that no single step's own validation would see.
+
+    Args:
+        output_path: Path to the written complexity_index_*.csv.
+        reference_input_path: CSV or parquet file whose row count the
+            output should match.
+    """
+    assert output_path.exists(), f"Pipeline output not found at {output_path}"
+
+    scores_df = pd.read_csv(output_path)
+    if reference_input_path.suffix == ".parquet":
+        reference_df = pd.read_parquet(reference_input_path)
+    else:
+        reference_df = pd.read_csv(reference_input_path)
+
+    assert len(scores_df) == len(reference_df), (
+        f"Row count mismatch: {len(scores_df)} scores vs "
+        f"{len(reference_df)} rows in {reference_input_path}"
+    )
+    assert scores_df["complexity_score"].notna().all(), "Null complexity_score values found!"
+    assert scores_df["complexity_score"].between(0, 100).all(), (
+        "complexity_score must be within [0, 100]!"
+    )
+
+    print(f"Pipeline validation passed: {len(scores_df)} companies scored")
+
+
 def run_pipeline(
     steps: Optional[List[str]] = None,
     output_version: str = "v1",
@@ -173,3 +206,10 @@ def run_pipeline(
         print(f"PIPELINE STEP: {step}")
         print(f"{'#' * 60}")
         STEP_RUNNERS[step](paths[step]["kwargs"])
+
+    if "score" in resolved_steps:
+        first_step = resolved_steps[0]
+        validate_pipeline_output(
+            output_path=paths["score"]["kwargs"]["output_path"],
+            reference_input_path=paths[first_step]["required_input"],
+        )

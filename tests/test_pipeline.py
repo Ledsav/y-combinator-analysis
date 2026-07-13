@@ -1,3 +1,4 @@
+import pandas as pd
 import pytest
 
 from src.etl.pipeline import DEFAULT_STEPS, STEP_ORDER, normalize_steps
@@ -121,3 +122,99 @@ def test_run_pipeline_raises_runtime_error_when_clean_step_fails(tmp_path, monke
 def test_run_pipeline_raises_file_not_found_when_prerequisite_missing(tmp_path):
     with pytest.raises(FileNotFoundError, match="run 'clean' first"):
         run_pipeline(steps=["impute"], data_root=tmp_path)
+
+
+from src.etl.pipeline import validate_pipeline_output
+
+
+def test_validate_pipeline_output_passes_on_valid_csv_reference(tmp_path):
+    reference_path = tmp_path / "companies_cleaned.csv"
+    output_path = tmp_path / "complexity_index_v1.csv"
+    pd.DataFrame({"id": [1, 2]}).to_csv(reference_path, index=False)
+    pd.DataFrame({"id": [1, 2], "complexity_score": [10.0, 90.0]}).to_csv(
+        output_path, index=False
+    )
+
+    validate_pipeline_output(output_path, reference_path)  # should not raise
+
+
+def test_validate_pipeline_output_passes_on_valid_parquet_reference(tmp_path):
+    reference_path = tmp_path / "complexity_features.parquet"
+    output_path = tmp_path / "complexity_index_v1.csv"
+    pd.DataFrame({"id": [1, 2]}).to_parquet(reference_path, index=False)
+    pd.DataFrame({"id": [1, 2], "complexity_score": [10.0, 90.0]}).to_csv(
+        output_path, index=False
+    )
+
+    validate_pipeline_output(output_path, reference_path)  # should not raise
+
+
+def test_validate_pipeline_output_raises_on_row_count_mismatch(tmp_path):
+    reference_path = tmp_path / "companies_cleaned.csv"
+    output_path = tmp_path / "complexity_index_v1.csv"
+    pd.DataFrame({"id": [1, 2, 3]}).to_csv(reference_path, index=False)
+    pd.DataFrame({"id": [1, 2], "complexity_score": [10.0, 90.0]}).to_csv(
+        output_path, index=False
+    )
+
+    with pytest.raises(AssertionError, match="Row count mismatch"):
+        validate_pipeline_output(output_path, reference_path)
+
+
+def test_validate_pipeline_output_raises_on_out_of_range_score(tmp_path):
+    reference_path = tmp_path / "companies_cleaned.csv"
+    output_path = tmp_path / "complexity_index_v1.csv"
+    pd.DataFrame({"id": [1]}).to_csv(reference_path, index=False)
+    pd.DataFrame({"id": [1], "complexity_score": [150.0]}).to_csv(
+        output_path, index=False
+    )
+
+    with pytest.raises(AssertionError, match="complexity_score"):
+        validate_pipeline_output(output_path, reference_path)
+
+
+def test_run_pipeline_end_to_end_features_and_score(tmp_path):
+    data_root = tmp_path
+    raw_dir = data_root / "raw"
+    step3_dir = data_root / "processed" / "step3_enriched"
+    raw_dir.mkdir(parents=True)
+    step3_dir.mkdir(parents=True)
+
+    companies = pd.DataFrame(
+        [
+            {
+                "id": 1, "slug": "acme", "name": "Acme", "batch": "W24",
+                "status": "Active",
+                "longDescription": "Acme builds a proprietary machine learning platform.",
+            },
+            {
+                "id": 2, "slug": "beta", "name": "Beta", "batch": "S23",
+                "status": "Active", "longDescription": "Beta is a local bakery.",
+            },
+        ]
+    )
+    tags = pd.DataFrame({"id": [1], "tag": ["Artificial Intelligence"]})
+    industries = pd.DataFrame({"id": [1], "industry": ["Fintech"]})
+    regions = pd.DataFrame(
+        {"id": [1, 2], "country": ["United States of America", "India"]}
+    )
+    founders = pd.DataFrame({"hnid": ["a"], "company_slug": ["acme"]})
+    schools = pd.DataFrame({"hnid": ["a"], "field_of_study": ["Doctor Of Philosophy"]})
+    prior_companies = pd.DataFrame({"hnid": [], "company": []})
+
+    companies.to_csv(step3_dir / "companies_enriched.csv", index=False)
+    tags.to_csv(step3_dir / "tags_enriched.csv", index=False)
+    industries.to_csv(step3_dir / "industries_enriched.csv", index=False)
+    regions.to_csv(step3_dir / "regions_enriched.csv", index=False)
+    founders.to_csv(step3_dir / "founders_enriched.csv", index=False)
+    schools.to_csv(step3_dir / "schools_enriched.csv", index=False)
+    prior_companies.to_csv(step3_dir / "prior_companies_enriched.csv", index=False)
+
+    run_pipeline(steps=["features", "score"], output_version="v9", data_root=data_root)
+
+    output_path = data_root / "processed" / "scores" / "complexity_index_v9.csv"
+    assert output_path.exists()
+    scores_df = pd.read_csv(output_path)
+    assert len(scores_df) == 2
+    acme = scores_df[scores_df["slug"] == "acme"].iloc[0]
+    assert acme["complexity_score"] > 0
