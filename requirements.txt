@@ -7,3 +7,4 @@ nbconvert
 scipy
 matplotlib
 plotly
+pyyaml
