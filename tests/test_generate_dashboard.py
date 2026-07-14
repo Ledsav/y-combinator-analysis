@@ -329,6 +329,29 @@ def test_build_dashboard_body_contains_one_bundle_and_all_six_charts():
     assert "<table id=\"company-table\"></table>" in body
 
 
+def test_build_findings_summary_contains_expected_section_and_key_stats():
+    from scripts.generate_dashboard import build_findings_summary
+
+    summary = build_findings_summary()
+
+    assert '<section class="findings">' in summary
+    assert "Key Findings" in summary
+    assert "Drug Discovery and Delivery" in summary
+    assert "Known limitation" in summary
+
+
+def test_build_dashboard_body_includes_findings_summary_before_charts():
+    scores_df = _sample_scores_df()
+    industry_exploded_df = scores_df.assign(industry="Fintech")
+    corr_matrix = pd.DataFrame({"a": [1.0, 0.5], "b": [0.5, 1.0]}, index=["a", "b"])
+    table_html = '<table id="company-table"></table>'
+
+    body = build_dashboard_body(scores_df, industry_exploded_df, corr_matrix, table_html)
+
+    assert '<section class="findings">' in body
+    assert body.index('<section class="findings">') < body.index("chart-distribution")
+
+
 def test_build_standalone_dashboard_wraps_body_exactly_once():
     body = "<div>hello</div>"
 

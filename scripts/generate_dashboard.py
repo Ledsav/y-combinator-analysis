@@ -401,6 +401,9 @@ STYLE = """
 <style>
   body { font-family: sans-serif; margin: 2rem; }
   h1 { margin-bottom: 0.5rem; }
+  .findings { background: #f7f7f7; border: 1px solid #ddd; border-radius: 4px; padding: 1rem 1.5rem; margin-bottom: 2rem; }
+  .findings h2 { margin-top: 0; }
+  .findings li { margin-bottom: 0.5rem; }
   .chart { margin-bottom: 2rem; }
   table { border-collapse: collapse; width: 100%; }
   th, td { border: 1px solid #ccc; padding: 4px 8px; text-align: left; }
@@ -408,6 +411,28 @@ STYLE = """
   .table-controls { margin-bottom: 1rem; }
   .table-controls input, .table-controls select { margin-right: 0.5rem; }
 </style>
+"""
+
+
+def build_findings_summary() -> str:
+    """
+    A scannable "Key Findings" summary placed before the charts, adapting
+    Phase 9's notebook analysis into dashboard-appropriate bullets. All
+    numbers are the same verified figures from Phase 9 — this phase only
+    visualizes the already-computed index, it doesn't recompute it.
+    """
+    return """
+<section class="findings">
+<h2>Key Findings</h2>
+<ul>
+<li><strong>Deep-tech and regulated industries dominate the top of the index</strong> &mdash; Drug Discovery and Delivery (39.4), Legal (38.0), and Industrial Bio (35.0) lead, while consumer/content industries sit at the bottom &mdash; Education (6.7), Social (8.2), Content (9.2).</li>
+<li><strong>Complexity has risen steadily across YC batches</strong> &mdash; from ~10&ndash;15 in the earliest batches (S05&ndash;S09) to ~22&ndash;29 in the most recent (S22&ndash;S24). The cause isn't diagnosed here &mdash; it could reflect real growth in deep-tech/AI representation, or richer data on newer companies.</li>
+<li><strong>Technical and practical complexity are independent dimensions</strong> (correlation &asymp; 0), confirming the rubric measures two distinct kinds of difficulty rather than one thing twice.</li>
+<li><strong>Industry tags behave as expected</strong> &mdash; Healthcare-tagged companies score ~2x the overall average on technical complexity; Fintech-tagged companies score higher on practical complexity and universally receive the regulated-industry bonus.</li>
+<li><strong>Public and Active companies score similarly</strong> (~22.6 both), each above Acquired (17.7) and Inactive (16.7) &mdash; though the Public group is small (19 companies).</li>
+<li><strong>Known limitation:</strong> two quantitative calibration targets &mdash; correlation with team size and score distribution spread &mdash; remain unmet (see the project roadmap for details). The index passes manual review and produces intuitive patterns, but hasn't been fully validated against those targets.</li>
+</ul>
+</section>
 """
 
 
@@ -419,8 +444,8 @@ def build_dashboard_body(
 ) -> str:
     """
     Body-only HTML (no <html>/<head>/<body> tags): one inline Plotly.js
-    bundle (never duplicated per chart), 6 chart sections, and the company
-    table.
+    bundle (never duplicated per chart), a key-findings summary, 6 chart
+    sections, and the company table.
     """
     chart_specs = [
         ("chart-distribution", "Score Distribution", build_distribution_chart(scores_df)),
@@ -438,10 +463,12 @@ def build_dashboard_body(
     )
 
     plotly_bundle = f"<script>{pyo.get_plotlyjs()}</script>"
+    findings_summary = build_findings_summary()
 
     return (
         f"{STYLE}{plotly_bundle}"
         f"<h1>Y Combinator Complexity Index Dashboard</h1>"
+        f"{findings_summary}"
         f"{chart_sections}"
         f"<h2>Company Explorer</h2>{table_html}"
     )
