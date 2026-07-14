@@ -147,6 +147,49 @@ CELLS = [
         ")\n"
         "industry_summary"
     ),
+    markdown_cell(
+        "## 6. Correlation Heatmap\n"
+        "\n"
+        "Correlation matrix across all 8 raw features (`complexity_features.parquet`), "
+        "the 6 rubric bucket scores, and the 3 top-level scores."
+    ),
+    code_cell(
+        "import matplotlib.pyplot as plt\n"
+        "\n"
+        "corr_cols = feature_cols + [\n"
+        "    \"deep_tech_score\", \"description_score\", \"founder_background_score\",\n"
+        "    \"regulated_score\", \"market_type_pts\", \"geo_ops_score\",\n"
+        "    \"technical_score\", \"practical_score\", \"complexity_score\",\n"
+        "]\n"
+        "corr_matrix = merged[corr_cols].corr()\n"
+        "\n"
+        "fig, ax = plt.subplots(figsize=(10, 8))\n"
+        "im = ax.imshow(corr_matrix, cmap=\"coolwarm\", vmin=-1, vmax=1)\n"
+        "ax.set_xticks(range(len(corr_cols)))\n"
+        "ax.set_xticklabels(corr_cols, rotation=90)\n"
+        "ax.set_yticks(range(len(corr_cols)))\n"
+        "ax.set_yticklabels(corr_cols)\n"
+        "fig.colorbar(im, ax=ax)\n"
+        "ax.set_title(\"Correlation Heatmap: Raw Features, Bucket Scores, Totals\")\n"
+        "fig.tight_layout()"
+    ),
+    markdown_cell(
+        "## 7. Team-Size Correlation\n"
+        "\n"
+        "Objectives doc target: `r > 0.2` with team size. `teamSize` is heavily "
+        "right-skewed (median 7, max 8,600), so it's log1p-transformed before "
+        "correlating. Re-derived fresh here (not copied from "
+        "`notebooks/score_design.ipynb`) so this notebook is self-contained."
+    ),
+    code_cell(
+        "team_size_valid = merged.dropna(subset=[\"teamSize\"])\n"
+        "pearson_r = team_size_valid[\"complexity_score\"].corr(team_size_valid[\"log_team_size\"], method=\"pearson\")\n"
+        "spearman_r = team_size_valid[\"complexity_score\"].corr(team_size_valid[\"log_team_size\"], method=\"spearman\")\n"
+        "print(f\"Pearson r (complexity_score vs log1p(teamSize)): {pearson_r:.3f}\")\n"
+        "print(f\"Spearman r: {spearman_r:.3f}\")\n"
+        "print(\"Target from objectives doc: r > 0.2\")\n"
+        "print(f\"n = {len(team_size_valid)} companies with known teamSize\")"
+    ),
 ]
 
 
