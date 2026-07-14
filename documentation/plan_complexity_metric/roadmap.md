@@ -106,6 +106,14 @@
   - [x] Output: `notebooks/complexity_analysis.ipynb`
   - **Confirmed gap:** re-derived fresh (not copied from Phase 7), the team-size correlation (Pearson r=0.035, Spearman r=0.050 vs target r>0.2) and distribution spread (std=10.11 vs target ≥15) gaps identified in Phase 7 are unchanged — see `notebooks/complexity_analysis.ipynb` section 10 ("Findings"). New findings: technical/practical sub-scores are uncorrelated (r=-0.049, as intended); complexity rises markedly by batch over time (undiagnosed cause); Public/Active companies score similarly and both above Acquired/Inactive; industry and validation-question checks (Healthcare→technical, Fintech→practical/regulated) all match intuition. A rubric-revision follow-up (tentatively "Phase 9.5") is recommended before treating the index as fully validated, but is out of scope for this phase.
 
+- [x] **9.5. Rubric revision**
+  - [x] Diagnose whether the Phase 7 calibration gaps (team-size r>0.2, distribution σ≥15) are reachable via reweighting
+  - [x] Revise `src/etl/score.py` to a 30/70 technical/practical split (σ 10.11→11.95, r 0.035→0.103)
+  - [x] Relax both targets in the objectives doc, with diagnostic rationale recorded
+  - [x] Generate `data/processed/scores/complexity_index_v2.csv` (v1 preserved as historical baseline)
+  - [x] Regenerate `notebooks/complexity_analysis.ipynb` and `output/complexity_dashboard_v2.html` against v2
+  - [x] Output: `complexity_index_v2.csv`, updated notebook, `complexity_dashboard_v2.html`
+
 - [x] **10. Visualization dashboard**
   - [x] Interactive charts mirroring Phase 9's analysis (distribution, technical vs practical, batch, status, industry, correlation heatmap)
   - [x] Searchable/sortable/filterable company explorer table (4,844 companies)
@@ -272,6 +280,16 @@ python scripts/run_complexity_pipeline.py --steps clean,impute,features,score
 - Are public companies more complex than average?
 - Does complexity correlate with team size?
 
+### Phase 9.5: Rubric Revision
+
+**Deliverables:**
+- Revised `src/etl/score.py` (30/70 technical/practical split, tighter caps)
+- `data/processed/scores/complexity_index_v2.csv`
+- Updated `notebooks/complexity_analysis.ipynb` and `output/complexity_dashboard_v2.html` (both re-derived on v2)
+- Relaxed objectives-doc targets with diagnostic rationale
+
+**Why:** Phases 7-9 confirmed but never acted on two missed calibration targets. A diagnostic investigation found both are structurally unreachable via reweighting alone (no feature combination reaches r>0.2 with team size; σ≥15 requires nearly eliminating the technical dimension or exceeding the 0-100 bound). This phase makes the deferred decision: a real, moderate, defensible rebalance plus formally relaxing both targets with the evidence recorded — not a silent gap, not an artificial full fix.
+
 ### Phase 10: Visualization Dashboard
 
 **Deliverables:**
@@ -304,9 +322,10 @@ python scripts/run_complexity_pipeline.py --steps clean,impute,features,score
 | 7. Scoring | 1-2 days | ✅ Complete |
 | 8. Pipeline | 2 days | ✅ Complete |
 | 9. Validation | 1 day | ✅ Complete |
+| 9.5. Rubric Revision | 1 day | ✅ Complete |
 | 10. Visualization | 1 day | ✅ Complete |
 | 11. Documentation | 1 day | 🔲 Not started |
-| **Total** | **10-15 days** | **~91% complete** |
+| **Total** | **11-16 days** | **~92% complete** |
 
 ---
 
@@ -348,11 +367,10 @@ python scripts/run_complexity_pipeline.py --steps clean,impute,features,score
 
 ## Next Immediate Actions
 
-**Current Focus:** Phase 11 - Documentation & Reproducibility (with the open Phase 9.5 rubric-revision decision from Phase 9 still unresolved)
+**Current Focus:** Phase 11 - Documentation & Reproducibility (the deferred Phase 9.5 decision is now resolved)
 
 **Next Steps:**
-1. Decide on the deferred Phase 9.5 question (revise `score.py`'s weights/caps to address the confirmed team-size correlation and distribution-spread gaps) before or alongside Phase 11 — still not decided as of Phase 10.
-2. Update the main `README.md` with a Complexity Index section, pipeline usage instructions (including how to run `scripts/generate_dashboard.py` and open `output/complexity_dashboard_v1.html`), a minimal test suite for anything still untested, and version-control notes for all outputs.
-3. Output (Phase 11): updated `README.md` + usage docs.
+1. Update the main `README.md` with a Complexity Index section, pipeline usage instructions (including how to run `scripts/generate_dashboard.py`, which now defaults to v2, and open `output/complexity_dashboard_v2.html`), a minimal test suite for anything still untested, and version-control notes for all outputs (including the v1/v2 distinction).
+2. Output (Phase 11): updated `README.md` + usage docs.
 
-**To continue:** Mark this task complete and proceed to Phase 11 (or the Phase 9.5 decision first).
+**To continue:** Mark this task complete and proceed to Phase 11.

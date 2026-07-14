@@ -14,6 +14,7 @@ Checklist
 - [x] 7. Design scoring rubric
 - [x] 8. Implement ETL pipeline
 - [x] 9. Validate & analyze index
+- [x] 9.5. Revise scoring rubric
 - [x] 10. Build visualization dashboard
 - [ ] 11. Documentation & reproducibility
 - [ ] 12. Deploy & monitor
