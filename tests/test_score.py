@@ -135,8 +135,8 @@ def test_build_score_table_computes_expected_values_for_acme_and_beta():
     scores_df = build_score_table(features_df)
 
     acme = scores_df[scores_df["slug"] == "acme"].iloc[0]
-    assert acme["technical_score"] == 50  # 20 + 15 + 15 (all buckets at cap)
-    assert acme["practical_score"] == 50  # 15 + 15 + 20 (all buckets at cap)
+    assert acme["technical_score"] == 30  # 12 + 9 + 9 (all buckets at cap)
+    assert acme["practical_score"] == 70  # 21 + 21 + 28 (all buckets at cap)
     assert acme["complexity_score"] == 100
 
     beta = scores_df[scores_df["slug"] == "beta"].iloc[0]
@@ -205,7 +205,7 @@ def test_validate_scores_raises_on_missing_values():
 def test_validate_scores_raises_on_out_of_range_practical_score():
     features_df = pd.DataFrame({"id": [1]})
     scores_df = pd.DataFrame(
-        {"id": [1], "technical_score": [10.0], "practical_score": [55.0], "complexity_score": [65.0]}
+        {"id": [1], "technical_score": [10.0], "practical_score": [75.0], "complexity_score": [85.0]}
     )
 
     with pytest.raises(AssertionError, match="practical_score"):
@@ -215,7 +215,7 @@ def test_validate_scores_raises_on_out_of_range_practical_score():
 def test_validate_scores_raises_on_out_of_range_complexity_score():
     features_df = pd.DataFrame({"id": [1]})
     scores_df = pd.DataFrame(
-        {"id": [1], "technical_score": [45.0], "practical_score": [45.0], "complexity_score": [110.0]}
+        {"id": [1], "technical_score": [25.0], "practical_score": [45.0], "complexity_score": [110.0]}
     )
 
     with pytest.raises(AssertionError, match="complexity_score"):

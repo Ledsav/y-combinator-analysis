@@ -1,20 +1,31 @@
 """
 Scoring Module for Y Combinator Analysis
 Phase 7: Convert Phase 6 raw complexity features into a 0-100 Complexity Index.
+Phase 9.5: Weights revised from 50/50 to 30/70 technical/practical — see
+docs/superpowers/specs/2026-07-14-phase9.5-rubric-revision-design.md.
 
-Strategy (see docs/superpowers/specs/2026-07-10-phase7-scoring-rubric-design.md):
+Strategy (see docs/superpowers/specs/2026-07-10-phase7-scoring-rubric-design.md
+for the original architecture, docs/superpowers/specs/2026-07-14-phase9.5-rubric-revision-design.md
+for the Phase 9.5 weight revision):
 - Each raw feature (or combination of features) is scaled via capped linear
   scaling: linear from 0 up to a cap, then clipped, then scaled to fill a
   fixed point budget. Caps come from the observed p95-p99 feature
   distribution, not the absolute max, so rare outliers don't waste the
   scale on a handful of companies.
-- Technical (0-50): deep-tech tags (0-20) + description NLP score (0-15) +
-  founder background (0-15, combining PhD count and research-institution
+- Technical (0-30): deep-tech tags (0-12) + description NLP score (0-9) +
+  founder background (0-9, combining PhD count and research-institution
   experience since founder_phd_count alone is near-zero-variance).
-- Practical (0-50): regulated industry (0-15) + market type (0-15) +
-  geography & operations (0-20, combining international_operations and
+- Practical (0-70): regulated industry (0-21) + market type (0-21) +
+  geography & operations (0-28, combining international_operations and
   operational_intensity since there is no distinct "GTM complexity" signal
   in the Phase 6 feature set).
+- The 30/70 split (was 50/50 through Phase 9) was revised in Phase 9.5:
+  diagnostics showed the objectives doc's r>0.2 team-size-correlation and
+  sigma>=15 spread targets were unreachable via reweighting alone while
+  keeping technical and practical both meaningfully represented and the
+  score bounded 0-100 — see the Phase 9.5 spec for the full investigation.
+  This split is a real, verified improvement (sigma 10.11->11.95, r
+  0.035->0.103) with both targets formally relaxed rather than fully met.
 - All caps/weights/points are overridable default parameters, per the
   Phase 6 convention, so tests exercise the scaling logic independent of
   the exact curated values.
@@ -27,7 +38,7 @@ import pandas as pd
 
 
 def compute_deep_tech_score(
-    features_df: pd.DataFrame, cap: int = 3, points: float = 20
+    features_df: pd.DataFrame, cap: int = 2, points: float = 12
 ) -> pd.DataFrame:
     """
     Scale deep_tech_tag_count linearly to a 0-`points` budget, capped at
@@ -49,7 +60,7 @@ def compute_deep_tech_score(
 
 
 def compute_description_score(
-    features_df: pd.DataFrame, cap: int = 3, points: float = 15
+    features_df: pd.DataFrame, cap: int = 2, points: float = 9
 ) -> pd.DataFrame:
     """
     Scale description_tech_score (R&D-vocabulary keyword count) linearly to
@@ -73,8 +84,8 @@ def compute_description_score(
 def compute_founder_background_score(
     features_df: pd.DataFrame,
     phd_weight: float = 2,
-    cap: float = 4,
-    points: float = 15,
+    cap: float = 2,
+    points: float = 9,
 ) -> pd.DataFrame:
     """
     Combine founder_phd_count and research_company_experience into one
@@ -104,7 +115,7 @@ def compute_founder_background_score(
 
 
 def compute_regulated_score(
-    features_df: pd.DataFrame, points: float = 15
+    features_df: pd.DataFrame, points: float = 21
 ) -> pd.DataFrame:
     """
     Score the regulated_industry binary flag as 0 or `points`.
@@ -122,7 +133,7 @@ def compute_regulated_score(
 
 
 def compute_market_type_pts(
-    features_df: pd.DataFrame, points_per_level: float = 5
+    features_df: pd.DataFrame, points_per_level: float = 7
 ) -> pd.DataFrame:
     """
     Score market_type_score (0-3 ordinal) linearly, `points_per_level` per level.
@@ -141,10 +152,10 @@ def compute_market_type_pts(
 
 def compute_geo_ops_score(
     features_df: pd.DataFrame,
-    intl_cap: int = 2,
-    ops_cap: int = 2,
-    intl_points: float = 10,
-    ops_points: float = 10,
+    intl_cap: int = 1,
+    ops_cap: int = 1,
+    intl_points: float = 14,
+    ops_points: float = 14,
 ) -> pd.DataFrame:
     """
     Combine international_operations and operational_intensity into one
@@ -236,11 +247,16 @@ def validate_scores(features_df: pd.DataFrame, scores_df: pd.DataFrame) -> None:
     for col in ["technical_score", "practical_score", "complexity_score"]:
         assert scores_df[col].notna().all(), f"Missing values found in {col}!"
 
-    assert scores_df["technical_score"].between(0, 50).all(), (
-        "technical_score must be within [0, 50]!"
+    # Bounds below must stay in sync with the technical/practical point
+    # budgets set by compute_deep_tech_score/compute_description_score/
+    # compute_founder_background_score (technical, sums to 30) and
+    # compute_regulated_score/compute_market_type_pts/compute_geo_ops_score
+    # (practical, sums to 70) — see the Phase 9.5 rubric revision spec.
+    assert scores_df["technical_score"].between(0, 30).all(), (
+        "technical_score must be within [0, 30]!"
     )
-    assert scores_df["practical_score"].between(0, 50).all(), (
-        "practical_score must be within [0, 50]!"
+    assert scores_df["practical_score"].between(0, 70).all(), (
+        "practical_score must be within [0, 70]!"
     )
     assert scores_df["complexity_score"].between(0, 100).all(), (
         "complexity_score must be within [0, 100]!"
