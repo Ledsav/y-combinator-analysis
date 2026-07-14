@@ -202,7 +202,13 @@ def test_build_company_records_handles_missing_teamsize_and_empty_industries():
             "complexity_score": [15.0, 35.0],
         }
     )
-    company_industries_df = pd.DataFrame({"id": [1, 2], "industries": ["Fintech", ""]})
+    company_industries_df = pd.DataFrame(
+        {
+            "id": [1, 2],
+            "industries": ["Fintech", ""],
+            "industries_list": [["Fintech"], []],
+        }
+    )
     team_sizes_df = pd.DataFrame({"id": [1, 2], "teamSize": [5.0, float("nan")]})
 
     records = build_company_records(scores_df, company_industries_df, team_sizes_df)
@@ -211,9 +217,11 @@ def test_build_company_records_handles_missing_teamsize_and_empty_industries():
     acme = next(r for r in records if r["slug"] == "acme")
     assert acme["teamSize"] == 5.0
     assert acme["industries"] == "Fintech"
+    assert acme["industries_list"] == ["Fintech"]
     beta = next(r for r in records if r["slug"] == "beta")
     assert beta["teamSize"] is None
     assert beta["industries"] == ""
+    assert beta["industries_list"] == []
 
 
 def test_build_company_records_produces_valid_json_with_none_not_nan():
@@ -229,7 +237,9 @@ def test_build_company_records_produces_valid_json_with_none_not_nan():
             "complexity_score": [15.0],
         }
     )
-    company_industries_df = pd.DataFrame({"id": [1], "industries": [""]})
+    company_industries_df = pd.DataFrame(
+        {"id": [1], "industries": [""], "industries_list": [[]]}
+    )
     team_sizes_df = pd.DataFrame({"id": [1], "teamSize": [float("nan")]})
 
     records = build_company_records(scores_df, company_industries_df, team_sizes_df)
@@ -329,3 +339,44 @@ def test_build_standalone_dashboard_wraps_body_exactly_once():
     assert html.count("<body>") == 1
     assert "<div>hello</div>" in html
     assert "<title>YC Complexity Index Dashboard</title>" in html
+
+
+def test_aggregate_company_industries_preserves_names_containing_the_join_delimiter():
+    scores_df = pd.DataFrame({"id": [1]})
+    industries_df = pd.DataFrame(
+        {"id": [1, 1], "industry": ["Engineering, Product and Design", "Consumer"]}
+    )
+
+    result = aggregate_company_industries(scores_df, industries_df).set_index("id")
+
+    assert result.loc[1, "industries_list"] == ["Engineering, Product and Design", "Consumer"]
+    assert result.loc[1, "industries"] == "Engineering, Product and Design, Consumer"
+
+
+def test_build_table_html_embeds_industries_list_for_exact_filter_matching():
+    records = [
+        {
+            "id": 1,
+            "slug": "acme",
+            "name": "Acme",
+            "batch": "W24",
+            "status": "Active",
+            "industries": "Consumer Finance",
+            "industries_list": ["Consumer Finance"],
+            "teamSize": 5.0,
+            "technical_score": 10.0,
+            "practical_score": 5.0,
+            "complexity_score": 15.0,
+        }
+    ]
+
+    html = build_table_html(records)
+
+    match = re.search(
+        r'<script id="company-data" type="application/json">(.*?)</script>',
+        html,
+        re.DOTALL,
+    )
+    assert match, "company-data script tag not found"
+    payload = json.loads(match.group(1).replace("<\\/", "</"))
+    assert payload[0]["industries_list"] == ["Consumer Finance"]

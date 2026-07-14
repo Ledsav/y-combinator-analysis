@@ -43,17 +43,25 @@ def aggregate_company_industries(
 ) -> pd.DataFrame:
     """
     One row per company id (from scores_df, so companies with zero industry
-    tags are still present), with a comma-joined `industries` string column
-    ("" if the company has no industry tags).
+    tags are still present), with a comma-joined `industries` display string
+    ("" if none) and an `industries_list` column (a Python list of the
+    individual industry tags, [] if none) derived directly from the
+    untouched multi-row industries_df — not by splitting the joined string,
+    since some real industry names contain the literal ", " delimiter
+    (e.g. "Engineering, Product and Design") and splitting on it would
+    shatter them into bogus fragments.
     """
     grouped = (
         industries_df.groupby("id")["industry"]
-        .apply(lambda s: ", ".join(s))
+        .agg(list)
         .reset_index()
-        .rename(columns={"industry": "industries"})
+        .rename(columns={"industry": "industries_list"})
     )
     result = scores_df[["id"]].merge(grouped, on="id", how="left")
-    result["industries"] = result["industries"].fillna("")
+    result["industries_list"] = result["industries_list"].apply(
+        lambda v: v if isinstance(v, list) else []
+    )
+    result["industries"] = result["industries_list"].apply(lambda v: ", ".join(v))
     return result
 
 
@@ -209,6 +217,7 @@ def build_company_records(
         "batch",
         "status",
         "industries",
+        "industries_list",
         "teamSize",
         "technical_score",
         "practical_score",
@@ -292,8 +301,8 @@ def build_table_html(records: List[dict]) -> str:
     addOptions(statusFilter, uniqueSorted(records.map((r) => r.status)));
     const allIndustries = new Set();
     records.forEach((r) => {{
-      (r.industries || "").split(", ").forEach((ind) => {{
-        if (ind) allIndustries.add(ind);
+      (r.industries_list || []).forEach((ind) => {{
+        allIndustries.add(ind);
       }});
     }});
     addOptions(industryFilter, Array.from(allIndustries).sort());
@@ -318,7 +327,7 @@ def build_table_html(records: List[dict]) -> str:
     if (filters.status && record.status !== filters.status) {{
       return false;
     }}
-    if (filters.industry && !(record.industries || "").includes(filters.industry)) {{
+    if (filters.industry && !(record.industries_list || []).includes(filters.industry)) {{
       return false;
     }}
     return true;
