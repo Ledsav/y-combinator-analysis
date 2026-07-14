@@ -181,3 +181,100 @@ def test_build_correlation_heatmap_uses_matrix_values_and_labels():
     assert fig.data[0].z.tolist() == [[1.0, 0.5], [0.5, 1.0]]
     assert list(fig.data[0].x) == ["a", "b"]
     assert list(fig.data[0].y) == ["a", "b"]
+
+
+import json
+import re
+
+from scripts.generate_dashboard import build_company_records, build_table_html
+
+
+def test_build_company_records_handles_missing_teamsize_and_empty_industries():
+    scores_df = pd.DataFrame(
+        {
+            "id": [1, 2],
+            "slug": ["acme", "beta"],
+            "name": ["Acme", "Beta"],
+            "batch": ["W24", "S23"],
+            "status": ["Active", "Active"],
+            "technical_score": [10.0, 20.0],
+            "practical_score": [5.0, 15.0],
+            "complexity_score": [15.0, 35.0],
+        }
+    )
+    company_industries_df = pd.DataFrame({"id": [1, 2], "industries": ["Fintech", ""]})
+    team_sizes_df = pd.DataFrame({"id": [1, 2], "teamSize": [5.0, float("nan")]})
+
+    records = build_company_records(scores_df, company_industries_df, team_sizes_df)
+
+    assert len(records) == 2
+    acme = next(r for r in records if r["slug"] == "acme")
+    assert acme["teamSize"] == 5.0
+    assert acme["industries"] == "Fintech"
+    beta = next(r for r in records if r["slug"] == "beta")
+    assert beta["teamSize"] is None
+    assert beta["industries"] == ""
+
+
+def test_build_company_records_produces_valid_json_with_none_not_nan():
+    scores_df = pd.DataFrame(
+        {
+            "id": [1],
+            "slug": ["acme"],
+            "name": ["Acme"],
+            "batch": ["W24"],
+            "status": ["Active"],
+            "technical_score": [10.0],
+            "practical_score": [5.0],
+            "complexity_score": [15.0],
+        }
+    )
+    company_industries_df = pd.DataFrame({"id": [1], "industries": [""]})
+    team_sizes_df = pd.DataFrame({"id": [1], "teamSize": [float("nan")]})
+
+    records = build_company_records(scores_df, company_industries_df, team_sizes_df)
+    json_str = json.dumps(records)
+
+    # json.dumps emits a bare `NaN` token (not valid per strict JSON, and
+    # rejected by a browser's JSON.parse) unless NaN was already replaced
+    # with None before this call.
+    assert "NaN" not in json_str
+    parsed = json.loads(json_str)
+    assert parsed[0]["teamSize"] is None
+
+
+def test_build_table_html_embeds_escaped_json_and_expected_structure():
+    records = [
+        {
+            "id": 1,
+            "slug": "acme",
+            "name": "Acme </script> Co",
+            "batch": "W24",
+            "status": "Active",
+            "industries": "Fintech",
+            "teamSize": 5.0,
+            "technical_score": 10.0,
+            "practical_score": 5.0,
+            "complexity_score": 15.0,
+        }
+    ]
+
+    html = build_table_html(records)
+
+    assert '<table id="company-table">' in html
+    assert 'data-key="complexity_score"' in html
+
+    # Non-greedy match stops at the FIRST </script> it finds. If the name's
+    # literal "</script>" substring weren't escaped, this would find that
+    # instead of the real closing tag, truncating the payload early — this
+    # test would then fail to json.loads() a complete, valid record.
+    match = re.search(
+        r'<script id="company-data" type="application/json">(.*?)</script>',
+        html,
+        re.DOTALL,
+    )
+    assert match, "company-data script tag not found or was truncated early"
+    payload = match.group(1)
+    assert "</script>" not in payload
+    parsed = json.loads(payload.replace("<\\/", "</"))
+    assert parsed[0]["name"] == "Acme </script> Co"

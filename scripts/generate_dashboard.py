@@ -9,6 +9,8 @@ This phase only visualizes the already-computed index; it does not
 recompute or re-validate any scores.
 """
 
+import json
+import math
 from pathlib import Path
 from typing import Dict, List, Tuple
 
@@ -187,3 +189,199 @@ def build_correlation_heatmap(corr_matrix: pd.DataFrame) -> go.Figure:
     )
     fig.update_layout(title="Correlation Heatmap")
     return fig
+
+
+def build_company_records(
+    scores_df: pd.DataFrame, company_industries_df: pd.DataFrame, team_sizes_df: pd.DataFrame
+) -> List[dict]:
+    """
+    One dict per company, JSON-safe (NaN replaced with None — json.dumps'
+    default NaN output is not valid JSON and a browser's JSON.parse rejects
+    it).
+    """
+    merged = scores_df.merge(company_industries_df, on="id", how="left")
+    merged = merged.merge(team_sizes_df[["id", "teamSize"]], on="id", how="left")
+    columns = [
+        "id",
+        "slug",
+        "name",
+        "batch",
+        "status",
+        "industries",
+        "teamSize",
+        "technical_score",
+        "practical_score",
+        "complexity_score",
+    ]
+    records = merged[columns].to_dict(orient="records")
+    for record in records:
+        for key, value in record.items():
+            if isinstance(value, float) and math.isnan(value):
+                record[key] = None
+    return records
+
+
+TABLE_COLUMNS = [
+    ("slug", "Slug"),
+    ("name", "Name"),
+    ("batch", "Batch"),
+    ("status", "Status"),
+    ("industries", "Industries"),
+    ("teamSize", "Team Size"),
+    ("technical_score", "Technical"),
+    ("practical_score", "Practical"),
+    ("complexity_score", "Complexity"),
+]
+
+
+def build_table_html(records: List[dict]) -> str:
+    """
+    A sortable/filterable/searchable company table: data embedded as a JSON
+    payload, everything else hand-rolled vanilla JS (no table library).
+    `</` is escaped to `<\\/` in the JSON payload so a field value containing
+    the literal substring `</script>` cannot prematurely close the
+    surrounding <script> tag.
+    """
+    json_payload = json.dumps(records).replace("</", "<\\/")
+    header_cells = "".join(
+        f'<th data-key="{key}">{label}</th>' for key, label in TABLE_COLUMNS
+    )
+
+    return f"""
+<div class="table-controls">
+  <input type="text" id="search-box" placeholder="Search by name...">
+  <select id="batch-filter"><option value="">All Batches</option></select>
+  <select id="status-filter"><option value="">All Statuses</option></select>
+  <select id="industry-filter"><option value="">All Industries</option></select>
+  <span id="company-count"></span>
+</div>
+<table id="company-table">
+  <thead><tr>{header_cells}</tr></thead>
+  <tbody id="company-table-body"></tbody>
+</table>
+<script id="company-data" type="application/json">{json_payload}</script>
+<script>
+(function () {{
+  const records = JSON.parse(document.getElementById("company-data").textContent);
+  let sortKey = "complexity_score";
+  let sortAsc = false;
+
+  const tbody = document.getElementById("company-table-body");
+  const searchBox = document.getElementById("search-box");
+  const batchFilter = document.getElementById("batch-filter");
+  const statusFilter = document.getElementById("status-filter");
+  const industryFilter = document.getElementById("industry-filter");
+  const countLabel = document.getElementById("company-count");
+
+  function uniqueSorted(values) {{
+    return Array.from(new Set(values)).sort();
+  }}
+
+  function addOptions(select, values) {{
+    values.forEach((v) => {{
+      const opt = document.createElement("option");
+      opt.value = v;
+      opt.textContent = v;
+      select.appendChild(opt);
+    }});
+  }}
+
+  function populateFilters() {{
+    addOptions(batchFilter, uniqueSorted(records.map((r) => r.batch)));
+    addOptions(statusFilter, uniqueSorted(records.map((r) => r.status)));
+    const allIndustries = new Set();
+    records.forEach((r) => {{
+      (r.industries || "").split(", ").forEach((ind) => {{
+        if (ind) allIndustries.add(ind);
+      }});
+    }});
+    addOptions(industryFilter, Array.from(allIndustries).sort());
+  }}
+
+  function currentFilters() {{
+    return {{
+      search: searchBox.value.trim().toLowerCase(),
+      batch: batchFilter.value,
+      status: statusFilter.value,
+      industry: industryFilter.value,
+    }};
+  }}
+
+  function matchesFilters(record, filters) {{
+    if (filters.search && !record.name.toLowerCase().includes(filters.search)) {{
+      return false;
+    }}
+    if (filters.batch && record.batch !== filters.batch) {{
+      return false;
+    }}
+    if (filters.status && record.status !== filters.status) {{
+      return false;
+    }}
+    if (filters.industry && !(record.industries || "").includes(filters.industry)) {{
+      return false;
+    }}
+    return true;
+  }}
+
+  function makeCell(value) {{
+    const td = document.createElement("td");
+    td.textContent = value === null || value === undefined ? "" : value;
+    return td;
+  }}
+
+  function render() {{
+    const filters = currentFilters();
+    const filtered = records.filter((r) => matchesFilters(r, filters));
+    filtered.sort((a, b) => {{
+      const av = a[sortKey];
+      const bv = b[sortKey];
+      if (av === null || av === undefined) return 1;
+      if (bv === null || bv === undefined) return -1;
+      if (av < bv) return sortAsc ? -1 : 1;
+      if (av > bv) return sortAsc ? 1 : -1;
+      return 0;
+    }});
+
+    const fragment = document.createDocumentFragment();
+    filtered.forEach((r) => {{
+      const tr = document.createElement("tr");
+      tr.appendChild(makeCell(r.slug));
+      tr.appendChild(makeCell(r.name));
+      tr.appendChild(makeCell(r.batch));
+      tr.appendChild(makeCell(r.status));
+      tr.appendChild(makeCell(r.industries));
+      tr.appendChild(makeCell(r.teamSize));
+      tr.appendChild(makeCell(r.technical_score));
+      tr.appendChild(makeCell(r.practical_score));
+      tr.appendChild(makeCell(r.complexity_score));
+      fragment.appendChild(tr);
+    }});
+    tbody.innerHTML = "";
+    tbody.appendChild(fragment);
+
+    countLabel.textContent = filtered.length + " of " + records.length + " companies";
+  }}
+
+  document.querySelectorAll("#company-table thead th").forEach((th) => {{
+    th.style.cursor = "pointer";
+    th.addEventListener("click", () => {{
+      const key = th.getAttribute("data-key");
+      if (sortKey === key) {{
+        sortAsc = !sortAsc;
+      }} else {{
+        sortKey = key;
+        sortAsc = true;
+      }}
+      render();
+    }});
+  }});
+
+  [searchBox, batchFilter, statusFilter, industryFilter].forEach((el) => {{
+    el.addEventListener("input", render);
+  }});
+
+  populateFilters();
+  render();
+}})();
+</script>
+"""
