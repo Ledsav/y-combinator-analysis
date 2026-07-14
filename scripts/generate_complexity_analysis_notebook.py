@@ -190,6 +190,49 @@ CELLS = [
         "print(\"Target from objectives doc: r > 0.2\")\n"
         "print(f\"n = {len(team_size_valid)} companies with known teamSize\")"
     ),
+    markdown_cell(
+        "## 8. Validation Questions\n"
+        "\n"
+        "Do Healthcare-tagged companies skew high on `technical_score`? Do "
+        "Fintech-tagged companies skew high on `practical_score`/`regulated_score`? "
+        "(No distinct \"Biotech\" industry tag exists in this dataset — "
+        "`Healthcare` is the closest proxy for deep-tech/hard-science regulation.)"
+    ),
+    code_cell(
+        "def industry_group_mean(industry_name: str, score_col: str) -> tuple:\n"
+        "    tagged = industry_merged[industry_merged[\"industry\"] == industry_name][score_col]\n"
+        "    overall = industry_merged[score_col].mean()\n"
+        "    return tagged.mean(), overall, len(tagged)\n"
+        "\n"
+        "for industry_name, score_col in [\n"
+        "    (\"Healthcare\", \"technical_score\"),\n"
+        "    (\"Fintech\", \"practical_score\"),\n"
+        "    (\"Fintech\", \"regulated_score\"),\n"
+        "]:\n"
+        "    group_mean, overall_mean_val, n = industry_group_mean(industry_name, score_col)\n"
+        "    print(f\"{industry_name} mean {score_col}: {group_mean:.2f} (n={n}) vs overall mean: {overall_mean_val:.2f}\")"
+    ),
+    markdown_cell(
+        "## 9. Manual Review of Outliers\n"
+        "\n"
+        "Objectives doc target: top/bottom 25 companies should make sense on "
+        "manual inspection. Re-derived fresh here (not copied from "
+        "`notebooks/score_design.ipynb`)."
+    ),
+    code_cell(
+        "bucket_cols = [\n"
+        "    \"slug\", \"name\", \"batch\", \"status\",\n"
+        "    \"deep_tech_score\", \"description_score\", \"founder_background_score\",\n"
+        "    \"regulated_score\", \"market_type_pts\", \"geo_ops_score\",\n"
+        "    \"technical_score\", \"practical_score\", \"complexity_score\",\n"
+        "]\n"
+        "top_25 = merged.sort_values(\"complexity_score\", ascending=False)[bucket_cols].head(25)\n"
+        "top_25"
+    ),
+    code_cell(
+        "bottom_25 = merged.sort_values(\"complexity_score\", ascending=True)[bucket_cols].head(25)\n"
+        "bottom_25"
+    ),
 ]
 
 
