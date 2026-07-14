@@ -1,11 +1,14 @@
 """
-Generates output/complexity_dashboard_v1.html — a self-contained, offline
-HTML dashboard for exploring data/processed/scores/complexity_index_v1.csv,
-per docs/superpowers/specs/2026-07-14-phase10-visualization-dashboard-design.md.
+Generates output/complexity_dashboard_v2.html — a self-contained, offline
+HTML dashboard for exploring data/processed/scores/complexity_index_v2.csv,
+per docs/superpowers/specs/2026-07-14-phase10-visualization-dashboard-design.md
+(original dashboard architecture) and
+docs/superpowers/specs/2026-07-14-phase9.5-rubric-revision-design.md
+(v2 rubric + retargeting to v2, plus the About This Index section).
 
 Run: ./.venv/Scripts/python.exe scripts/generate_dashboard.py
 
-This phase only visualizes the already-computed index; it does not
+This script only visualizes the already-computed index; it does not
 recompute or re-validate any scores.
 """
 
@@ -19,11 +22,11 @@ import plotly.graph_objects as go
 import plotly.offline as pyo
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-SCORES_PATH = REPO_ROOT / "data" / "processed" / "scores" / "complexity_index_v1.csv"
+SCORES_PATH = REPO_ROOT / "data" / "processed" / "scores" / "complexity_index_v2.csv"
 FEATURES_PATH = REPO_ROOT / "data" / "processed" / "features" / "complexity_features.parquet"
 INDUSTRIES_PATH = REPO_ROOT / "data" / "processed" / "step3_enriched" / "industries_enriched.csv"
 COMPANIES_PATH = REPO_ROOT / "data" / "processed" / "step3_enriched" / "companies_enriched.csv"
-OUTPUT_PATH = REPO_ROOT / "output" / "complexity_dashboard_v1.html"
+OUTPUT_PATH = REPO_ROOT / "output" / "complexity_dashboard_v2.html"
 
 
 def load_dashboard_data(
@@ -401,8 +404,9 @@ STYLE = """
 <style>
   body { font-family: sans-serif; margin: 2rem; }
   h1 { margin-bottom: 0.5rem; }
-  .findings { background: #f7f7f7; border: 1px solid #ddd; border-radius: 4px; padding: 1rem 1.5rem; margin-bottom: 2rem; }
-  .findings h2 { margin-top: 0; }
+  .about, .findings { background: #f7f7f7; border: 1px solid #ddd; border-radius: 4px; padding: 1rem 1.5rem; margin-bottom: 2rem; }
+  .about h2, .findings h2 { margin-top: 0; }
+  .about p { margin: 0.5rem 0; }
   .findings li { margin-bottom: 0.5rem; }
   .chart { margin-bottom: 2rem; }
   table { border-collapse: collapse; width: 100%; }
@@ -414,23 +418,43 @@ STYLE = """
 """
 
 
+def build_about_section() -> str:
+    """
+    Explains what the score measures, how it's computed, and how to read
+    it — placed before Key Findings so a first-time visitor has the
+    context needed to interpret the charts and table that follow.
+    """
+    return """
+<section class="about">
+<h2>About This Index</h2>
+<p><strong>What it measures:</strong> a 0-100 Complexity Index combining Technical difficulty (building the core technology) and Practical/Market difficulty (executing in the market) for each Y Combinator company.</p>
+<p><strong>How it's built:</strong> capped linear scaling &mdash; each raw signal (deep-tech tags, regulatory status, market type, etc.) is scaled from 0 up to a cap, then clipped. Caps come from the 95th&ndash;99th percentile of real observed values, so rare outliers don't dominate the scale.</p>
+<p><strong>The weighting (Phase 9.5 revision):</strong> Technical component 0&ndash;30 points (deep-tech tags, R&amp;D-vocabulary in descriptions, founder background), Practical component 0&ndash;70 points (regulated industry, market type, geography &amp; operations). This shifted from an original 50/50 split because practical signals cover far more of the company base &mdash; most YC companies aren't deep-tech, so a 50-point technical budget was mostly wasted on zeros for about half the dataset.</p>
+<p><strong>Key assumptions:</strong> deep-tech signal comes from tags and description keywords, not a hands-on technical audit; "regulated" is industry-based, not a legal determination; team size wasn't found to reliably predict complexity in this dataset, so it isn't part of the formula.</p>
+<p><strong>How to read a score:</strong> roughly, <strong>0&ndash;20 = minimal</strong> complexity (plain consumer/SaaS, no regulation or deep-tech signal), <strong>20&ndash;40 = moderate</strong> (the bulk of companies &mdash; some regulation or market complexity; the median score is 25.5), <strong>40+ = high</strong> (roughly the top 10% &mdash; deep-tech and/or heavily regulated, p90 is 42).</p>
+<p><strong>Known limitations:</strong> this index does not correlate strongly with team size (r=0.10), and the score distribution remains narrower than originally targeted (std=11.95 vs an original aspiration of &ge;15). Both are explained by real "no signal" mass in about half the dataset &mdash; most companies simply have zero deep-tech indicators &mdash; not a tuning failure. See the project roadmap for the full diagnostic writeup.</p>
+</section>
+"""
+
+
 def build_findings_summary() -> str:
     """
-    A scannable "Key Findings" summary placed before the charts, adapting
-    Phase 9's notebook analysis into dashboard-appropriate bullets. All
-    numbers are the same verified figures from Phase 9 — this phase only
-    visualizes the already-computed index, it doesn't recompute it.
+    A scannable "Key Findings" summary placed after About This Index and
+    before the charts, adapting the notebook's Phase 9.5 analysis into
+    dashboard-appropriate bullets. All numbers are the same verified
+    figures re-derived on complexity_index_v2.csv.
     """
     return """
 <section class="findings">
 <h2>Key Findings</h2>
 <ul>
-<li><strong>Deep-tech and regulated industries dominate the top of the index</strong> &mdash; Drug Discovery and Delivery (39.4), Legal (38.0), and Industrial Bio (35.0) lead, while consumer/content industries sit at the bottom &mdash; Education (6.7), Social (8.2), Content (9.2).</li>
-<li><strong>Complexity has risen steadily across YC batches</strong> &mdash; from ~10&ndash;15 in the earliest batches (S05&ndash;S09) to ~22&ndash;29 in the most recent (S22&ndash;S24). The cause isn't diagnosed here &mdash; it could reflect real growth in deep-tech/AI representation, or richer data on newer companies.</li>
-<li><strong>Technical and practical complexity are independent dimensions</strong> (correlation &asymp; 0), confirming the rubric measures two distinct kinds of difficulty rather than one thing twice.</li>
-<li><strong>Industry tags behave as expected</strong> &mdash; Healthcare-tagged companies score ~2x the overall average on technical complexity; Fintech-tagged companies score higher on practical complexity and universally receive the regulated-industry bonus.</li>
-<li><strong>Public and Active companies score similarly</strong> (~22.6 both), each above Acquired (17.7) and Inactive (16.7) &mdash; though the Public group is small (19 companies).</li>
-<li><strong>Known limitation:</strong> two quantitative calibration targets &mdash; correlation with team size and score distribution spread &mdash; remain unmet (see the project roadmap for details). The index passes manual review and produces intuitive patterns, but hasn't been fully validated against those targets.</li>
+<li><strong>Regulated and operations-heavy industries now dominate the top of the index</strong> &mdash; Legal (49.4), Finance and Accounting (46.6), and Supply Chain and Logistics (42.7) lead, ahead of Drug Discovery and Delivery (40.5). Consumer/content industries remain at the bottom &mdash; Education (8.5), Social (10.9), Content (11.8).</li>
+<li><strong>Complexity has risen steadily across YC batches</strong> &mdash; from ~19 in the earliest batches (S05&ndash;S09) to ~34 in the most recent (S22&ndash;S24), the same upward shape observed before this rubric revision.</li>
+<li><strong>Technical and practical complexity are independent dimensions</strong> (correlation &asymp; -0.05), confirming the rubric measures two distinct kinds of difficulty rather than one thing twice.</li>
+<li><strong>Industry tags behave as expected</strong> &mdash; Healthcare-tagged companies score ~1.9x the overall average on technical complexity; Fintech-tagged companies score higher on practical complexity and universally receive the full regulated-industry bonus.</li>
+<li><strong>Active and Public companies score similarly</strong> (~29 both), each above Acquired (23.9) and Inactive (22.3).</li>
+<li><strong>A company can now reach a high score on practical complexity alone</strong> &mdash; since the practical budget (70 points) exceeds the entire previous version's observed maximum, several companies with zero technical signal (e.g. logistics and supply-chain operators) now rank in the top 25. This is an expected effect of shifting weight toward the practical dimension, not an anomaly.</li>
+<li><strong>Known limitation:</strong> two quantitative calibration targets &mdash; correlation with team size and score distribution spread &mdash; were revisited in this rubric revision. Both improved meaningfully (r: 0.035&rarr;0.103, &sigma;: 10.11&rarr;11.95) but remain short of their original targets, which have been formally relaxed rather than further chased (see About This Index above).</li>
 </ul>
 </section>
 """
@@ -463,11 +487,13 @@ def build_dashboard_body(
     )
 
     plotly_bundle = f"<script>{pyo.get_plotlyjs()}</script>"
+    about_section = build_about_section()
     findings_summary = build_findings_summary()
 
     return (
         f"{STYLE}{plotly_bundle}"
         f"<h1>Y Combinator Complexity Index Dashboard</h1>"
+        f"{about_section}"
         f"{findings_summary}"
         f"{chart_sections}"
         f"<h2>Company Explorer</h2>{table_html}"

@@ -340,7 +340,7 @@ def test_build_findings_summary_contains_expected_section_and_key_stats():
     assert "Known limitation" in summary
 
 
-def test_build_dashboard_body_includes_findings_summary_before_charts():
+def test_build_dashboard_body_includes_about_and_findings_before_charts():
     scores_df = _sample_scores_df()
     industry_exploded_df = scores_df.assign(industry="Fintech")
     corr_matrix = pd.DataFrame({"a": [1.0, 0.5], "b": [0.5, 1.0]}, index=["a", "b"])
@@ -348,7 +348,9 @@ def test_build_dashboard_body_includes_findings_summary_before_charts():
 
     body = build_dashboard_body(scores_df, industry_exploded_df, corr_matrix, table_html)
 
+    assert '<section class="about">' in body
     assert '<section class="findings">' in body
+    assert body.index('<section class="about">') < body.index('<section class="findings">')
     assert body.index('<section class="findings">') < body.index("chart-distribution")
 
 
@@ -403,3 +405,14 @@ def test_build_table_html_embeds_industries_list_for_exact_filter_matching():
     assert match, "company-data script tag not found"
     payload = json.loads(match.group(1).replace("<\\/", "</"))
     assert payload[0]["industries_list"] == ["Consumer Finance"]
+
+
+def test_build_about_section_contains_expected_content():
+    from scripts.generate_dashboard import build_about_section
+
+    about = build_about_section()
+
+    assert '<section class="about">' in about
+    assert "About This Index" in about
+    assert "30" in about and "70" in about
+    assert "team size" in about.lower()
