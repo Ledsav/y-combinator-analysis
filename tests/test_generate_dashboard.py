@@ -64,3 +64,64 @@ def test_explode_industries_produces_one_row_per_company_industry_pair():
 def test_batch_sort_key_orders_winter_before_summer_within_year():
     assert batch_sort_key("W12") < batch_sort_key("S12")
     assert batch_sort_key("S11") < batch_sort_key("W12")
+
+
+from scripts.generate_dashboard import (
+    build_batch_chart,
+    build_distribution_chart,
+    build_scatter_chart,
+    build_status_chart,
+)
+
+
+def test_build_distribution_chart_uses_complexity_score_as_x():
+    scores_df = pd.DataFrame({"complexity_score": [10.0, 20.0, 30.0]})
+
+    fig = build_distribution_chart(scores_df)
+
+    assert list(fig.data[0].x) == [10.0, 20.0, 30.0]
+    assert fig.layout.title.text == "Complexity Score Distribution"
+
+
+def test_build_scatter_chart_plots_technical_vs_practical():
+    scores_df = pd.DataFrame(
+        {
+            "technical_score": [10.0, 20.0],
+            "practical_score": [5.0, 15.0],
+            "name": ["Acme", "Beta"],
+        }
+    )
+
+    fig = build_scatter_chart(scores_df)
+
+    assert list(fig.data[0].x) == [10.0, 20.0]
+    assert list(fig.data[0].y) == [5.0, 15.0]
+    assert list(fig.data[0].text) == ["Acme", "Beta"]
+
+
+def test_build_batch_chart_orders_batches_chronologically():
+    scores_df = pd.DataFrame(
+        {
+            "batch": ["S12", "W12", "S11"],
+            "complexity_score": [30.0, 20.0, 10.0],
+        }
+    )
+
+    fig = build_batch_chart(scores_df)
+
+    assert list(fig.data[0].x) == ["S11", "W12", "S12"]
+    assert list(fig.data[0].y) == [10.0, 20.0, 30.0]
+
+
+def test_build_status_chart_sorts_descending_by_mean_score():
+    scores_df = pd.DataFrame(
+        {
+            "status": ["Active", "Active", "Inactive"],
+            "complexity_score": [10.0, 30.0, 5.0],
+        }
+    )
+
+    fig = build_status_chart(scores_df)
+
+    assert list(fig.data[0].x) == ["Active", "Inactive"]
+    assert list(fig.data[0].y) == [20.0, 5.0]

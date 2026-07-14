@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Dict, List, Tuple
 
 import pandas as pd
+import plotly.graph_objects as go
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCORES_PATH = REPO_ROOT / "data" / "processed" / "scores" / "complexity_index_v1.csv"
@@ -63,3 +64,72 @@ def batch_sort_key(batch: str) -> Tuple[int, int]:
     year = int(batch[1:])
     season_order = 0 if batch[0] == "W" else 1
     return (year, season_order)
+
+
+def build_distribution_chart(scores_df: pd.DataFrame) -> go.Figure:
+    fig = go.Figure(data=[go.Histogram(x=scores_df["complexity_score"], nbinsx=30)])
+    fig.update_layout(
+        title="Complexity Score Distribution",
+        xaxis_title="complexity_score",
+        yaxis_title="count",
+    )
+    return fig
+
+
+def build_scatter_chart(scores_df: pd.DataFrame) -> go.Figure:
+    fig = go.Figure(
+        data=[
+            go.Scatter(
+                x=scores_df["technical_score"],
+                y=scores_df["practical_score"],
+                mode="markers",
+                marker=dict(opacity=0.5),
+                text=scores_df["name"],
+                hovertemplate="%{text}<br>Technical: %{x}<br>Practical: %{y}<extra></extra>",
+            )
+        ]
+    )
+    fig.update_layout(
+        title="Technical vs Practical Complexity",
+        xaxis_title="technical_score",
+        yaxis_title="practical_score",
+    )
+    return fig
+
+
+def build_batch_chart(scores_df: pd.DataFrame) -> go.Figure:
+    batch_summary = scores_df.groupby("batch")["complexity_score"].mean().reset_index()
+    batch_summary["sort_key"] = batch_summary["batch"].apply(batch_sort_key)
+    batch_summary = batch_summary.sort_values("sort_key").drop(columns="sort_key")
+
+    fig = go.Figure(
+        data=[
+            go.Scatter(
+                x=batch_summary["batch"], y=batch_summary["complexity_score"], mode="lines+markers"
+            )
+        ]
+    )
+    fig.update_layout(
+        title="Mean Complexity Score by Batch",
+        xaxis_title="batch",
+        yaxis_title="mean complexity_score",
+    )
+    return fig
+
+
+def build_status_chart(scores_df: pd.DataFrame) -> go.Figure:
+    status_summary = (
+        scores_df.groupby("status")["complexity_score"]
+        .mean()
+        .sort_values(ascending=False)
+        .reset_index()
+    )
+    fig = go.Figure(
+        data=[go.Bar(x=status_summary["status"], y=status_summary["complexity_score"])]
+    )
+    fig.update_layout(
+        title="Mean Complexity Score by Status",
+        xaxis_title="status",
+        yaxis_title="mean complexity_score",
+    )
+    return fig
