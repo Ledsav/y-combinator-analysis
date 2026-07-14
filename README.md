@@ -65,7 +65,7 @@ Produces `output/complexity_dashboard_v2.html` — a single self-contained, offl
 
 - **`complexity_index_v1.csv`** — the original Phase 7 calibration (50/50 technical/practical split). Preserved as the historical baseline; not the current default.
 - **`complexity_index_v2.csv`** — the current default, from the Phase 9.5 rubric revision (30/70 split). This is what `notebooks/complexity_analysis.ipynb` and `output/complexity_dashboard_v2.html` currently analyze.
-- To produce a new version, pass `--output-version vN` to `scripts/run_complexity_pipeline.py`. Nothing else is auto-versioned — if you generate a new score version, manually re-point and re-run `scripts/generate_complexity_analysis_notebook.py` / `scripts/generate_dashboard.py` against it if you want updated analysis artifacts (see each script's `SCORES_PATH` constant).
+- To produce a new version, pass `--output-version vN` to `scripts/run_complexity_pipeline.py`. Nothing else is auto-versioned — if you generate a new score version, manually re-point and re-run `scripts/generate_complexity_analysis_notebook.py` / `scripts/generate_dashboard.py` against it if you want updated analysis artifacts (`generate_dashboard.py` has a `SCORES_PATH` constant; the notebook generator embeds the path inline in its setup cell's source string instead).
 
 ## Project Structure
 

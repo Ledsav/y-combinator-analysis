@@ -348,13 +348,13 @@ python scripts/run_complexity_pipeline.py --steps clean,impute,features,score
    - **Decision**: Start with global normalization, analyze batch effects later
 
 2. **Enrichment scope**: How many companies to enrich?
-   - **Decision**: TBD based on Phase 4 results
+   - **Decision**: Resolved in Phase 5 — scoped to `complexity_score >= 80` companies, rate-limited scraping (see Phase 5's timeline entry)
 
 3. **NLP approach**: Simple keyword matching or embeddings?
    - **Decision**: Start simple (keyword), upgrade if needed
 
 4. **Version control**: How to version complexity scores?
-   - **Decision**: Date-stamped CSVs + git tags (e.g., `complexity_index_v1_2026-01-24.csv`)
+   - **Decision**: Superseded by what actually shipped — plain incrementing version suffixes (`complexity_index_v1.csv`, `complexity_index_v2.csv`), not date-stamped filenames. See [Data Versioning in README.md](../../README.md#data-versioning).
 
 ---
 

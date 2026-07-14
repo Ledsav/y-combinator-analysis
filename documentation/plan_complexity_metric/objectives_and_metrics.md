@@ -2,7 +2,7 @@
 
 **Document Version:** 1.0  
 **Date:** 2026-01-24  
-**Status:** Planning Phase
+**Status:** Complete (all 11 phases — see `documentation/plan_complexity_metric/roadmap.md`)
 
 ---
 
@@ -167,12 +167,10 @@ Expected relationships (to validate scoring):
 
 ---
 
-## 8. Project Status
+## 9. Project Status
 
-**See the main roadmap for task tracking**: `documentation/plan_complexity_metric/ROADMAP.md`
+**See the main roadmap for full task tracking**: `documentation/plan_complexity_metric/roadmap.md`
 
-**Completed:**
-- ✅ Objectives & metrics definition
-- ✅ Data inventory & dictionary
+**Completed:** all 11 phases — data cleaning, imputation, enrichment, feature engineering, scoring rubric (including the Phase 9.5 revision to a 30/70 technical/practical split), the ETL pipeline, validation & analysis, the visualization dashboard, and this documentation pass.
 
-**Next:** Data cleaning & normalization (Phase 3)
+**Current output:** `data/processed/scores/complexity_index_v2.csv` (current default) and `complexity_index_v1.csv` (historical Phase 7 baseline), analyzed in `notebooks/complexity_analysis.ipynb` and `output/complexity_dashboard_v2.html`.
