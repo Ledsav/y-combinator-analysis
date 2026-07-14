@@ -101,3 +101,31 @@ def test_load_rubric_raises_on_invalid_yaml_content(tmp_path):
 
     with pytest.raises(ValueError, match="buckets"):
         load_rubric(rubric_path)
+
+
+from pathlib import Path
+
+CONFIG_DIR = Path(__file__).resolve().parents[1] / "config"
+
+
+def _dimension_points(rubric):
+    totals = {}
+    for bucket in rubric["buckets"]:
+        totals[bucket["dimension"]] = totals.get(bucket["dimension"], 0) + bucket["params"]["points"]
+    return totals
+
+
+def test_rubric_v2_loads_and_sums_to_30_70():
+    rubric = load_rubric(CONFIG_DIR / "rubric_v2.yaml")
+
+    totals = _dimension_points(rubric)
+    assert totals["technical"] == 30
+    assert totals["practical"] == 70
+
+
+def test_rubric_v1_loads_and_sums_to_50_50():
+    rubric = load_rubric(CONFIG_DIR / "rubric_v1.yaml")
+
+    totals = _dimension_points(rubric)
+    assert totals["technical"] == 50
+    assert totals["practical"] == 50

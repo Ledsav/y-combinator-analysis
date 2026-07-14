@@ -1,0 +1,62 @@
+version: v1
+description: "Phase 7 original rubric -- 50/50 technical/practical split (historical baseline, preserved for provenance of complexity_index_v1.csv; not the current default)"
+buckets:
+  - name: deep_tech
+    dimension: technical
+    raw_feature: deep_tech_tag_count
+    method: linear_capped
+    params:
+      cap: 3
+      points: 20
+
+  - name: description
+    dimension: technical
+    raw_feature: description_tech_score
+    method: linear_capped
+    params:
+      cap: 3
+      points: 15
+
+  - name: founder_background
+    dimension: technical
+    combine: weighted_sum
+    combine_params:
+      features:
+        founder_phd_count: 2
+        research_company_experience: 1
+    method: linear_capped
+    params:
+      cap: 4
+      points: 15
+
+  - name: regulated
+    dimension: practical
+    raw_feature: regulated_industry
+    method: linear_capped
+    params:
+      cap: 1
+      points: 15
+
+  - name: market_type
+    dimension: practical
+    raw_feature: market_type_score
+    method: linear_capped
+    params:
+      cap: 3
+      points: 15
+
+  - name: international_operations
+    dimension: practical
+    raw_feature: international_operations
+    method: linear_capped
+    params:
+      cap: 2
+      points: 10
+
+  - name: operational_intensity
+    dimension: practical
+    raw_feature: operational_intensity
+    method: linear_capped
+    params:
+      cap: 2
+      points: 10
