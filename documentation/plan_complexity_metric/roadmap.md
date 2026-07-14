@@ -1,7 +1,7 @@
 # Y Combinator Complexity Index - Project Roadmap
 
 **Version:** 1.0  
-**Last Updated:** 2026-01-24  
+**Last Updated:** 2026-07-14  
 **Status:** In Progress
 
 ---
@@ -272,11 +272,21 @@ python scripts/run_complexity_pipeline.py --steps clean,impute,features,score
 - Are public companies more complex than average?
 - Does complexity correlate with team size?
 
-### Phase 10: Documentation
+### Phase 10: Visualization Dashboard
+
+**Deliverables:**
+- `scripts/generate_dashboard.py` - generator script
+- `output/complexity_dashboard_v1.html` - self-contained, offline-capable dashboard (Plotly.js bundled inline, no CDN, no server)
+
+**Contents:**
+1. Score distribution, technical vs practical scatter, complexity by batch/status/industry, correlation heatmap (all interactive Plotly charts, mirroring Phase 9's analysis)
+2. Company Explorer: a sortable/filterable/searchable table of all 4,844 companies (batch/status/industry filters, name search)
+
+### Phase 11: Documentation
 
 **Updates Required:**
 - Main `README.md` - add Complexity Index section
-- Pipeline usage guide
+- Pipeline usage guide (including how to run `scripts/generate_dashboard.py`)
 - Data versioning conventions
 - Known limitations & future work
 
