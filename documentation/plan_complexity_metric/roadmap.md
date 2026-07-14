@@ -99,11 +99,12 @@
   - [x] Output: Complete pipeline + `complexity_index_v1.csv`
   - **Known gap:** `DEFAULT_STEPS` in `src/etl/pipeline.py` (what `--steps all` resolves to) deliberately excludes `enrich`, but `run_feature_engineering_pipeline` in `src/etl/features.py` always reads its input from `data/processed/step3_enriched/` — `enrich`'s output directory, not `impute`'s (`step2_imputed/`). So a default `--steps all` run regenerates `step1_cleaned/` and `step2_imputed/` but then `features` reads the untouched, pre-existing `step3_enriched/`, meaning fresh clean/impute output never reaches the final `complexity_index` CSV unless `enrich` is explicitly included in `--steps`. No behavior change was made; this is documented only (see the `--steps` help text in `scripts/run_complexity_pipeline.py`).
 
-- [ ] **9. Validation & analysis**
-  - [ ] Score distribution analysis
-  - [ ] Correlation checks (team size, status)
-  - [ ] Manual review top/bottom companies
-  - [ ] Output: `notebooks/complexity_analysis.ipynb`
+- [x] **9. Validation & analysis**
+  - [x] Score distribution analysis
+  - [x] Correlation checks (team size, status)
+  - [x] Manual review top/bottom companies
+  - [x] Output: `notebooks/complexity_analysis.ipynb`
+  - **Confirmed gap:** re-derived fresh (not copied from Phase 7), the team-size correlation (Pearson r=0.035, Spearman r=0.050 vs target r>0.2) and distribution spread (std=10.11 vs target ≥15) gaps identified in Phase 7 are unchanged — see `notebooks/complexity_analysis.ipynb` section 10 ("Findings"). New findings: technical/practical sub-scores are uncorrelated (r=-0.049, as intended); complexity rises markedly by batch over time (undiagnosed cause); Public/Active companies score similarly and both above Acquired/Inactive; industry and validation-question checks (Healthcare→technical, Fintech→practical/regulated) all match intuition. A rubric-revision follow-up (tentatively "Phase 9.5") is recommended before treating the index as fully validated, but is out of scope for this phase.
 
 - [ ] **10. Documentation & reproducibility**
   - [ ] Update main README
@@ -286,9 +287,9 @@ python scripts/run_complexity_pipeline.py --steps clean,impute,features,score
 | 6. Features | 2-3 days | ✅ Complete |
 | 7. Scoring | 1-2 days | ✅ Complete |
 | 8. Pipeline | 2 days | ✅ Complete |
-| 9. Validation | 1 day | 🔲 Not started |
+| 9. Validation | 1 day | ✅ Complete |
 | 10. Documentation | 1 day | 🔲 Not started |
-| **Total** | **10-15 days** | **80% complete** |
+| **Total** | **10-15 days** | **90% complete** |
 
 ---
 
@@ -330,12 +331,11 @@ python scripts/run_complexity_pipeline.py --steps clean,impute,features,score
 
 ## Next Immediate Actions
 
-**Current Focus:** Phase 9 - Validation & Analysis
+**Current Focus:** Phase 10 - Documentation & Reproducibility (with an open decision on inserting a Phase 9.5 rubric revision first)
 
 **Next Steps:**
-1. Build `notebooks/complexity_analysis.ipynb`: score distribution, technical vs practical scatter, complexity by batch/status/industry, correlation heatmap
-2. Manual review of top/bottom outliers
-3. Revisit the Phase 7 calibration gap (team-size correlation r=0.035 vs target >0.2; score spread σ=10.11 vs target ≥15) — this is the natural point to decide whether to fix it before treating the index as validated, since Phase 9 is the first phase that actually analyzes/uses the scores rather than just producing them
-4. Output: `notebooks/complexity_analysis.ipynb`
+1. Decide whether to insert a Phase 9.5 (revise `score.py`'s weights/caps to address the confirmed team-size correlation and distribution-spread gaps) before Phase 10, or proceed to documentation with the gap recorded as a known limitation — this requires a follow-up brainstorming pass, not a decision made silently here.
+2. If proceeding to Phase 10 directly: update the main `README.md` with a Complexity Index section, add pipeline usage instructions, write a minimal test suite for anything still untested, and version-control all outputs.
+3. Output (Phase 10): updated `README.md` + usage docs.
 
-**To continue:** Mark this task complete and proceed to implementation.
+**To continue:** Mark this task complete and decide on Phase 9.5 vs. Phase 10 before proceeding to implementation.

@@ -13,7 +13,7 @@ Checklist
 - [x] 6. Feature engineering
 - [x] 7. Design scoring rubric
 - [x] 8. Implement ETL pipeline
-- [ ] 9. Validate & analyze index
+- [x] 9. Validate & analyze index
 - [ ] 10. Documentation & reproducibility
 - [ ] 11. Deploy & monitor
 - [ ] 12. Maintain interactive todo file
