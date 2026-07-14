@@ -16,6 +16,7 @@ from typing import Dict, List, Tuple
 
 import pandas as pd
 import plotly.graph_objects as go
+import plotly.offline as pyo
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCORES_PATH = REPO_ROOT / "data" / "processed" / "scores" / "complexity_index_v1.csv"
@@ -384,4 +385,71 @@ def build_table_html(records: List[dict]) -> str:
   render();
 }})();
 </script>
+"""
+
+
+STYLE = """
+<style>
+  body { font-family: sans-serif; margin: 2rem; }
+  h1 { margin-bottom: 0.5rem; }
+  .chart { margin-bottom: 2rem; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #ccc; padding: 4px 8px; text-align: left; }
+  th { background: #f0f0f0; }
+  .table-controls { margin-bottom: 1rem; }
+  .table-controls input, .table-controls select { margin-right: 0.5rem; }
+</style>
+"""
+
+
+def build_dashboard_body(
+    scores_df: pd.DataFrame,
+    industry_exploded_df: pd.DataFrame,
+    corr_matrix: pd.DataFrame,
+    table_html: str,
+) -> str:
+    """
+    Body-only HTML (no <html>/<head>/<body> tags): one inline Plotly.js
+    bundle (never duplicated per chart), 6 chart sections, and the company
+    table.
+    """
+    chart_specs = [
+        ("chart-distribution", "Score Distribution", build_distribution_chart(scores_df)),
+        ("chart-scatter", "Technical vs Practical", build_scatter_chart(scores_df)),
+        ("chart-batch", "Complexity by Batch", build_batch_chart(scores_df)),
+        ("chart-status", "Complexity by Status", build_status_chart(scores_df)),
+        ("chart-industry", "Complexity by Industry", build_industry_chart(industry_exploded_df)),
+        ("chart-heatmap", "Correlation Heatmap", build_correlation_heatmap(corr_matrix)),
+    ]
+
+    chart_sections = "\n".join(
+        f'<div class="chart"><h2>{title}</h2>'
+        f'{fig.to_html(full_html=False, include_plotlyjs=False, div_id=div_id)}</div>'
+        for div_id, title, fig in chart_specs
+    )
+
+    plotly_bundle = f"<script>{pyo.get_plotlyjs()}</script>"
+
+    return (
+        f"{STYLE}{plotly_bundle}"
+        f"<h1>Y Combinator Complexity Index Dashboard</h1>"
+        f"{chart_sections}"
+        f"<h2>Company Explorer</h2>{table_html}"
+    )
+
+
+def build_standalone_dashboard(
+    body: str, title: str = "YC Complexity Index Dashboard"
+) -> str:
+    """Wrap body-only HTML in a minimal standalone document."""
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>{title}</title>
+</head>
+<body>
+{body}
+</body>
+</html>
 """

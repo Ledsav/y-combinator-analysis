@@ -278,3 +278,54 @@ def test_build_table_html_embeds_escaped_json_and_expected_structure():
     assert "</script>" not in payload
     parsed = json.loads(payload.replace("<\\/", "</"))
     assert parsed[0]["name"] == "Acme </script> Co"
+
+
+from scripts.generate_dashboard import build_dashboard_body, build_standalone_dashboard
+
+
+def _sample_scores_df():
+    return pd.DataFrame(
+        {
+            "id": [1, 2],
+            "name": ["Acme", "Beta"],
+            "batch": ["W24", "S23"],
+            "status": ["Active", "Active"],
+            "technical_score": [10.0, 5.0],
+            "practical_score": [5.0, 10.0],
+            "complexity_score": [15.0, 15.0],
+        }
+    )
+
+
+def test_build_dashboard_body_contains_one_bundle_and_all_six_charts():
+    scores_df = _sample_scores_df()
+    industry_exploded_df = scores_df.assign(industry="Fintech")
+    corr_matrix = pd.DataFrame({"a": [1.0, 0.5], "b": [0.5, 1.0]}, index=["a", "b"])
+    table_html = '<table id="company-table"></table>'
+
+    body = build_dashboard_body(scores_df, industry_exploded_df, corr_matrix, table_html)
+
+    assert body.count("plotly.js v") == 1
+    for div_id in [
+        "chart-distribution",
+        "chart-scatter",
+        "chart-batch",
+        "chart-status",
+        "chart-industry",
+        "chart-heatmap",
+    ]:
+        assert div_id in body
+    assert "<html" not in body.lower()
+    assert "<table id=\"company-table\"></table>" in body
+
+
+def test_build_standalone_dashboard_wraps_body_exactly_once():
+    body = "<div>hello</div>"
+
+    html = build_standalone_dashboard(body)
+
+    assert html.count("<html") == 1
+    assert html.count("<head>") == 1
+    assert html.count("<body>") == 1
+    assert "<div>hello</div>" in html
+    assert "<title>YC Complexity Index Dashboard</title>" in html
