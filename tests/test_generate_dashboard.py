@@ -125,3 +125,59 @@ def test_build_status_chart_sorts_descending_by_mean_score():
 
     assert list(fig.data[0].x) == ["Active", "Inactive"]
     assert list(fig.data[0].y) == [20.0, 5.0]
+
+
+from scripts.generate_dashboard import (
+    build_correlation_heatmap,
+    build_correlation_matrix,
+    build_industry_chart,
+)
+
+
+def test_build_industry_chart_filters_by_min_count_and_sorts_descending():
+    industry_exploded_df = pd.DataFrame(
+        {
+            "industry": ["A", "A", "A", "B", "B", "C"],
+            "complexity_score": [10.0, 20.0, 30.0, 5.0, 15.0, 100.0],
+        }
+    )
+
+    fig = build_industry_chart(industry_exploded_df, min_count=2)
+
+    # C has only 1 company (< min_count), excluded; A (mean 20) > B (mean 10)
+    assert list(fig.data[0].y) == ["A", "B"]
+    assert list(fig.data[0].x) == [20.0, 10.0]
+
+
+def test_build_correlation_matrix_computes_expected_shape_and_values():
+    scores_df = pd.DataFrame(
+        {
+            "id": [1, 2, 3],
+            "deep_tech_score": [10.0, 20.0, 30.0],
+            "technical_score": [10.0, 20.0, 30.0],
+            "practical_score": [30.0, 20.0, 10.0],
+            "description_score": [0.0, 0.0, 0.0],
+            "founder_background_score": [0.0, 0.0, 0.0],
+            "regulated_score": [0, 0, 0],
+            "market_type_pts": [0, 0, 0],
+            "geo_ops_score": [0.0, 0.0, 0.0],
+            "complexity_score": [40.0, 40.0, 40.0],
+        }
+    )
+    features_df = pd.DataFrame({"id": [1, 2, 3], "deep_tech_tag_count": [1, 2, 3]})
+
+    corr = build_correlation_matrix(scores_df, features_df, feature_cols=["deep_tech_tag_count"])
+
+    assert corr.shape == (10, 10)
+    assert corr.loc["deep_tech_tag_count", "technical_score"] == pytest.approx(1.0)
+    assert corr.loc["technical_score", "practical_score"] == pytest.approx(-1.0)
+
+
+def test_build_correlation_heatmap_uses_matrix_values_and_labels():
+    corr_matrix = pd.DataFrame({"a": [1.0, 0.5], "b": [0.5, 1.0]}, index=["a", "b"])
+
+    fig = build_correlation_heatmap(corr_matrix)
+
+    assert fig.data[0].z.tolist() == [[1.0, 0.5], [0.5, 1.0]]
+    assert list(fig.data[0].x) == ["a", "b"]
+    assert list(fig.data[0].y) == ["a", "b"]

@@ -133,3 +133,57 @@ def build_status_chart(scores_df: pd.DataFrame) -> go.Figure:
         yaxis_title="mean complexity_score",
     )
     return fig
+
+
+def build_industry_chart(industry_exploded_df: pd.DataFrame, min_count: int = 20) -> go.Figure:
+    industry_summary = (
+        industry_exploded_df.groupby("industry")["complexity_score"]
+        .agg(["mean", "count"])
+        .query("count >= @min_count")
+        .sort_values("mean", ascending=False)
+        .reset_index()
+    )
+    fig = go.Figure(
+        data=[go.Bar(y=industry_summary["industry"], x=industry_summary["mean"], orientation="h")]
+    )
+    fig.update_layout(
+        title=f"Mean Complexity Score by Industry (>= {min_count} companies)",
+        xaxis_title="mean complexity_score",
+        yaxis_title="industry",
+        height=max(400, 20 * len(industry_summary)),
+    )
+    return fig
+
+
+def build_correlation_matrix(
+    scores_df: pd.DataFrame, features_df: pd.DataFrame, feature_cols: List[str]
+) -> pd.DataFrame:
+    merged = scores_df.merge(features_df[["id"] + feature_cols], on="id", how="left")
+    corr_cols = feature_cols + [
+        "deep_tech_score",
+        "description_score",
+        "founder_background_score",
+        "regulated_score",
+        "market_type_pts",
+        "geo_ops_score",
+        "technical_score",
+        "practical_score",
+        "complexity_score",
+    ]
+    return merged[corr_cols].corr()
+
+
+def build_correlation_heatmap(corr_matrix: pd.DataFrame) -> go.Figure:
+    fig = go.Figure(
+        data=go.Heatmap(
+            z=corr_matrix.values,
+            x=corr_matrix.columns.tolist(),
+            y=corr_matrix.columns.tolist(),
+            colorscale="RdBu",
+            zmid=0,
+            zmin=-1,
+            zmax=1,
+        )
+    )
+    fig.update_layout(title="Correlation Heatmap")
+    return fig
