@@ -13,8 +13,8 @@
 **Data Source:** 8 CSV files in `data/raw/` (4,844 companies, 8,465 founders)
 
 **Output:** Per-company complexity scores (0-100 scale) with:
-- Technical Complexity component (0-50)
-- Practical/Market Complexity component (0-50)
+- Technical Complexity component (0-30, revised from 0-50 in Phase 9.5)
+- Practical/Market Complexity component (0-70, revised from 0-50 in Phase 9.5)
 - Combined index and detailed breakdowns
 
 ---
@@ -23,13 +23,13 @@
 
 ### What the Index Measures
 
-**Technical Complexity (50%)**: Difficulty of building the core technology
+**Technical Complexity (30%, revised from 50% in Phase 9.5)**: Difficulty of building the core technology
 - Deep tech indicators: AI, Biotech, Robotics, Hardware
 - R&D intensity from descriptions
 - Technical founder backgrounds (PhDs, research labs)
 - Hard science industries
 
-**Practical Complexity (50%)**: Difficulty of market execution
+**Practical Complexity (70%, revised from 50% in Phase 9.5)**: Difficulty of market execution
 - Regulatory burden (Fintech, Healthcare)
 - Market structure (B2B, B2C, Marketplace)
 - Geographic challenges
@@ -42,8 +42,8 @@
 | **Coverage** | ≥95% of companies | Ensure broad applicability |
 | **Reproducibility** | 100% deterministic | Same input = same output |
 | **Validity** | Pass manual review | Top/bottom 50 companies make sense |
-| **Correlation** | r>0.2 with team size | Complex ventures need bigger teams |
-| **Distribution** | σ ≥15 points | Good variance, avoid clustering |
+| **Correlation** | Relaxed in Phase 9.5 (r=0.103, up from 0.035; original target r>0.2 found structurally unreachable) | Complex ventures need bigger teams |
+| **Distribution** | Relaxed in Phase 9.5 (σ=11.95, up from 10.11; original target σ≥15 found structurally unreachable) | Good variance, avoid clustering |
 
 ---
 

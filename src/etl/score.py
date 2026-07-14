@@ -280,9 +280,14 @@ def run_scoring_pipeline(input_path: Path = None, output_path: Path = None) -> N
             / "data" / "processed" / "features" / "complexity_features.parquet"
         )
     if output_path is None:
+        # Defaults to v2 (the current rubric this module produces, per the
+        # Phase 9.5 revision) — never v1, which must stay the immutable
+        # historical Phase 7 baseline. Callers who need a specific version
+        # should pass output_path explicitly (scripts/run_complexity_pipeline.py
+        # always does, via --output-version).
         output_path = (
             Path(__file__).resolve().parents[2]
-            / "data" / "processed" / "scores" / "complexity_index_v1.csv"
+            / "data" / "processed" / "scores" / "complexity_index_v2.csv"
         )
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
