@@ -42,7 +42,7 @@ def compute_deep_tech_score(
 ) -> pd.DataFrame:
     """
     Scale deep_tech_tag_count linearly to a 0-`points` budget, capped at
-    `cap` tags (3+ tags = maximally deep-tech).
+    `cap` tags (2+ tags = maximally deep-tech).
 
     Args:
         features_df: Feature table with an 'id' and 'deep_tech_tag_count' column.
@@ -196,10 +196,11 @@ SCORE_COLUMNS: List[str] = [
 
 def build_score_table(features_df: pd.DataFrame) -> pd.DataFrame:
     """
-    Build the full per-company Phase 7 score table: compute each sub-bucket
-    score independently, merge them onto the company identity columns, and
-    sum into technical_score (0-50), practical_score (0-50), and
-    complexity_score (0-100).
+    Build the full per-company score table: compute each sub-bucket score
+    independently, merge them onto the company identity columns, and sum
+    into technical_score (0-30), practical_score (0-70), and
+    complexity_score (0-100) — see the Phase 9.5 rubric revision spec for
+    why the split isn't 50/50.
 
     Args:
         features_df: Phase 6 feature table (id, slug, name, batch, status,
