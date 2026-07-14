@@ -14,9 +14,10 @@ Checklist
 - [x] 7. Design scoring rubric
 - [x] 8. Implement ETL pipeline
 - [x] 9. Validate & analyze index
-- [ ] 10. Documentation & reproducibility
-- [ ] 11. Deploy & monitor
-- [ ] 12. Maintain interactive todo file
+- [x] 10. Build visualization dashboard
+- [ ] 11. Documentation & reproducibility
+- [ ] 12. Deploy & monitor
+- [ ] 13. Maintain interactive todo file
 
 Notes
 - Keep this file as the single editable source of progress you change by hand or via the CLI script.

@@ -453,3 +453,34 @@ def build_standalone_dashboard(
 </body>
 </html>
 """
+
+
+def main() -> None:
+    data = load_dashboard_data(SCORES_PATH, FEATURES_PATH, INDUSTRIES_PATH, COMPANIES_PATH)
+    scores_df = data["scores"]
+    features_df = data["features"]
+    industries_df = data["industries"]
+    companies_df = data["companies"]
+
+    industry_exploded_df = explode_industries(scores_df, industries_df)
+    company_industries_df = aggregate_company_industries(scores_df, industries_df)
+    team_sizes_df = companies_df[["id", "teamSize"]]
+
+    feature_cols = [
+        c for c in features_df.columns if c not in ("id", "slug", "name", "batch", "status")
+    ]
+    corr_matrix = build_correlation_matrix(scores_df, features_df, feature_cols)
+
+    records = build_company_records(scores_df, company_industries_df, team_sizes_df)
+    table_html = build_table_html(records)
+
+    body = build_dashboard_body(scores_df, industry_exploded_df, corr_matrix, table_html)
+    standalone = build_standalone_dashboard(body)
+
+    OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    OUTPUT_PATH.write_text(standalone, encoding="utf-8")
+    print(f"Wrote {OUTPUT_PATH}")
+
+
+if __name__ == "__main__":
+    main()
