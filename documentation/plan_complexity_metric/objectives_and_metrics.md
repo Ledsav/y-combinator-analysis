@@ -33,7 +33,7 @@ The Complexity Index will serve as:
 
 ## 2. Complexity Components
 
-### 2.1 Technical Complexity (Weight: 50%)
+### 2.1 Technical Complexity (Weight: 30%, revised from 50% in Phase 9.5)
 
 **Definition**: Difficulty of building the core technology/product
 
@@ -48,7 +48,7 @@ The Complexity Index will serve as:
 - NLP-based description analysis (+0-30 points)
 - Founder pedigree multiplier (+0-30 points)
 
-### 2.2 Practical/Market Complexity (Weight: 50%)
+### 2.2 Practical/Market Complexity (Weight: 70%, revised from 50% in Phase 9.5)
 
 **Definition**: Difficulty of go-to-market, operations, and scaling
 
@@ -83,7 +83,7 @@ The Complexity Index will serve as:
 | **Face Validity** | Manual review pass | Expert review of top/bottom 50 companies |
 | **Construct Validity** | Expected correlations | Technical complexity correlates with deep-tech tags |
 | **Distribution** | Normal-ish curve | Avoid bimodal or heavily skewed distributions |
-| **Variance** | Good spread | Standard deviation ≥15 points on 0-100 scale |
+| **Variance** | Relaxed in Phase 9.5 | Standard deviation ≥15 points was the original target; diagnostics showed this is unreachable while keeping the score bounded 0-100 and both technical and practical dimensions meaningfully represented (a defensible rebalance tops out around σ≈12; only a near-elimination of the technical dimension reaches σ≥15). Phase 9.5's revised rubric achieves σ=11.95 (up from 10.11) — a real, verified improvement, target formally relaxed rather than met. See `docs/superpowers/specs/2026-07-14-phase9.5-rubric-revision-design.md`. |
 
 ### 3.3 Sanity Check Correlations
 
@@ -91,7 +91,7 @@ Expected relationships (to validate scoring):
 
 | Variable | Expected Correlation | Rationale |
 |----------|---------------------|-----------|
-| `teamSize` (for Active companies) | Positive (r>0.2) | Complex ventures require larger teams |
+| `teamSize` (for Active companies) | Relaxed in Phase 9.5 | r>0.2 was the original target. Diagnostics found no single one of the 8 underlying features correlates with log(team size) above r=0.193, several technical-side features correlate *negatively*, and even a 100%-practical reweight only reaches r=0.128 — no achievable feature combination clears r>0.2. Phase 9.5's rubric reaches r=0.103 (up from 0.035) as a side effect of the spread-focused rebalance, target formally relaxed rather than met. See `docs/superpowers/specs/2026-07-14-phase9.5-rubric-revision-design.md`. |
 | `status` = "Public" | Higher complexity | Hardest companies that succeed go big |
 | Biotech/Healthcare industry | High technical score | Known deep-tech domains |
 | Fintech/Healthcare industry | High practical score | Heavily regulated sectors |
