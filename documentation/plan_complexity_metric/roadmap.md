@@ -120,11 +120,11 @@
   - [x] Self-contained, offline-capable single HTML file (Plotly.js bundled inline, no CDN, no server)
   - [x] Output: `output/complexity_dashboard_v1.html`
 
-- [ ] **11. Documentation & reproducibility**
-  - [ ] Update main README
-  - [ ] Add pipeline usage instructions
-  - [ ] Write minimal test suite
-  - [ ] Version control all outputs
+- [x] **11. Documentation & reproducibility**
+  - [x] Update main README
+  - [x] Add pipeline usage instructions
+  - [x] Write minimal test suite (added `tests/test_impute.py`, closing the one real coverage gap found)
+  - [x] Version control all outputs (already complete — verified `data/processed/` and `output/` are fully tracked, including both v1/v2 score files and dashboards)
 
 ---
 
@@ -300,13 +300,14 @@ python scripts/run_complexity_pipeline.py --steps clean,impute,features,score
 1. Score distribution, technical vs practical scatter, complexity by batch/status/industry, correlation heatmap (all interactive Plotly charts, mirroring Phase 9's analysis)
 2. Company Explorer: a sortable/filterable/searchable table of all 4,844 companies (batch/status/industry filters, name search)
 
-### Phase 11: Documentation
+### Phase 11: Documentation ✅ COMPLETE
 
-**Updates Required:**
-- Main `README.md` - add Complexity Index section
-- Pipeline usage guide (including how to run `scripts/generate_dashboard.py`)
-- Data versioning conventions
-- Known limitations & future work
+**Deliverables:**
+- Rewritten `README.md` — Complexity Index overview, quickstart, data versioning, project structure, known limitations, testing
+- `tests/test_impute.py` — closed the one real test-coverage gap (15 new tests, `src/etl/impute.py`'s 6 functions were previously only indirectly covered via mocked pipeline-orchestration tests)
+- Confirmed "version control all outputs" was already satisfied (no action needed)
+
+**Why:** `README.md` was still the generic project-scaffold template from before any Complexity Index work started. This phase gives the project a real entry point and closes the project's only remaining test-coverage gap.
 
 ---
 
@@ -324,8 +325,8 @@ python scripts/run_complexity_pipeline.py --steps clean,impute,features,score
 | 9. Validation | 1 day | ✅ Complete |
 | 9.5. Rubric Revision | 1 day | ✅ Complete |
 | 10. Visualization | 1 day | ✅ Complete |
-| 11. Documentation | 1 day | 🔲 Not started |
-| **Total** | **11-16 days** | **~92% complete** |
+| 11. Documentation | 1 day | ✅ Complete |
+| **Total** | **11-16 days** | **100% complete** |
 
 ---
 
@@ -367,10 +368,9 @@ python scripts/run_complexity_pipeline.py --steps clean,impute,features,score
 
 ## Next Immediate Actions
 
-**Current Focus:** Phase 11 - Documentation & Reproducibility (the deferred Phase 9.5 decision is now resolved)
+**Status:** All 11 phases complete. The Complexity Index pipeline, validation analysis, visualization dashboard, and documentation are all done, tested, and versioned.
 
-**Next Steps:**
-1. Update the main `README.md` with a Complexity Index section, pipeline usage instructions (including how to run `scripts/generate_dashboard.py`, which now defaults to v2, and open `output/complexity_dashboard_v2.html`), a minimal test suite for anything still untested, and version-control notes for all outputs (including the v1/v2 distinction).
-2. Output (Phase 11): updated `README.md` + usage docs.
-
-**To continue:** Mark this task complete and proceed to Phase 11.
+**Possible future work (not scheduled):**
+- Investigate the batch-over-time complexity trend (rising from ~19 in the earliest batches to ~34 in the most recent) — cause undiagnosed.
+- Revisit the team-size correlation and score-spread targets if new features become available that might close the gap without gutting the technical dimension.
+- Fix the Phase 8 `--steps all` / `enrich` ordering gap if it becomes a real friction point (currently just documented).
