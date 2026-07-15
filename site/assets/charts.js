@@ -59,7 +59,6 @@ function renderHistogram(container, bins, opts) {
     .range([height - margin.bottom, margin.top]);
 
   const tooltip = makeTooltip(container);
-  const rect = container.getBoundingClientRect();
 
   svg.selectAll(".bar").data(bins).join("rect")
     .attr("x", d => x(d.start) + 1)
@@ -69,7 +68,7 @@ function renderHistogram(container, bins, opts) {
     .attr("rx", 2)
     .attr("fill", CHART_COLORS.technical)
     .on("mousemove", (event, d) => showTooltip(tooltip, event,
-      `${d.start}&ndash;${d.end}: <strong>${d.count}</strong> companies`, rect))
+      `${d.start}&ndash;${d.end}: <strong>${d.count}</strong> companies`, container.getBoundingClientRect()))
     .on("mouseleave", () => hideTooltip(tooltip));
 
   [{ value: opts.median, label: "median", dash: null },
@@ -111,7 +110,6 @@ function renderScatter(container, points, opts) {
     .range([height - margin.bottom, margin.top]);
 
   const tooltip = makeTooltip(container);
-  const rect = container.getBoundingClientRect();
 
   svg.selectAll(".dot").data(points).join("circle")
     .attr("cx", d => x(d.x)).attr("cy", d => y(d.y))
@@ -119,7 +117,7 @@ function renderScatter(container, points, opts) {
     .attr("fill", CHART_COLORS.technical)
     .attr("fill-opacity", 0.45)
     .on("mousemove", (event, d) => showTooltip(tooltip, event,
-      `<strong>${d.name}</strong><br>Technical: ${d.x}<br>Practical: ${d.y}`, rect))
+      `<strong>${d.name}</strong><br>Technical: ${d.x}<br>Practical: ${d.y}`, container.getBoundingClientRect()))
     .on("mouseleave", () => hideTooltip(tooltip));
 
   svg.append("g").attr("transform", `translate(0,${height - margin.bottom})`)
@@ -182,7 +180,6 @@ function renderRankedBars(container, records, opts) {
     .range([margin.top, height - margin.bottom]).padding(0.3);
 
   const tooltip = makeTooltip(container);
-  const rect = container.getBoundingClientRect();
 
   svg.selectAll(".bar").data(records).join("rect")
     .attr("x", x(0)).attr("y", d => y(d.industry))
@@ -192,7 +189,7 @@ function renderRankedBars(container, records, opts) {
     .attr("fill", CHART_COLORS.ink)
     .attr("fill-opacity", (d, i) => 0.9 - i * 0.08)
     .on("mousemove", (event, d) => showTooltip(tooltip, event,
-      `<strong>${d.industry}</strong><br>${d.mean_complexity} avg, ${d.count} companies`, rect))
+      `<strong>${d.industry}</strong><br>${d.mean_complexity} avg, ${d.count} companies`, container.getBoundingClientRect()))
     .on("mouseleave", () => hideTooltip(tooltip));
 
   svg.selectAll(".label").data(records).join("text")
@@ -224,13 +221,12 @@ function renderLineChart(container, series, opts) {
     .attr("fill", "none").attr("stroke", CHART_COLORS.technical).attr("stroke-width", 2);
 
   const tooltip = makeTooltip(container);
-  const rect = container.getBoundingClientRect();
 
   svg.selectAll(".dot").data(series).join("circle")
     .attr("cx", d => x(d.batch)).attr("cy", d => y(d.mean_complexity)).attr("r", 4)
     .attr("fill", CHART_COLORS.technical)
     .on("mousemove", (event, d) => showTooltip(tooltip, event,
-      `<strong>${d.batch}</strong><br>${d.mean_complexity} avg complexity`, rect))
+      `<strong>${d.batch}</strong><br>${d.mean_complexity} avg complexity`, container.getBoundingClientRect()))
     .on("mouseleave", () => hideTooltip(tooltip));
 
   const tickEvery = Math.ceil(series.length / 12);
@@ -293,7 +289,6 @@ function renderHeatmap(container, columns, values, opts) {
     .range([CHART_COLORS.practical, CHART_COLORS.surface, CHART_COLORS.technical]);
 
   const tooltip = makeTooltip(container);
-  const rect = container.getBoundingClientRect();
 
   columns.forEach((rowLabel, i) => {
     columns.forEach((colLabel, j) => {
@@ -303,7 +298,7 @@ function renderHeatmap(container, columns, values, opts) {
         .attr("width", cell - 2).attr("height", cell - 2)
         .attr("fill", color(v))
         .on("mousemove", (event) => showTooltip(tooltip, event,
-          `<strong>${rowLabel} × ${colLabel}</strong><br>r = ${v}`, rect))
+          `<strong>${rowLabel} × ${colLabel}</strong><br>r = ${v}`, container.getBoundingClientRect()))
         .on("mouseleave", () => hideTooltip(tooltip));
       if (Math.abs(v) >= 0.4 && rowLabel !== colLabel) {
         svg.append("text")
