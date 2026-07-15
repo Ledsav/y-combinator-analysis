@@ -53,6 +53,9 @@ def test_default_paths_computes_expected_required_inputs(tmp_path):
         paths["score"]["kwargs"]["output_path"]
         == tmp_path / "processed" / "scores" / "complexity_index_v1.csv"
     )
+    rubric_path = paths["score"]["kwargs"]["rubric_config_path"]
+    assert rubric_path.name == "rubric_v1.yaml"
+    assert rubric_path.parent.name == "config"
 
 
 def test_default_paths_respects_output_version(tmp_path):
@@ -67,7 +70,7 @@ def test_default_paths_kwargs_use_each_steps_own_param_names(tmp_path):
     assert set(paths["impute"]["kwargs"]) == {"input_dir", "output_dir"}
     assert set(paths["enrich"]["kwargs"]) == {"input_dir", "output_dir"}
     assert set(paths["features"]["kwargs"]) == {"input_dir", "output_dir"}
-    assert set(paths["score"]["kwargs"]) == {"input_path", "output_path"}
+    assert set(paths["score"]["kwargs"]) == {"input_path", "output_path", "rubric_config_path"}
 
 
 def test_check_step_prerequisite_passes_when_input_exists(tmp_path):
@@ -174,7 +177,7 @@ def test_validate_pipeline_output_raises_on_out_of_range_score(tmp_path):
 
 
 def test_run_pipeline_end_to_end_features_and_score(tmp_path):
-    data_root = tmp_path
+    data_root = tmp_path / "data"
     raw_dir = data_root / "raw"
     step3_dir = data_root / "processed" / "step3_enriched"
     raw_dir.mkdir(parents=True)
@@ -210,7 +213,31 @@ def test_run_pipeline_end_to_end_features_and_score(tmp_path):
     schools.to_csv(step3_dir / "schools_enriched.csv", index=False)
     prior_companies.to_csv(step3_dir / "prior_companies_enriched.csv", index=False)
 
-    run_pipeline(steps=["features", "score"], output_version="v9", data_root=data_root)
+    rubric_config_path = tmp_path / "rubric.yaml"
+    rubric_config_path.write_text(
+        """
+version: test
+buckets:
+  - name: deep_tech
+    dimension: technical
+    raw_feature: deep_tech_tag_count
+    method: linear_capped
+    params: {cap: 2, points: 30}
+  - name: regulated
+    dimension: practical
+    raw_feature: regulated_industry
+    method: linear_capped
+    params: {cap: 1, points: 70}
+""",
+        encoding="utf-8",
+    )
+
+    run_pipeline(
+        steps=["features", "score"],
+        output_version="v9",
+        data_root=data_root,
+        rubric_config_path=rubric_config_path,
+    )
 
     output_path = data_root / "processed" / "scores" / "complexity_index_v9.csv"
     assert output_path.exists()

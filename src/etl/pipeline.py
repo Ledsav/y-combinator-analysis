@@ -78,6 +78,7 @@ def _default_paths(data_root: Path, output_version: str) -> Dict[str, dict]:
     features_dir = processed_dir / "features"
     scores_dir = processed_dir / "scores"
     features_path = features_dir / "complexity_features.parquet"
+    default_rubric_path = data_root.parent / "config" / f"rubric_{output_version}.yaml"
 
     return {
         "clean": {
@@ -101,6 +102,7 @@ def _default_paths(data_root: Path, output_version: str) -> Dict[str, dict]:
             "kwargs": {
                 "input_path": features_path,
                 "output_path": scores_dir / f"complexity_index_{output_version}.csv",
+                "rubric_config_path": default_rubric_path,
             },
         },
     }
@@ -181,6 +183,7 @@ def run_pipeline(
     steps: Optional[List[str]] = None,
     output_version: str = "v1",
     data_root: Optional[Path] = None,
+    rubric_config_path: Optional[Path] = None,
 ) -> None:
     """
     Run the requested ETL steps in canonical order.
@@ -192,6 +195,10 @@ def run_pipeline(
         data_root: Root data directory. Defaults to the real project's
             data/ directory; overridden in tests to isolate I/O. Not
             exposed via the CLI.
+        rubric_config_path: Explicit override for the score step's rubric
+            config file. Defaults to <repo_root>/config/rubric_<output_version>.yaml
+            (derived from data_root's parent) when not given. Exposed via
+            the CLI's --rubric-config flag.
     """
     resolved_steps = normalize_steps(steps)
 
@@ -199,6 +206,8 @@ def run_pipeline(
         data_root = Path(__file__).resolve().parents[2] / "data"
 
     paths = _default_paths(data_root, output_version)
+    if rubric_config_path is not None:
+        paths["score"]["kwargs"]["rubric_config_path"] = rubric_config_path
 
     for step in resolved_steps:
         check_step_prerequisite(step, paths[step]["required_input"])
