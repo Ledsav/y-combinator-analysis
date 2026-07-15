@@ -11,10 +11,13 @@ Run: ./.venv/Scripts/python.exe scripts/export_site_data.py
 import datetime
 import json
 import math
+import sys
 from pathlib import Path
 from typing import Any, Dict, List
 
 import pandas as pd
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from scripts.generate_dashboard import aggregate_company_industries, batch_sort_key
 from src.etl.rubric import load_rubric
