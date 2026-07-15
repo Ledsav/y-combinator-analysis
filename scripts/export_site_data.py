@@ -145,6 +145,8 @@ def build_summary(
         "generated_at": generated_at,
         "company_count": int(len(scores_df)),
         "median_complexity": round(scores_df["complexity_score"].median(), 2),
+        "median_technical_score": round(scores_df["technical_score"].median(), 2),
+        "median_practical_score": round(scores_df["practical_score"].median(), 2),
         "sigma_complexity": round(scores_df["complexity_score"].std(), 2),
         "min_complexity": round(scores_df["complexity_score"].min(), 2),
         "max_complexity": round(scores_df["complexity_score"].max(), 2),

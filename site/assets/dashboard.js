@@ -5,7 +5,12 @@ async function loadDashboard() {
   ]);
 
   document.getElementById("kpi-count").textContent = summary.company_count.toLocaleString();
-  document.getElementById("kpi-median").textContent = summary.median_complexity;
+  renderSplitBar(
+    document.getElementById("kpi-median"),
+    summary.median_technical_score,
+    summary.median_practical_score,
+    { maxScale: 100 }
+  );
   document.getElementById("kpi-sigma").textContent = summary.sigma_complexity;
   document.getElementById("kpi-top-industry-name").textContent = summary.top_industry.industry;
   document.getElementById("kpi-top-industry-value").textContent =

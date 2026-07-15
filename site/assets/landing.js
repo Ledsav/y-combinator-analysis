@@ -5,7 +5,12 @@ async function loadLanding() {
   ]);
 
   document.getElementById("stat-count").textContent = summary.company_count.toLocaleString();
-  document.getElementById("stat-median").textContent = summary.median_complexity;
+  renderSplitBar(
+    document.getElementById("stat-median"),
+    summary.median_technical_score,
+    summary.median_practical_score,
+    { maxScale: 100 }
+  );
   document.getElementById("stat-correlation").textContent =
     "r = " + summary.technical_practical_correlation;
   document.getElementById("stat-top-industry-name").textContent = summary.top_industry.industry;

@@ -140,6 +140,8 @@ def test_build_summary_includes_headline_stats_and_top_industry():
     assert summary["generated_at"] == "2026-07-15"
     assert summary["company_count"] == 20
     assert summary["median_complexity"] == 20.0
+    assert summary["median_technical_score"] == 10.0
+    assert summary["median_practical_score"] == 10.0
     assert summary["top_industry"]["industry"] == "Fintech"
     assert "distribution_bins" in summary
     assert "mean_by_batch" in summary

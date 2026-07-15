@@ -2,6 +2,8 @@
   "generated_at": "2026-07-15",
   "company_count": 4844,
   "median_complexity": 25.5,
+  "median_technical_score": 4.5,
+  "median_practical_score": 21.0,
   "sigma_complexity": 11.95,
   "min_complexity": 0.0,
   "max_complexity": 85.0,
