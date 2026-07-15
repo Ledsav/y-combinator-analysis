@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Pipeline, Y Combinator Complexity Index</title>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
@@ -34,9 +35,9 @@
 
   <section class="wrap">
     <p>
-      The <code class="mono">score</code> step is config-driven: its rubric &mdash; which
+      The <code class="mono">score</code> step is config-driven: its rubric, which
       signals count, how they're combined, how they're scaled, and how many points each is
-      worth &mdash; lives in a YAML file the engine reads.
+      worth, lives in a YAML file the engine reads.
     </p>
   </section>
 
@@ -68,7 +69,7 @@
     <h2>Why YAML</h2>
     <p>
       The rubric lives in <code class="mono">config/rubric_v2.yaml</code>. Each
-      bucket's cap and points value carries an inline comment explaining its rationale &mdash;
+      bucket's cap and points value carries an inline comment explaining its rationale, 
       the <code class="mono">deep_tech</code> bucket's <code class="mono">cap: 2</code> comment
       reads &ldquo;2+ tags = maximally deep-tech,&rdquo; for example. That context stays
       attached to the number it explains.
@@ -82,7 +83,7 @@
       default step list excludes it, but <code class="mono">features</code> always reads its
       output directory.</li>
       <li><strong>Team-size correlation is weak.</strong> <code class="mono">complexity_score</code>
-      correlates with log(team size) at r&asymp;0.10 &mdash; roughly half the dataset carries
+      correlates with log(team size) at r&asymp;0.10, roughly half the dataset carries
       no deep-tech signal at all, which caps how strongly team size can track the score.</li>
     </ul>
   </section>
