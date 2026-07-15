@@ -1,0 +1,534 @@
+{
+  "generated_at": "2026-07-15",
+  "company_count": 4844,
+  "median_complexity": 25.5,
+  "sigma_complexity": 11.95,
+  "min_complexity": 0.0,
+  "max_complexity": 85.0,
+  "technical_practical_correlation": -0.051,
+  "top_industry": {
+    "industry": "Legal",
+    "mean_complexity": 49.44,
+    "count": 33
+  },
+  "distribution_bins": [
+    {
+      "start": -0.09,
+      "end": 2.83,
+      "count": 51
+    },
+    {
+      "start": 2.83,
+      "end": 5.67,
+      "count": 17
+    },
+    {
+      "start": 5.67,
+      "end": 8.5,
+      "count": 286
+    },
+    {
+      "start": 8.5,
+      "end": 11.33,
+      "count": 12
+    },
+    {
+      "start": 11.33,
+      "end": 14.17,
+      "count": 300
+    },
+    {
+      "start": 14.17,
+      "end": 17.0,
+      "count": 26
+    },
+    {
+      "start": 17.0,
+      "end": 19.83,
+      "count": 95
+    },
+    {
+      "start": 19.83,
+      "end": 22.67,
+      "count": 1337
+    },
+    {
+      "start": 22.67,
+      "end": 25.5,
+      "count": 378
+    },
+    {
+      "start": 25.5,
+      "end": 28.33,
+      "count": 472
+    },
+    {
+      "start": 28.33,
+      "end": 31.17,
+      "count": 171
+    },
+    {
+      "start": 31.17,
+      "end": 34.0,
+      "count": 384
+    },
+    {
+      "start": 34.0,
+      "end": 36.83,
+      "count": 329
+    },
+    {
+      "start": 36.83,
+      "end": 39.67,
+      "count": 166
+    },
+    {
+      "start": 39.67,
+      "end": 42.5,
+      "count": 376
+    },
+    {
+      "start": 42.5,
+      "end": 45.33,
+      "count": 27
+    },
+    {
+      "start": 45.33,
+      "end": 48.17,
+      "count": 198
+    },
+    {
+      "start": 48.17,
+      "end": 51.0,
+      "count": 59
+    },
+    {
+      "start": 51.0,
+      "end": 53.83,
+      "count": 31
+    },
+    {
+      "start": 53.83,
+      "end": 56.67,
+      "count": 79
+    },
+    {
+      "start": 56.67,
+      "end": 59.5,
+      "count": 14
+    },
+    {
+      "start": 59.5,
+      "end": 62.33,
+      "count": 14
+    },
+    {
+      "start": 62.33,
+      "end": 65.17,
+      "count": 7
+    },
+    {
+      "start": 65.17,
+      "end": 68.0,
+      "count": 2
+    },
+    {
+      "start": 68.0,
+      "end": 70.83,
+      "count": 11
+    },
+    {
+      "start": 70.83,
+      "end": 73.67,
+      "count": 0
+    },
+    {
+      "start": 73.67,
+      "end": 76.5,
+      "count": 0
+    },
+    {
+      "start": 76.5,
+      "end": 79.33,
+      "count": 1
+    },
+    {
+      "start": 79.33,
+      "end": 82.17,
+      "count": 0
+    },
+    {
+      "start": 82.17,
+      "end": 85.0,
+      "count": 1
+    }
+  ],
+  "mean_by_batch": [
+    {
+      "batch": "S05",
+      "mean_complexity": 19.19
+    },
+    {
+      "batch": "W06",
+      "mean_complexity": 19.29
+    },
+    {
+      "batch": "S06",
+      "mean_complexity": 13.59
+    },
+    {
+      "batch": "W07",
+      "mean_complexity": 14.15
+    },
+    {
+      "batch": "S07",
+      "mean_complexity": 15.0
+    },
+    {
+      "batch": "W08",
+      "mean_complexity": 18.29
+    },
+    {
+      "batch": "S08",
+      "mean_complexity": 14.8
+    },
+    {
+      "batch": "W09",
+      "mean_complexity": 14.97
+    },
+    {
+      "batch": "S09",
+      "mean_complexity": 19.25
+    },
+    {
+      "batch": "W10",
+      "mean_complexity": 17.57
+    },
+    {
+      "batch": "S10",
+      "mean_complexity": 18.88
+    },
+    {
+      "batch": "W11",
+      "mean_complexity": 19.6
+    },
+    {
+      "batch": "S11",
+      "mean_complexity": 21.15
+    },
+    {
+      "batch": "W12",
+      "mean_complexity": 20.76
+    },
+    {
+      "batch": "S12",
+      "mean_complexity": 20.91
+    },
+    {
+      "batch": "W13",
+      "mean_complexity": 27.29
+    },
+    {
+      "batch": "S13",
+      "mean_complexity": 23.02
+    },
+    {
+      "batch": "W14",
+      "mean_complexity": 22.22
+    },
+    {
+      "batch": "S14",
+      "mean_complexity": 25.61
+    },
+    {
+      "batch": "W15",
+      "mean_complexity": 28.34
+    },
+    {
+      "batch": "S15",
+      "mean_complexity": 25.64
+    },
+    {
+      "batch": "W16",
+      "mean_complexity": 26.5
+    },
+    {
+      "batch": "S16",
+      "mean_complexity": 24.41
+    },
+    {
+      "batch": "W17",
+      "mean_complexity": 28.22
+    },
+    {
+      "batch": "S17",
+      "mean_complexity": 25.92
+    },
+    {
+      "batch": "W18",
+      "mean_complexity": 26.82
+    },
+    {
+      "batch": "S18",
+      "mean_complexity": 29.28
+    },
+    {
+      "batch": "W19",
+      "mean_complexity": 27.07
+    },
+    {
+      "batch": "S19",
+      "mean_complexity": 26.02
+    },
+    {
+      "batch": "W20",
+      "mean_complexity": 28.21
+    },
+    {
+      "batch": "S20",
+      "mean_complexity": 27.19
+    },
+    {
+      "batch": "W21",
+      "mean_complexity": 26.34
+    },
+    {
+      "batch": "S21",
+      "mean_complexity": 29.02
+    },
+    {
+      "batch": "W22",
+      "mean_complexity": 29.03
+    },
+    {
+      "batch": "S22",
+      "mean_complexity": 30.18
+    },
+    {
+      "batch": "W23",
+      "mean_complexity": 29.83
+    },
+    {
+      "batch": "S23",
+      "mean_complexity": 30.08
+    },
+    {
+      "batch": "W24",
+      "mean_complexity": 29.05
+    },
+    {
+      "batch": "S24",
+      "mean_complexity": 34.25
+    }
+  ],
+  "mean_by_status": [
+    {
+      "status": "Active",
+      "mean_complexity": 29.12
+    },
+    {
+      "status": "Public",
+      "mean_complexity": 28.97
+    },
+    {
+      "status": "Acquired",
+      "mean_complexity": 23.86
+    },
+    {
+      "status": "Inactive",
+      "mean_complexity": 22.33
+    }
+  ],
+  "industry_ranking": {
+    "top": [
+      {
+        "industry": "Legal",
+        "mean_complexity": 49.44,
+        "count": 33
+      },
+      {
+        "industry": "Finance and Accounting",
+        "mean_complexity": 46.58,
+        "count": 111
+      },
+      {
+        "industry": "Supply Chain and Logistics",
+        "mean_complexity": 42.75,
+        "count": 114
+      },
+      {
+        "industry": "Drug Discovery and Delivery",
+        "mean_complexity": 40.5,
+        "count": 42
+      },
+      {
+        "industry": "Industrial Bio",
+        "mean_complexity": 39.79,
+        "count": 34
+      }
+    ],
+    "bottom": [
+      {
+        "industry": "Education",
+        "mean_complexity": 8.48,
+        "count": 114
+      },
+      {
+        "industry": "Social",
+        "mean_complexity": 10.88,
+        "count": 114
+      },
+      {
+        "industry": "Content",
+        "mean_complexity": 11.79,
+        "count": 109
+      },
+      {
+        "industry": "Virtual and Augmented Reality",
+        "mean_complexity": 13.12,
+        "count": 21
+      },
+      {
+        "industry": "Gaming",
+        "mean_complexity": 13.33,
+        "count": 68
+      }
+    ]
+  },
+  "correlation_matrix": {
+    "columns": [
+      "deep_tech_score",
+      "description_score",
+      "founder_background_score",
+      "regulated_score",
+      "market_type_score",
+      "international_operations_score",
+      "operational_intensity_score",
+      "technical_score",
+      "practical_score",
+      "complexity_score"
+    ],
+    "values": [
+      [
+        1.0,
+        0.266,
+        0.034,
+        -0.021,
+        -0.028,
+        -0.107,
+        0.117,
+        0.825,
+        -0.023,
+        0.405
+      ],
+      [
+        0.266,
+        1.0,
+        0.115,
+        0.058,
+        -0.118,
+        -0.024,
+        0.088,
+        0.593,
+        -0.016,
+        0.291
+      ],
+      [
+        0.034,
+        0.115,
+        1.0,
+        0.04,
+        -0.142,
+        -0.012,
+        0.05,
+        0.479,
+        -0.069,
+        0.186
+      ],
+      [
+        -0.021,
+        0.058,
+        0.04,
+        1.0,
+        -0.436,
+        0.099,
+        -0.169,
+        0.022,
+        0.493,
+        0.447
+      ],
+      [
+        -0.028,
+        -0.118,
+        -0.142,
+        -0.436,
+        1.0,
+        -0.096,
+        -0.174,
+        -0.121,
+        0.367,
+        0.262
+      ],
+      [
+        -0.107,
+        -0.024,
+        -0.012,
+        0.099,
+        -0.096,
+        1.0,
+        0.054,
+        -0.09,
+        0.368,
+        0.278
+      ],
+      [
+        0.117,
+        0.088,
+        0.05,
+        -0.169,
+        -0.174,
+        0.054,
+        1.0,
+        0.135,
+        0.192,
+        0.239
+      ],
+      [
+        0.825,
+        0.593,
+        0.479,
+        0.022,
+        -0.121,
+        -0.09,
+        0.135,
+        1.0,
+        -0.051,
+        0.471
+      ],
+      [
+        -0.023,
+        -0.016,
+        -0.069,
+        0.493,
+        0.367,
+        0.368,
+        0.192,
+        -0.051,
+        1.0,
+        0.857
+      ],
+      [
+        0.405,
+        0.291,
+        0.186,
+        0.447,
+        0.262,
+        0.278,
+        0.239,
+        0.471,
+        0.857,
+        1.0
+      ]
+    ]
+  }
+}

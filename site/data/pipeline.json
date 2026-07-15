@@ -1,0 +1,130 @@
+{
+  "steps": [
+    {
+      "name": "clean",
+      "module": "src/etl/clean.py",
+      "input_dir": "data/raw/",
+      "output_dir": "data/processed/step1_cleaned/",
+      "optional": false
+    },
+    {
+      "name": "impute",
+      "module": "src/etl/impute.py",
+      "input_dir": "data/processed/step1_cleaned/",
+      "output_dir": "data/processed/step2_imputed/",
+      "optional": false
+    },
+    {
+      "name": "enrich",
+      "module": "src/etl/enrich.py",
+      "input_dir": "data/processed/step2_imputed/",
+      "output_dir": "data/processed/step3_enriched/",
+      "optional": true
+    },
+    {
+      "name": "features",
+      "module": "src/etl/features.py",
+      "input_dir": "data/processed/step3_enriched/",
+      "output_dir": "data/processed/features/",
+      "optional": false
+    },
+    {
+      "name": "score",
+      "module": "src/etl/score.py",
+      "input_dir": "data/processed/features/",
+      "output_dir": "data/processed/scores/",
+      "optional": false
+    }
+  ],
+  "buckets": [
+    {
+      "name": "deep_tech",
+      "dimension": "technical",
+      "raw_feature": "deep_tech_tag_count",
+      "combine": null,
+      "combine_params": null,
+      "method": "linear_capped",
+      "params": {
+        "cap": 2,
+        "points": 12
+      }
+    },
+    {
+      "name": "description",
+      "dimension": "technical",
+      "raw_feature": "description_tech_score",
+      "combine": null,
+      "combine_params": null,
+      "method": "linear_capped",
+      "params": {
+        "cap": 2,
+        "points": 9
+      }
+    },
+    {
+      "name": "founder_background",
+      "dimension": "technical",
+      "raw_feature": null,
+      "combine": "weighted_sum",
+      "combine_params": {
+        "features": {
+          "founder_phd_count": 2,
+          "research_company_experience": 1
+        }
+      },
+      "method": "linear_capped",
+      "params": {
+        "cap": 2,
+        "points": 9
+      }
+    },
+    {
+      "name": "regulated",
+      "dimension": "practical",
+      "raw_feature": "regulated_industry",
+      "combine": null,
+      "combine_params": null,
+      "method": "linear_capped",
+      "params": {
+        "cap": 1,
+        "points": 21
+      }
+    },
+    {
+      "name": "market_type",
+      "dimension": "practical",
+      "raw_feature": "market_type_score",
+      "combine": null,
+      "combine_params": null,
+      "method": "linear_capped",
+      "params": {
+        "cap": 3,
+        "points": 21
+      }
+    },
+    {
+      "name": "international_operations",
+      "dimension": "practical",
+      "raw_feature": "international_operations",
+      "combine": null,
+      "combine_params": null,
+      "method": "linear_capped",
+      "params": {
+        "cap": 1,
+        "points": 14
+      }
+    },
+    {
+      "name": "operational_intensity",
+      "dimension": "practical",
+      "raw_feature": "operational_intensity",
+      "combine": null,
+      "combine_params": null,
+      "method": "linear_capped",
+      "params": {
+        "cap": 1,
+        "points": 14
+      }
+    }
+  ]
+}
