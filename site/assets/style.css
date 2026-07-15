@@ -346,3 +346,27 @@ table.explorer-table { width: 100%; border-collapse: collapse; }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
 }
+
+/* -- Scoring engine diagram (pipeline page) --------------------------------- */
+
+.scoring-engine {
+  display: grid;
+  grid-template-columns: 2fr auto 1fr auto 1fr;
+  gap: var(--space-3);
+  align-items: start;
+  overflow-x: auto;
+  padding: var(--space-3) 0;
+}
+
+.scoring-engine__buckets, .scoring-engine__totals, .scoring-engine__total {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 160px;
+}
+
+.scoring-engine__arrow {
+  align-self: center;
+  color: var(--color-ink-muted);
+  font-size: 1.2rem;
+}
