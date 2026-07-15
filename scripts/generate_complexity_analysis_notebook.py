@@ -57,6 +57,7 @@ CELLS = [
         "sys.path.insert(0, str(REPO_ROOT))\n"
         "\n"
         "scores_df = pd.read_csv(REPO_ROOT / \"data\" / \"processed\" / \"scores\" / \"complexity_index_v2.csv\")\n"
+        "bucket_score_cols = [c for c in scores_df.columns if c.endswith(\"_score\") and c not in (\"technical_score\", \"practical_score\", \"complexity_score\")]\n"
         "features_df = pd.read_parquet(REPO_ROOT / \"data\" / \"processed\" / \"features\" / \"complexity_features.parquet\")\n"
         "companies_df = pd.read_csv(REPO_ROOT / \"data\" / \"processed\" / \"step3_enriched\" / \"companies_enriched.csv\")\n"
         "industries_df = pd.read_csv(REPO_ROOT / \"data\" / \"processed\" / \"step3_enriched\" / \"industries_enriched.csv\")\n"
@@ -153,14 +154,12 @@ CELLS = [
         "## 6. Correlation Heatmap\n"
         "\n"
         "Correlation matrix across all 8 raw features (`complexity_features.parquet`), "
-        "the 6 rubric bucket scores, and the 3 top-level scores."
+        "the rubric's bucket scores, and the 3 top-level scores."
     ),
     code_cell(
         "import matplotlib.pyplot as plt\n"
         "\n"
-        "corr_cols = feature_cols + [\n"
-        "    \"deep_tech_score\", \"description_score\", \"founder_background_score\",\n"
-        "    \"regulated_score\", \"market_type_pts\", \"geo_ops_score\",\n"
+        "corr_cols = feature_cols + bucket_score_cols + [\n"
         "    \"technical_score\", \"practical_score\", \"complexity_score\",\n"
         "]\n"
         "corr_matrix = merged[corr_cols].corr()\n"
@@ -222,10 +221,7 @@ CELLS = [
         "`notebooks/score_design.ipynb`)."
     ),
     code_cell(
-        "bucket_cols = [\n"
-        "    \"slug\", \"name\", \"batch\", \"status\",\n"
-        "    \"deep_tech_score\", \"description_score\", \"founder_background_score\",\n"
-        "    \"regulated_score\", \"market_type_pts\", \"geo_ops_score\",\n"
+        "bucket_cols = [\"slug\", \"name\", \"batch\", \"status\"] + bucket_score_cols + [\n"
         "    \"technical_score\", \"practical_score\", \"complexity_score\",\n"
         "]\n"
         "top_25 = merged.sort_values(\"complexity_score\", ascending=False)[bucket_cols].head(25)\n"
