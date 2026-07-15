@@ -11,7 +11,84 @@
 </head>
 <body>
 <div id="site-nav"></div>
-<main class="wrap"></main>
+<main>
+  <section class="wrap" style="padding-top: var(--space-6);">
+    <p class="eyebrow">A reproducible startup complexity index</p>
+    <h1>How hard is it, actually, to build a Y Combinator company?</h1>
+    <p style="max-width: 640px; font-size: 1.1rem; color: var(--color-ink-muted);">
+      Every company in the dataset gets two scores — one for the technology, one for the
+      market — that combine into a single 0&ndash;100 Complexity Index.
+    </p>
+
+    <div class="stat-tile-row">
+      <div class="stat-tile">
+        <p class="eyebrow">Companies scored</p>
+        <p class="stat-tile__value" id="stat-count">&mdash;</p>
+      </div>
+      <div class="stat-tile">
+        <p class="eyebrow">Median complexity</p>
+        <p class="stat-tile__value" id="stat-median">&mdash;</p>
+        <p class="stat-tile__caption">0&ndash;100 scale</p>
+      </div>
+      <div class="stat-tile">
+        <p class="eyebrow">Technical vs. practical</p>
+        <p class="stat-tile__value" id="stat-correlation">&mdash;</p>
+        <p class="stat-tile__caption">independent dimensions</p>
+      </div>
+      <div class="stat-tile">
+        <p class="eyebrow">Highest-scoring industry</p>
+        <p class="stat-tile__value" id="stat-top-industry-name">&mdash;</p>
+        <p class="stat-tile__caption" id="stat-top-industry-value"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap" style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-5); align-items: start;">
+    <div>
+      <h2>Two kinds of hard</h2>
+      <p>
+        Practical execution &mdash; regulation, market structure, geography, operations &mdash;
+        carries more of the score than raw technical difficulty, because it accounts for more
+        of what actually varies between companies. Most Y Combinator companies aren&rsquo;t
+        deep-tech; regulatory and market complexity is where the real spread in difficulty
+        shows up.
+      </p>
+      <p>
+        The two dimensions are almost entirely independent of each other &mdash; building hard
+        technology and operating in a hard market are, empirically, two different problems,
+        not two names for the same one.
+      </p>
+    </div>
+    <div id="teaser-scatter" style="position: relative;"></div>
+  </section>
+
+  <section class="wrap">
+    <div class="card-row">
+      <a class="ticket-card" href="dashboard.html">
+        <p class="eyebrow">01</p>
+        <h3>Explore the Dashboard</h3>
+        <p>See the score distribution, how technical and practical complexity relate, which
+        industries top the index, and search all companies.</p>
+      </a>
+      <a class="ticket-card" href="pipeline.html">
+        <p class="eyebrow">02</p>
+        <h3>See How It's Built</h3>
+        <p>A rubric of scoring buckets, combined and summed by a config-driven engine &mdash;
+        walk through exactly how a raw signal becomes a score.</p>
+      </a>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <a href="https://github.com/Ledsav/y-combinator-analysis">Source on GitHub</a>
+      &middot; data generated <span id="generated-at" class="mono"></span>
+    </div>
+  </footer>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
 <script src="assets/nav.js"></script>
+<script src="assets/charts.js"></script>
+<script src="assets/landing.js"></script>
 </body>
 </html>
