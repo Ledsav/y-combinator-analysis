@@ -198,6 +198,35 @@ def test_build_correlation_matrix_discovers_bucket_score_columns_dynamically():
     assert "some_new_bucket_score" in corr.columns
 
 
+def test_build_correlation_matrix_drops_raw_feature_colliding_with_bucket_score_name():
+    """
+    Regression guard for a real production collision: complexity_features.parquet
+    has a raw feature literally named "market_type_score", which collides with
+    the derived market_type bucket's <name>_score column of the same name.
+    Passing that name in feature_cols must not raise (merge suffix collision)
+    and the bucket-score version must be the one retained.
+    """
+    scores_df = pd.DataFrame(
+        {
+            "id": [1, 2],
+            "market_type_score": [10.0, 20.0],
+            "technical_score": [10.0, 20.0],
+            "practical_score": [5.0, 15.0],
+            "complexity_score": [15.0, 35.0],
+        }
+    )
+    features_df = pd.DataFrame({"id": [1, 2], "market_type_score": [3, 1]})
+
+    corr = build_correlation_matrix(scores_df, features_df, feature_cols=["market_type_score"])
+
+    assert list(corr.columns) == [
+        "market_type_score",
+        "technical_score",
+        "practical_score",
+        "complexity_score",
+    ]
+
+
 def test_build_correlation_heatmap_uses_matrix_values_and_labels():
     corr_matrix = pd.DataFrame({"a": [1.0, 0.5], "b": [0.5, 1.0]}, index=["a", "b"])
 

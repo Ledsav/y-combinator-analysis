@@ -175,7 +175,10 @@ def build_correlation_matrix(
     """
     Correlation matrix across the given raw features, every rubric
     bucket's <name>_score column (discovered dynamically from scores_df,
-    not hardcoded -- see Phase 12), and the 3 top-level scores.
+    not hardcoded -- see Phase 12), and the 3 top-level scores. Raw
+    feature columns whose name collides with a scores_df column (e.g. a
+    raw feature and a derived bucket score sharing a name) are dropped
+    from the raw-feature side to avoid an ambiguous merge suffix collision.
     """
     bucket_score_cols = [
         c
@@ -183,6 +186,7 @@ def build_correlation_matrix(
         if c.endswith("_score")
         and c not in ("technical_score", "practical_score", "complexity_score")
     ]
+    feature_cols = [c for c in feature_cols if c not in scores_df.columns]
     merged = scores_df.merge(features_df[["id"] + feature_cols], on="id", how="left")
     corr_cols = feature_cols + bucket_score_cols + [
         "technical_score",

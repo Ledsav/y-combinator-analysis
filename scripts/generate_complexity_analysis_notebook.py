@@ -65,7 +65,7 @@ CELLS = [
         "merged = scores_df.merge(companies_df[[\"id\", \"teamSize\"]], on=\"id\", how=\"left\")\n"
         "merged[\"log_team_size\"] = np.log1p(merged[\"teamSize\"])\n"
         "\n"
-        "feature_cols = [c for c in features_df.columns if c not in (\"id\", \"slug\", \"name\", \"batch\", \"status\")]\n"
+        "feature_cols = [c for c in features_df.columns if c not in (\"id\", \"slug\", \"name\", \"batch\", \"status\") and c not in scores_df.columns]\n"
         "merged = merged.merge(features_df[[\"id\"] + feature_cols], on=\"id\", how=\"left\")\n"
         "\n"
         "industry_merged = scores_df.merge(industries_df, on=\"id\", how=\"left\")\n"
