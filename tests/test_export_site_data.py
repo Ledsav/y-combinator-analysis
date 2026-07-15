@@ -131,12 +131,14 @@ def test_build_summary_includes_headline_stats_and_top_industry():
             "complexity_score": [20.0, 30.0, 10.0],
         }
     )
+    # Expand to >= 20 rows (min_count requirement) by repeating rows
+    scores_df = pd.concat([scores_df] * 7, ignore_index=True).iloc[:20]
     industry_exploded_df = scores_df.assign(industry="Fintech")
 
     summary = build_summary(scores_df, industry_exploded_df, generated_at="2026-07-15")
 
     assert summary["generated_at"] == "2026-07-15"
-    assert summary["company_count"] == 3
+    assert summary["company_count"] == 20
     assert summary["median_complexity"] == 20.0
     assert summary["top_industry"]["industry"] == "Fintech"
     assert "distribution_bins" in summary

@@ -26,7 +26,7 @@ COMPANIES_PATH = REPO_ROOT / "data" / "processed" / "step3_enriched" / "companie
 RUBRIC_PATH = REPO_ROOT / "config" / "rubric_v2.yaml"
 SITE_DATA_DIR = REPO_ROOT / "site" / "data"
 
-INDUSTRY_MIN_COUNT = 3
+INDUSTRY_MIN_COUNT = 20
 
 
 def _clean_json(value: Any) -> Any:
