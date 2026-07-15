@@ -43,6 +43,14 @@ def build_arg_parser() -> argparse.ArgumentParser:
             "filename (default: v1)."
         ),
     )
+    parser.add_argument(
+        "--rubric-config",
+        default=None,
+        help=(
+            "Path to a rubric YAML file overriding the score step's rubric "
+            "(default: config/rubric_<output-version>.yaml)."
+        ),
+    )
     return parser
 
 
@@ -54,9 +62,14 @@ def main(argv: Optional[List[str]] = None) -> int:
     parser = build_arg_parser()
     args = parser.parse_args(argv)
     steps = parse_steps_arg(args.steps)
+    rubric_config_path = Path(args.rubric_config) if args.rubric_config else None
 
     try:
-        run_pipeline(steps=steps, output_version=args.output_version)
+        run_pipeline(
+            steps=steps,
+            output_version=args.output_version,
+            rubric_config_path=rubric_config_path,
+        )
     except Exception as exc:
         print(f"FAILED: {exc}", file=sys.stderr)
         return 1
