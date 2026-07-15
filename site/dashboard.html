@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard — Y Combinator Complexity Index</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div id="site-nav"></div>
+<main>
+  <section class="wrap" style="padding-top: var(--space-6);">
+    <p class="eyebrow">Dashboard</p>
+    <h1>Complexity Index Dashboard</h1>
+    <p style="max-width: 640px; color: var(--color-ink-muted);">
+      Y Combinator companies, scored 0&ndash;100 on Technical and Practical complexity.
+    </p>
+    <div class="stat-tile-row">
+      <div class="stat-tile">
+        <p class="eyebrow">Companies scored</p>
+        <p class="stat-tile__value" id="kpi-count">&mdash;</p>
+      </div>
+      <div class="stat-tile">
+        <p class="eyebrow">Median complexity</p>
+        <p class="stat-tile__value" id="kpi-median">&mdash;</p>
+      </div>
+      <div class="stat-tile">
+        <p class="eyebrow">Spread (&sigma;)</p>
+        <p class="stat-tile__value" id="kpi-sigma">&mdash;</p>
+      </div>
+      <div class="stat-tile">
+        <p class="eyebrow">Top industry</p>
+        <p class="stat-tile__value" id="kpi-top-industry-name">&mdash;</p>
+        <p class="stat-tile__caption" id="kpi-top-industry-value"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap chart-section">
+    <h2>Score distribution</h2>
+    <p class="chart-section__insight">Most companies land in the moderate band &mdash; plain
+    regulation or market complexity, not deep technology.</p>
+    <div id="chart-distribution" style="position: relative;"></div>
+  </section>
+
+  <section class="wrap chart-section">
+    <h2>Technical vs. Practical</h2>
+    <p class="chart-section__insight">The two dimensions are independent &mdash; a company can
+    score high on one, low on the other, or both.</p>
+    <div id="chart-scatter" style="position: relative;"></div>
+  </section>
+
+  <section class="wrap chart-section">
+    <h2>Complexity by industry</h2>
+    <p class="chart-section__insight">Regulated and operations-heavy industries dominate the
+    top of the index; consumer/content industries sit at the bottom.</p>
+    <div id="chart-industry" style="position: relative;"></div>
+  </section>
+
+  <section class="wrap chart-section">
+    <h2>Complexity by batch</h2>
+    <p class="chart-section__insight">Average complexity has risen across batches, from the
+    earliest cohorts to the most recent.</p>
+    <div id="chart-batch" style="position: relative;"></div>
+  </section>
+
+  <section class="wrap chart-section">
+    <h2>Complexity by status</h2>
+    <p class="chart-section__insight">Active and Public companies score similarly, both above
+    Acquired and Inactive.</p>
+    <div id="chart-status" style="position: relative;"></div>
+  </section>
+
+  <section class="wrap chart-section">
+    <h2>How the pieces relate</h2>
+    <p class="chart-section__insight">Correlation across every scoring bucket and the two
+    dimension totals they roll up into.</p>
+    <div id="chart-heatmap-toggle"></div>
+    <div id="chart-heatmap" style="position: relative;"></div>
+  </section>
+
+  <section class="wrap chart-section">
+    <h2>Company Explorer</h2>
+    <div class="table-controls">
+      <input type="text" id="explorer-search" placeholder="Search by name...">
+      <select id="explorer-batch"><option value="">All batches</option></select>
+      <select id="explorer-status"><option value="">All statuses</option></select>
+      <span id="explorer-count" class="mono"></span>
+    </div>
+    <table class="explorer-table" id="explorer-table">
+      <thead>
+        <tr>
+          <th data-key="name">Name</th>
+          <th data-key="batch">Batch</th>
+          <th data-key="status">Status</th>
+          <th>Industries</th>
+          <th data-key="complexity_score">Score (technical / practical)</th>
+        </tr>
+      </thead>
+      <tbody id="explorer-body"></tbody>
+    </table>
+  </section>
+
+  <footer class="site-footer">
+    <div class="wrap"><a href="index.html">&larr; Back to overview</a></div>
+  </footer>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+<script src="assets/nav.js"></script>
+<script src="assets/charts.js"></script>
+<script src="assets/dashboard.js"></script>
+</body>
+</html>
