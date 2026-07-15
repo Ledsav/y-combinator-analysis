@@ -123,7 +123,9 @@ function initExplorer(records) {
   }
 
   document.querySelectorAll("#explorer-table thead th[data-key]").forEach((th) => {
-    th.addEventListener("click", () => {
+    th.setAttribute("tabindex", "0");
+    th.setAttribute("role", "button");
+    const toggleSort = () => {
       const key = th.getAttribute("data-key");
       if (sortKey === key) {
         sortAsc = !sortAsc;
@@ -132,6 +134,13 @@ function initExplorer(records) {
         sortAsc = true;
       }
       render();
+    };
+    th.addEventListener("click", toggleSort);
+    th.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        toggleSort();
+      }
     });
   });
   [searchBox, batchFilter, statusFilter].forEach((el) => el.addEventListener("input", render));
