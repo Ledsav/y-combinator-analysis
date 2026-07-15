@@ -5,7 +5,7 @@
 // practical = gold -- never a third "brand" accent.
 
 const CHART_COLORS = {
-  technical: "#2B4C7E",
+  technical: "#3A5A96",
   practical: "#C08A2E",
   ink: "#1B1B18",
   inkMuted: "#5C594F",

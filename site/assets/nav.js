@@ -24,7 +24,7 @@
   <div class="wrap">
     <a class="site-nav__mark" href="index.html">
       <svg width="20" height="14" viewBox="0 0 20 14" aria-hidden="true">
-        <rect x="0" y="4" width="12" height="6" fill="#2B4C7E" />
+        <rect x="0" y="4" width="12" height="6" fill="#3A5A96" />
         <rect x="12" y="4" width="8" height="6" fill="#C08A2E" />
       </svg>
       YC Complexity Index
