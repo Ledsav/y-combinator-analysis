@@ -565,6 +565,7 @@ git commit -m "feat: add build_summary, build_pipeline_config, and main() to sit
 **Interfaces:**
 - Produces: CSS custom properties `--color-paper`, `--color-ink`, `--color-ink-muted`, `--color-technical`, `--color-practical`, `--color-surface`, `--color-rule`, `--radius-card`, `--space-1..6`, `--max-width`, and component classes `.site-nav`, `.split-bar`/`.split-bar__track`/`.split-bar__technical`/`.split-bar__practical`/`.split-bar__total`, `.stat-tile-row`/`.stat-tile`, `.card-row`/`.ticket-card`, `.chart-section`/`.chart-tooltip`/`.chart-legend`, `.explorer-table`, `.pipeline-flow`/`.pipeline-stage-card`/`.bucket-card`/`.callout-box`, `.site-footer` — every later page task (3, 5, 6) uses these class names verbatim; do not rename any of them mid-plan.
 - Fonts loaded via Google Fonts CDN `<link>` (Fraunces, IBM Plex Sans, IBM Plex Mono) in each page's `<head>` — simpler than self-hosting woff2 files with no build step to manage them, and GitHub Pages already requires network access so there's no offline constraint to preserve.
+- `nav.js` renders the nav header itself (not just active-link state) into a `<div id="site-nav"></div>` mount point each page provides — single source of truth for the nav markup instead of duplicating it verbatim across 3 HTML files. Tasks 4, 5, and 6's pages each include `<div id="site-nav"></div>` where the header goes, not inline `<header>` markup.
 
 - [ ] **Step 1: Create `site/assets/style.css`**
 
@@ -922,16 +923,45 @@ table.explorer-table { width: 100%; border-collapse: collapse; }
 - [ ] **Step 2: Create `site/assets/nav.js`**
 
 ```js
-// Marks the current page's nav link as active. Nav markup is duplicated
-// across the 3 pages (there are only 3, and no build step to template it
-// with) -- this script keeps the active-state logic in one place instead.
+// Single source of truth for the nav header: builds the markup and
+// injects it into each page's <div id="site-nav"></div> mount point,
+// with the current page's link marked aria-current. Avoids duplicating
+// the header HTML verbatim across all 3 pages.
 (function () {
-  const path = window.location.pathname.split("/").pop() || "index.html";
-  document.querySelectorAll(".site-nav__links a").forEach((link) => {
-    if (link.getAttribute("href") === path) {
-      link.setAttribute("aria-current", "page");
-    }
-  });
+  const NAV_LINKS = [
+    { href: "index.html", label: "Overview" },
+    { href: "dashboard.html", label: "Dashboard" },
+    { href: "pipeline.html", label: "Pipeline" },
+  ];
+
+  function renderNav() {
+    const mount = document.getElementById("site-nav");
+    if (!mount) return;
+    const path = window.location.pathname.split("/").pop() || "index.html";
+
+    const links = NAV_LINKS.map((link) => {
+      const current = link.href === path ? ' aria-current="page"' : "";
+      return `<li><a href="${link.href}"${current}>${link.label}</a></li>`;
+    }).join("");
+
+    mount.outerHTML = `
+<header class="site-nav">
+  <div class="wrap">
+    <a class="site-nav__mark" href="index.html">
+      <svg width="20" height="14" viewBox="0 0 20 14" aria-hidden="true">
+        <rect x="0" y="4" width="12" height="6" fill="#2B4C7E" />
+        <rect x="12" y="4" width="8" height="6" fill="#C08A2E" />
+      </svg>
+      YC Complexity Index
+    </a>
+    <nav>
+      <ul class="site-nav__links">${links}</ul>
+    </nav>
+  </div>
+</header>`;
+  }
+
+  renderNav();
 })();
 ```
 
@@ -950,24 +980,7 @@ table.explorer-table { width: 100%; border-collapse: collapse; }
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-<header class="site-nav">
-  <div class="wrap">
-    <a class="site-nav__mark" href="index.html">
-      <svg width="20" height="14" viewBox="0 0 20 14" aria-hidden="true">
-        <rect x="0" y="4" width="12" height="6" fill="#2B4C7E" />
-        <rect x="12" y="4" width="8" height="6" fill="#C08A2E" />
-      </svg>
-      YC Complexity Index
-    </a>
-    <nav>
-      <ul class="site-nav__links">
-        <li><a href="index.html">Overview</a></li>
-        <li><a href="dashboard.html">Dashboard</a></li>
-        <li><a href="pipeline.html">Pipeline</a></li>
-      </ul>
-    </nav>
-  </div>
-</header>
+<div id="site-nav"></div>
 <main class="wrap"></main>
 <script src="assets/nav.js"></script>
 </body>
@@ -977,7 +990,7 @@ table.explorer-table { width: 100%; border-collapse: collapse; }
 - [ ] **Step 4: Verify in browser**
 
 Run: `powershell -Command "Start-Process 'site/index.html'"` (or open the file directly in a browser)
-Expected: nav bar renders with the split-bar mark icon, "Overview" is underlined/highlighted as the active link (denim underline), the three fonts are visibly distinct (Fraunces on the mark isn't used here yet, but Plex Sans/Mono should already look right in the nav text), and the page background is the pale paper tone (`#FBFAF6`), not white.
+Expected: nav bar renders (injected by `nav.js` into `#site-nav`) with the split-bar mark icon, "Overview" is underlined/highlighted as the active link (denim underline), the three fonts are visibly distinct (Plex Sans/Mono should already look right in the nav text), and the page background is the pale paper tone (`#FBFAF6`), not white.
 
 - [ ] **Step 5: Commit**
 
@@ -1538,24 +1551,7 @@ git commit -m "feat: build the Phase 13 landing page"
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-<header class="site-nav">
-  <div class="wrap">
-    <a class="site-nav__mark" href="index.html">
-      <svg width="20" height="14" viewBox="0 0 20 14" aria-hidden="true">
-        <rect x="0" y="4" width="12" height="6" fill="#2B4C7E" />
-        <rect x="12" y="4" width="8" height="6" fill="#C08A2E" />
-      </svg>
-      YC Complexity Index
-    </a>
-    <nav>
-      <ul class="site-nav__links">
-        <li><a href="index.html">Overview</a></li>
-        <li><a href="dashboard.html">Dashboard</a></li>
-        <li><a href="pipeline.html">Pipeline</a></li>
-      </ul>
-    </nav>
-  </div>
-</header>
+<div id="site-nav"></div>
 <main>
   <section class="wrap" style="padding-top: var(--space-6);">
     <p class="eyebrow">Dashboard</p>
@@ -1957,24 +1953,7 @@ loadPipeline();
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-<header class="site-nav">
-  <div class="wrap">
-    <a class="site-nav__mark" href="index.html">
-      <svg width="20" height="14" viewBox="0 0 20 14" aria-hidden="true">
-        <rect x="0" y="4" width="12" height="6" fill="#2B4C7E" />
-        <rect x="12" y="4" width="8" height="6" fill="#C08A2E" />
-      </svg>
-      YC Complexity Index
-    </a>
-    <nav>
-      <ul class="site-nav__links">
-        <li><a href="index.html">Overview</a></li>
-        <li><a href="dashboard.html">Dashboard</a></li>
-        <li><a href="pipeline.html">Pipeline</a></li>
-      </ul>
-    </nav>
-  </div>
-</header>
+<div id="site-nav"></div>
 <main>
   <section class="wrap" style="padding-top: var(--space-6);">
     <p class="eyebrow">Pipeline</p>
