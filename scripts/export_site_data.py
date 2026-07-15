@@ -26,7 +26,7 @@ COMPANIES_PATH = REPO_ROOT / "data" / "processed" / "step3_enriched" / "companie
 RUBRIC_PATH = REPO_ROOT / "config" / "rubric_v2.yaml"
 SITE_DATA_DIR = REPO_ROOT / "site" / "data"
 
-INDUSTRY_MIN_COUNT = 20
+INDUSTRY_MIN_COUNT = 3
 
 
 def _clean_json(value: Any) -> Any:
@@ -128,3 +128,118 @@ def build_correlation_matrix(scores_df: pd.DataFrame) -> Dict[str, Any]:
     ordered_cols = bucket_cols + totals
     corr = scores_df[ordered_cols].corr().round(3)
     return {"columns": ordered_cols, "values": corr.values.tolist()}
+
+
+def build_summary(
+    scores_df: pd.DataFrame, industry_exploded_df: pd.DataFrame, generated_at: str
+) -> Dict[str, Any]:
+    """Everything the landing hero stats and dashboard charts need,
+    pre-aggregated so the browser never re-derives them from 4,844 rows."""
+    industry_ranking = build_industry_ranking(industry_exploded_df)
+    top_industry = industry_ranking["top"][0]
+    tp_corr = round(scores_df["technical_score"].corr(scores_df["practical_score"]), 3)
+    return {
+        "generated_at": generated_at,
+        "company_count": int(len(scores_df)),
+        "median_complexity": round(scores_df["complexity_score"].median(), 2),
+        "sigma_complexity": round(scores_df["complexity_score"].std(), 2),
+        "min_complexity": round(scores_df["complexity_score"].min(), 2),
+        "max_complexity": round(scores_df["complexity_score"].max(), 2),
+        "technical_practical_correlation": tp_corr,
+        "top_industry": top_industry,
+        "distribution_bins": build_distribution_bins(scores_df),
+        "mean_by_batch": build_mean_by_batch(scores_df),
+        "mean_by_status": build_mean_by_status(scores_df),
+        "industry_ranking": industry_ranking,
+        "correlation_matrix": build_correlation_matrix(scores_df),
+    }
+
+
+ETL_STEPS: List[Dict[str, Any]] = [
+    {
+        "name": "clean",
+        "module": "src/etl/clean.py",
+        "input_dir": "data/raw/",
+        "output_dir": "data/processed/step1_cleaned/",
+        "optional": False,
+    },
+    {
+        "name": "impute",
+        "module": "src/etl/impute.py",
+        "input_dir": "data/processed/step1_cleaned/",
+        "output_dir": "data/processed/step2_imputed/",
+        "optional": False,
+    },
+    {
+        "name": "enrich",
+        "module": "src/etl/enrich.py",
+        "input_dir": "data/processed/step2_imputed/",
+        "output_dir": "data/processed/step3_enriched/",
+        "optional": True,
+    },
+    {
+        "name": "features",
+        "module": "src/etl/features.py",
+        "input_dir": "data/processed/step3_enriched/",
+        "output_dir": "data/processed/features/",
+        "optional": False,
+    },
+    {
+        "name": "score",
+        "module": "src/etl/score.py",
+        "input_dir": "data/processed/features/",
+        "output_dir": "data/processed/scores/",
+        "optional": False,
+    },
+]
+
+
+def build_pipeline_config(rubric: Dict[str, Any]) -> Dict[str, Any]:
+    """Structured description of the 5 ETL steps and the rubric's buckets,
+    for the pipeline page's diagram labels."""
+    buckets = [
+        {
+            "name": bucket["name"],
+            "dimension": bucket["dimension"],
+            "raw_feature": bucket.get("raw_feature"),
+            "combine": bucket.get("combine"),
+            "combine_params": bucket.get("combine_params"),
+            "method": bucket["method"],
+            "params": bucket["params"],
+        }
+        for bucket in rubric["buckets"]
+    ]
+    return {"steps": ETL_STEPS, "buckets": buckets}
+
+
+def write_json(path: Path, data: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, indent=2), encoding="utf-8")
+
+
+def main() -> None:
+    scores_df = pd.read_csv(SCORES_PATH)
+    industries_df = pd.read_csv(INDUSTRIES_PATH)
+    companies_df = pd.read_csv(COMPANIES_PATH)
+    rubric = load_rubric(RUBRIC_PATH)
+
+    company_industries_df = aggregate_company_industries(scores_df, industries_df)
+    industry_exploded_df = scores_df.merge(industries_df, on="id", how="left")
+    team_sizes_df = companies_df[["id", "teamSize"]]
+    generated_at = datetime.date.today().isoformat()
+
+    write_json(
+        SITE_DATA_DIR / "companies.json",
+        build_company_records(scores_df, company_industries_df, team_sizes_df),
+    )
+    write_json(
+        SITE_DATA_DIR / "summary.json",
+        build_summary(scores_df, industry_exploded_df, generated_at),
+    )
+    write_json(SITE_DATA_DIR / "pipeline.json", build_pipeline_config(rubric))
+
+    print(f"Wrote site data to {SITE_DATA_DIR}")
+
+
+if __name__ == "__main__":
+    main()

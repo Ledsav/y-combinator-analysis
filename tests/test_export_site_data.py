@@ -11,6 +11,9 @@ from scripts.export_site_data import (
     build_industry_ranking,
     build_mean_by_batch,
     build_mean_by_status,
+    build_pipeline_config,
+    build_summary,
+    write_json,
 )
 
 
@@ -114,3 +117,74 @@ def test_build_correlation_matrix_orders_bucket_columns_before_totals():
     ]
     assert len(result["values"]) == 4
     assert result["values"][0][1] == pytest.approx(1.0)
+
+
+def test_build_summary_includes_headline_stats_and_top_industry():
+    scores_df = pd.DataFrame(
+        {
+            "id": [1, 2, 3],
+            "batch": ["W24", "W24", "S23"],
+            "status": ["Active", "Active", "Inactive"],
+            "deep_tech_score": [5.0, 10.0, 0.0],
+            "technical_score": [10.0, 20.0, 5.0],
+            "practical_score": [10.0, 10.0, 5.0],
+            "complexity_score": [20.0, 30.0, 10.0],
+        }
+    )
+    industry_exploded_df = scores_df.assign(industry="Fintech")
+
+    summary = build_summary(scores_df, industry_exploded_df, generated_at="2026-07-15")
+
+    assert summary["generated_at"] == "2026-07-15"
+    assert summary["company_count"] == 3
+    assert summary["median_complexity"] == 20.0
+    assert summary["top_industry"]["industry"] == "Fintech"
+    assert "distribution_bins" in summary
+    assert "mean_by_batch" in summary
+    assert "correlation_matrix" in summary
+
+
+def test_build_pipeline_config_maps_rubric_buckets_and_fixed_etl_steps():
+    rubric = {
+        "buckets": [
+            {
+                "name": "deep_tech",
+                "dimension": "technical",
+                "raw_feature": "deep_tech_tag_count",
+                "method": "linear_capped",
+                "params": {"cap": 2, "points": 12},
+            },
+            {
+                "name": "founder_background",
+                "dimension": "technical",
+                "combine": "weighted_sum",
+                "combine_params": {"features": {"founder_phd_count": 2}},
+                "method": "linear_capped",
+                "params": {"cap": 2, "points": 9},
+            },
+        ]
+    }
+
+    config = build_pipeline_config(rubric)
+
+    assert [s["name"] for s in config["steps"]] == [
+        "clean",
+        "impute",
+        "enrich",
+        "features",
+        "score",
+    ]
+    enrich_step = next(s for s in config["steps"] if s["name"] == "enrich")
+    assert enrich_step["optional"] is True
+    assert len(config["buckets"]) == 2
+    assert config["buckets"][0]["raw_feature"] == "deep_tech_tag_count"
+    assert config["buckets"][1]["combine"] == "weighted_sum"
+
+
+def test_write_json_produces_parseable_file_with_no_nan_tokens(tmp_path):
+    path = tmp_path / "out.json"
+
+    write_json(path, {"a": 1, "b": None})
+
+    parsed = json.loads(path.read_text(encoding="utf-8"))
+    assert parsed == {"a": 1, "b": None}
