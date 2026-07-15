@@ -17,7 +17,7 @@
     <h1>How the number is computed</h1>
     <p style="max-width: 640px; color: var(--color-ink-muted);">
       Five steps turn raw company data into a score. The last step, scoring, reads its
-      rubric from a config file rather than from code.
+      rubric from a config file.
     </p>
   </section>
 
@@ -36,7 +36,7 @@
     <p>
       The <code class="mono">score</code> step is config-driven: its rubric &mdash; which
       signals count, how they're combined, how they're scaled, and how many points each is
-      worth &mdash; lives in a YAML file the engine reads, not in code.
+      worth &mdash; lives in a YAML file the engine reads.
     </p>
   </section>
 
@@ -67,7 +67,7 @@
   <section class="wrap">
     <h2>Why YAML</h2>
     <p>
-      The rubric lives in <code class="mono">config/rubric_v2.yaml</code>, not in code. Each
+      The rubric lives in <code class="mono">config/rubric_v2.yaml</code>. Each
       bucket's cap and points value carries an inline comment explaining its rationale &mdash;
       the <code class="mono">deep_tech</code> bucket's <code class="mono">cap: 2</code> comment
       reads &ldquo;2+ tags = maximally deep-tech,&rdquo; for example. That context stays
