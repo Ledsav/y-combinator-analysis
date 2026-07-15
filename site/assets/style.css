@@ -134,7 +134,7 @@ a:hover { text-decoration: underline; }
   border-radius: 999px;
   overflow: hidden;
   display: flex;
-  background: var(--color-surface);
+  background: var(--color-ink);
   min-width: 60px;
 }
 
@@ -201,7 +201,7 @@ a:hover { text-decoration: underline; }
 
 /* -- Chart sections -------------------------------------------------------- */
 
-.chart-section { margin: var(--space-6) 0; }
+.chart-section { margin-top: var(--space-6); margin-bottom: var(--space-6); }
 
 .chart-section__insight {
   font-family: var(--font-display);

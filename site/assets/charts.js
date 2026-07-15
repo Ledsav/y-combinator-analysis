@@ -48,7 +48,7 @@ function renderHistogram(container, bins, opts) {
   opts = opts || {};
   const width = container.clientWidth;
   const height = opts.height || 320;
-  const margin = { top: 20, right: 20, bottom: 32, left: 36 };
+  const margin = { top: 20, right: 20, bottom: 32, left: 50 };
   const svg = d3.select(container).append("svg").attr("width", width).attr("height", height);
 
   const x = d3.scaleLinear()
@@ -101,7 +101,7 @@ function renderScatter(container, points, opts) {
   opts = opts || {};
   const width = container.clientWidth;
   const height = opts.height || 360;
-  const margin = { top: 20, right: 20, bottom: 36, left: 36 };
+  const margin = { top: 44, right: 20, bottom: 36, left: 36 };
   const svg = d3.select(container).append("svg").attr("width", width).attr("height", height);
 
   const x = d3.scaleLinear().domain([0, d3.max(points, d => d.x) || 1]).nice()
@@ -128,7 +128,7 @@ function renderScatter(container, points, opts) {
     .call(g => g.select(".domain").remove())
     .call(g => g.selectAll("text").attr("class", "mono").attr("font-size", "11px"));
 
-  svg.append("text").attr("x", width - margin.right).attr("y", margin.top)
+  svg.append("text").attr("x", width - margin.right).attr("y", margin.top - 4)
     .attr("text-anchor", "end").attr("class", "mono").attr("font-size", "11px")
     .attr("fill", CHART_COLORS.inkMuted).text("technical →");
   svg.append("text").attr("x", margin.left).attr("y", margin.top - 4)
