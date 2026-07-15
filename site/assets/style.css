@@ -1,0 +1,348 @@
+/* Phase 13 design system -- "Field Report" direction. Tokens mirror the
+   scoring model itself: technical (denim) + practical (gold) are the only
+   two hues in the palette, no third "brand" accent. */
+
+:root {
+  --color-paper: #FBFAF6;
+  --color-surface: #F1EFE6;
+  --color-ink: #1B1B18;
+  --color-ink-muted: #5C594F;
+  --color-rule: #DEDACB;
+  --color-technical: #2B4C7E;
+  --color-technical-soft: #DCE4EE;
+  --color-practical: #C08A2E;
+  --color-practical-soft: #F2E4C8;
+
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "IBM Plex Sans", -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", "Courier New", monospace;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --space-5: 40px;
+  --space-6: 64px;
+
+  --radius-card: 10px;
+  --max-width: 1120px;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-font-smoothing: antialiased; }
+
+body {
+  margin: 0;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.15;
+  margin: 0 0 var(--space-3);
+}
+
+h1 { font-size: clamp(2.2rem, 4vw, 3.4rem); }
+h2 { font-size: clamp(1.5rem, 2.4vw, 2rem); }
+h3 { font-size: 1.15rem; }
+
+p { margin: 0 0 var(--space-3); color: var(--color-ink); }
+
+a { color: var(--color-technical); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.mono { font-family: var(--font-mono); }
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+}
+
+.wrap {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+}
+
+/* -- Nav -------------------------------------------------------------- */
+
+.site-nav {
+  border-bottom: 1px solid var(--color-rule);
+  background: var(--color-paper);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.site-nav .wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+
+.site-nav__mark {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.site-nav__links {
+  display: flex;
+  gap: var(--space-4);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.site-nav__links a {
+  color: var(--color-ink-muted);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+}
+
+.site-nav__links a[aria-current="page"] {
+  color: var(--color-ink);
+  border-bottom: 2px solid var(--color-technical);
+  padding-bottom: 2px;
+}
+
+/* -- Split-bar signature element --------------------------------------- */
+
+.split-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.split-bar__track {
+  flex: 1 1 auto;
+  height: 8px;
+  border-radius: 999px;
+  overflow: hidden;
+  display: flex;
+  background: var(--color-surface);
+  min-width: 60px;
+}
+
+.split-bar__technical { background: var(--color-technical); height: 100%; }
+.split-bar__practical { background: var(--color-practical); height: 100%; }
+
+.split-bar__total {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+/* -- Stat tiles ---------------------------------------------------------- */
+
+.stat-tile-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-3);
+  margin: var(--space-5) 0;
+}
+
+.stat-tile {
+  background: var(--color-surface);
+  border-radius: var(--radius-card);
+  padding: var(--space-4);
+}
+
+.stat-tile .eyebrow { margin-bottom: var(--space-2); }
+
+.stat-tile__value {
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.stat-tile__caption {
+  color: var(--color-ink-muted);
+  font-size: 0.9rem;
+  margin-top: var(--space-1);
+}
+
+/* -- Cards (nav cards / ticket stubs) ------------------------------------ */
+
+.card-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-4);
+  margin: var(--space-5) 0;
+}
+
+.ticket-card {
+  display: block;
+  background: var(--color-paper);
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-card);
+  padding: var(--space-4);
+  transition: border-color 0.15s ease;
+}
+
+.ticket-card:hover { border-color: var(--color-technical); text-decoration: none; }
+.ticket-card h3 { margin-bottom: var(--space-2); }
+.ticket-card p { color: var(--color-ink-muted); margin: 0; }
+
+/* -- Chart sections -------------------------------------------------------- */
+
+.chart-section { margin: var(--space-6) 0; }
+
+.chart-section__insight {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  max-width: 640px;
+  margin-bottom: var(--space-3);
+}
+
+.chart-tooltip {
+  position: absolute;
+  pointer-events: none;
+  background: var(--color-ink);
+  color: var(--color-paper);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  padding: var(--space-2) var(--space-3);
+  border-radius: 6px;
+  opacity: 0;
+  transition: opacity 0.1s ease;
+  max-width: 240px;
+  z-index: 20;
+}
+
+.chart-legend {
+  display: flex;
+  gap: var(--space-4);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  margin-bottom: var(--space-2);
+}
+
+.chart-legend__item { display: flex; align-items: center; gap: var(--space-1); }
+
+.chart-legend__swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+/* -- Explorer table -------------------------------------------------------- */
+
+.table-controls { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-3); }
+
+.table-controls input, .table-controls select {
+  font-family: var(--font-body);
+  border: 1px solid var(--color-rule);
+  border-radius: 6px;
+  padding: var(--space-2);
+}
+
+table.explorer-table { width: 100%; border-collapse: collapse; }
+
+.explorer-table th, .explorer-table td {
+  text-align: left;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-rule);
+  font-size: 0.9rem;
+}
+
+.explorer-table th {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-ink-muted);
+  cursor: pointer;
+}
+
+/* -- Pipeline diagrams ------------------------------------------------------ */
+
+.pipeline-flow { display: flex; align-items: stretch; gap: var(--space-2); overflow-x: auto; padding: var(--space-3) 0; }
+
+.pipeline-stage-card {
+  flex: 0 0 200px;
+  background: var(--color-surface);
+  border-radius: var(--radius-card);
+  padding: var(--space-3);
+}
+
+.pipeline-stage-card--optional { border: 1px dashed var(--color-ink-muted); background: transparent; }
+
+.pipeline-stage-card__name {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+}
+
+.pipeline-stage-card__tag {
+  display: inline-block;
+  margin-top: var(--space-1);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--color-ink-muted);
+}
+
+.pipeline-arrow { flex: 0 0 24px; align-self: center; color: var(--color-ink-muted); font-size: 1.2rem; }
+
+.bucket-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-card);
+  padding: var(--space-3);
+  margin-bottom: var(--space-2);
+  font-size: 0.85rem;
+}
+
+.bucket-card__name { font-family: var(--font-mono); font-weight: 600; }
+
+.callout-box {
+  background: var(--color-technical-soft);
+  border-left: 4px solid var(--color-technical);
+  border-radius: 6px;
+  padding: var(--space-3) var(--space-4);
+  margin: var(--space-4) 0;
+}
+
+.callout-box h3 { margin-bottom: var(--space-2); }
+.callout-box ol { margin: 0; padding-left: 1.2em; }
+
+/* -- Footer ------------------------------------------------------------------ */
+
+.site-footer {
+  border-top: 1px solid var(--color-rule);
+  margin-top: var(--space-6);
+  padding: var(--space-4) 0;
+  color: var(--color-ink-muted);
+  font-size: 0.85rem;
+}
+
+/* -- Responsive --------------------------------------------------------------- */
+
+@media (max-width: 640px) {
+  .site-nav__links { gap: var(--space-3); }
+  .site-nav .wrap { flex-direction: column; height: auto; padding: var(--space-2) var(--space-4); gap: var(--space-2); }
+}
+
+/* -- Accessibility ------------------------------------------------------------- */
+
+:focus-visible { outline: 2px solid var(--color-technical); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
