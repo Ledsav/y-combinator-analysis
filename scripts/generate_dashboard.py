@@ -172,14 +172,19 @@ def build_industry_chart(industry_exploded_df: pd.DataFrame, min_count: int = 20
 def build_correlation_matrix(
     scores_df: pd.DataFrame, features_df: pd.DataFrame, feature_cols: List[str]
 ) -> pd.DataFrame:
+    """
+    Correlation matrix across the given raw features, every rubric
+    bucket's <name>_score column (discovered dynamically from scores_df,
+    not hardcoded -- see Phase 12), and the 3 top-level scores.
+    """
+    bucket_score_cols = [
+        c
+        for c in scores_df.columns
+        if c.endswith("_score")
+        and c not in ("technical_score", "practical_score", "complexity_score")
+    ]
     merged = scores_df.merge(features_df[["id"] + feature_cols], on="id", how="left")
-    corr_cols = feature_cols + [
-        "deep_tech_score",
-        "description_score",
-        "founder_background_score",
-        "regulated_score",
-        "market_type_pts",
-        "geo_ops_score",
+    corr_cols = feature_cols + bucket_score_cols + [
         "technical_score",
         "practical_score",
         "complexity_score",

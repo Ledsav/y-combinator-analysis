@@ -158,9 +158,10 @@ def test_build_correlation_matrix_computes_expected_shape_and_values():
             "practical_score": [30.0, 20.0, 10.0],
             "description_score": [0.0, 0.0, 0.0],
             "founder_background_score": [0.0, 0.0, 0.0],
-            "regulated_score": [0, 0, 0],
-            "market_type_pts": [0, 0, 0],
-            "geo_ops_score": [0.0, 0.0, 0.0],
+            "regulated_score": [0.0, 0.0, 0.0],
+            "market_type_score": [0.0, 0.0, 0.0],
+            "international_operations_score": [0.0, 0.0, 0.0],
+            "operational_intensity_score": [0.0, 0.0, 0.0],
             "complexity_score": [40.0, 40.0, 40.0],
         }
     )
@@ -168,9 +169,33 @@ def test_build_correlation_matrix_computes_expected_shape_and_values():
 
     corr = build_correlation_matrix(scores_df, features_df, feature_cols=["deep_tech_tag_count"])
 
-    assert corr.shape == (10, 10)
+    # 1 feature col + 7 bucket-score cols + technical/practical/complexity = 11
+    assert corr.shape == (11, 11)
     assert corr.loc["deep_tech_tag_count", "technical_score"] == pytest.approx(1.0)
     assert corr.loc["technical_score", "practical_score"] == pytest.approx(-1.0)
+
+
+def test_build_correlation_matrix_discovers_bucket_score_columns_dynamically():
+    """
+    Proves build_correlation_matrix no longer hardcodes bucket column
+    names -- any rubric bucket's <name>_score column is picked up
+    automatically, which is the whole point of Phase 12's config-driven
+    engine producing a dynamic schema.
+    """
+    scores_df = pd.DataFrame(
+        {
+            "id": [1, 2],
+            "some_new_bucket_score": [10.0, 20.0],
+            "technical_score": [10.0, 20.0],
+            "practical_score": [5.0, 15.0],
+            "complexity_score": [15.0, 35.0],
+        }
+    )
+    features_df = pd.DataFrame({"id": [1, 2], "x": [1, 2]})
+
+    corr = build_correlation_matrix(scores_df, features_df, feature_cols=["x"])
+
+    assert "some_new_bucket_score" in corr.columns
 
 
 def test_build_correlation_heatmap_uses_matrix_values_and_labels():
