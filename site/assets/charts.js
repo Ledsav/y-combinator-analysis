@@ -168,10 +168,12 @@ function renderScatter(container, points, opts) {
 
 function renderRankedBars(container, records, opts) {
   opts = opts || {};
-  const width = container.clientWidth;
   const barHeight = 28;
   const height = records.length * barHeight + 20;
   const margin = { top: 10, right: 60, bottom: 10, left: 180 };
+  const minBarArea = 140;
+  const width = Math.max(container.clientWidth, margin.left + margin.right + minBarArea);
+  if (width > container.clientWidth) container.style.overflowX = "auto";
   const svg = d3.select(container).append("svg").attr("width", width).attr("height", height);
 
   const x = d3.scaleLinear().domain([0, d3.max(records, d => d.mean_complexity)]).nice()
@@ -284,9 +286,11 @@ function renderBarCompare(container, records, opts) {
 
 function renderHeatmap(container, columns, values, opts) {
   opts = opts || {};
-  const width = container.clientWidth;
-  const cell = Math.min(48, (width - 160) / columns.length);
   const margin = { top: 120, right: 20, bottom: 20, left: 140 };
+  const minCell = 28;
+  const width = Math.max(container.clientWidth, margin.left + margin.right + columns.length * minCell);
+  container.style.overflowX = "auto";
+  const cell = Math.min(48, (width - margin.left - margin.right) / columns.length);
   const height = margin.top + cell * columns.length + margin.bottom;
   const svg = d3.select(container).append("svg").attr("width", width).attr("height", height);
 
@@ -325,7 +329,7 @@ function renderHeatmap(container, columns, values, opts) {
   });
 
   if (opts.tableToggleContainer) {
-    const btn = d3.select(opts.tableToggleContainer).append("button").text("Show as table");
+    const btn = d3.select(opts.tableToggleContainer).append("button").attr("class", "btn").attr("type", "button").text("Show as table");
     let showingTable = false;
     btn.on("click", () => {
       showingTable = !showingTable;

@@ -68,11 +68,14 @@ async function loadDashboard() {
 function initExplorer(records) {
   let sortKey = "complexity_score";
   let sortAsc = false;
+  const PAGE_SIZE = 50;
+  let visibleCount = PAGE_SIZE;
   const tbody = document.getElementById("explorer-body");
   const searchBox = document.getElementById("explorer-search");
   const batchFilter = document.getElementById("explorer-batch");
   const statusFilter = document.getElementById("explorer-status");
   const countLabel = document.getElementById("explorer-count");
+  const loadMoreBtn = document.getElementById("explorer-load-more");
 
   function unique(values) {
     return Array.from(new Set(values)).sort();
@@ -115,8 +118,9 @@ function initExplorer(records) {
       return 0;
     });
 
+    const visible = filtered.slice(0, visibleCount);
     const fragment = document.createDocumentFragment();
-    filtered.forEach((r) => {
+    visible.forEach((r) => {
       const tr = document.createElement("tr");
       const nameCell = document.createElement("td");
       nameCell.textContent = r.name;
@@ -133,7 +137,13 @@ function initExplorer(records) {
     });
     tbody.innerHTML = "";
     tbody.appendChild(fragment);
-    countLabel.textContent = filtered.length + " of " + records.length + " companies";
+    countLabel.textContent = visible.length + " of " + filtered.length + " companies";
+
+    const remaining = filtered.length - visible.length;
+    loadMoreBtn.hidden = remaining <= 0;
+    if (remaining > 0) {
+      loadMoreBtn.textContent = `Load more (${Math.min(PAGE_SIZE, remaining)} of ${remaining} remaining)`;
+    }
   }
 
   document.querySelectorAll("#explorer-table thead th[data-key]").forEach((th) => {
@@ -157,7 +167,14 @@ function initExplorer(records) {
       }
     });
   });
-  [searchBox, batchFilter, statusFilter].forEach((el) => el.addEventListener("input", render));
+  loadMoreBtn.addEventListener("click", () => {
+    visibleCount += PAGE_SIZE;
+    render();
+  });
+  [searchBox, batchFilter, statusFilter].forEach((el) => el.addEventListener("input", () => {
+    visibleCount = PAGE_SIZE;
+    render();
+  }));
   render();
 }
 

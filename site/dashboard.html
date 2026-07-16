@@ -184,18 +184,23 @@
       <select id="explorer-status"><option value="">All statuses</option></select>
       <span id="explorer-count" class="mono"></span>
     </div>
-    <table class="explorer-table" id="explorer-table">
-      <thead>
-        <tr>
-          <th data-key="name">Name</th>
-          <th data-key="batch">Batch</th>
-          <th data-key="status">Status</th>
-          <th>Industries</th>
-          <th data-key="complexity_score">Score (technical / practical)</th>
-        </tr>
-      </thead>
-      <tbody id="explorer-body"></tbody>
-    </table>
+    <div class="table-scroll">
+      <table class="explorer-table" id="explorer-table">
+        <thead>
+          <tr>
+            <th data-key="name">Name</th>
+            <th data-key="batch">Batch</th>
+            <th data-key="status">Status</th>
+            <th>Industries</th>
+            <th data-key="complexity_score">Score (technical / practical)</th>
+          </tr>
+        </thead>
+        <tbody id="explorer-body"></tbody>
+      </table>
+    </div>
+    <div class="table-load-more">
+      <button id="explorer-load-more" class="btn" type="button" hidden></button>
+    </div>
   </section>
 
   <footer class="site-footer">
