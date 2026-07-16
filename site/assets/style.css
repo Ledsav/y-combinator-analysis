@@ -225,6 +225,12 @@ a:hover { text-decoration: underline; }
   z-index: 20;
 }
 
+.chart-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--space-4);
+}
+
 .chart-legend {
   display: flex;
   gap: var(--space-4);

@@ -272,6 +272,12 @@ function renderBarCompare(container, records, opts) {
   svg.append("g").attr("transform", `translate(0,${height - margin.bottom})`)
     .call(d3.axisBottom(x))
     .call(g => g.selectAll("text").attr("font-size", "12px"));
+
+  if (opts.annotation) {
+    svg.append("text").attr("x", margin.left).attr("y", 14)
+      .attr("class", "mono").attr("font-size", "11px").attr("fill", CHART_COLORS.inkMuted)
+      .text(opts.annotation);
+  }
 }
 
 /* -- Correlation heatmap: diverging technical<->practical, + table view --- */

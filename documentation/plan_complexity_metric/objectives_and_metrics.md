@@ -92,7 +92,9 @@ Expected relationships (to validate scoring):
 | Variable | Expected Correlation | Rationale |
 |----------|---------------------|-----------|
 | `teamSize` (for Active companies) | Relaxed in Phase 9.5 | r>0.2 was the original target. Diagnostics found no single one of the 8 underlying features correlates with log(team size) above r=0.193, several technical-side features correlate *negatively*, and even a 100%-practical reweight only reaches r=0.128 — no achievable feature combination clears r>0.2. Phase 9.5's rubric reaches r=0.103 (up from 0.035) as a side effect of the spread-focused rebalance, target formally relaxed rather than met. See `docs/superpowers/specs/2026-07-14-phase9.5-rubric-revision-design.md`. |
-| `status` = "Public" | Higher complexity | Hardest companies that succeed go big |
+| `status` = "Public" | Higher complexity | Public (mean 29.0, n=19) and Active (29.1) score similarly, both above Acquired (23.9) and Inactive (22.3) — directionally right on Public, but n=19 is too small to lean on. |
+| `topCompany` badge / success (strict) | Positive correlation with complexity | **Not met.** Point-biserial r = -0.003 (n=91, 1.9% of companies) — essentially zero. Complexity does not predict YC's own top-performer flag. See notebook §10. |
+| `status` in {Acquired, Public} / success (broad) | Positive correlation with complexity | **Not met.** Point-biserial r = -0.105 (n=598, 12.4%) — weakly *negative*. Companies reaching this outcome score 24.0 on average vs. 27.8 for the rest. Confounded by batch vintage (older batches score lower on complexity and have had more time to reach Acquired/Public) and by `Acquired` mixing strong exits with acquihires; not controlled for here. See notebook §10 and `documentation/dataset/dataset_overview.md`. |
 | Biotech/Healthcare industry | High technical score | Known deep-tech domains |
 | Fintech/Healthcare industry | High practical score | Heavily regulated sectors |
 | YC batch vintage | ? | Test if complexity thesis changed over time |

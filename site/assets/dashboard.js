@@ -46,6 +46,15 @@ async function loadDashboard() {
 
   renderBarCompare(document.getElementById("chart-status"), summary.mean_by_status);
 
+  const successStrict = summary.success_correlation.strict;
+  renderBarCompare(document.getElementById("chart-success-strict"), successStrict.mean_by_group, {
+    annotation: `r = ${successStrict.r_complexity} (n=${successStrict.count}, ${(successStrict.rate * 100).toFixed(1)}%)`,
+  });
+  const successBroad = summary.success_correlation.broad;
+  renderBarCompare(document.getElementById("chart-success-broad"), successBroad.mean_by_group, {
+    annotation: `r = ${successBroad.r_complexity} (n=${successBroad.count}, ${(successBroad.rate * 100).toFixed(1)}%)`,
+  });
+
   renderHeatmap(
     document.getElementById("chart-heatmap"),
     summary.correlation_matrix.columns,

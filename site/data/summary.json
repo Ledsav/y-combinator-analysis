@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-15",
+  "generated_at": "2026-07-16",
   "company_count": 4844,
   "median_complexity": 25.5,
   "median_technical_score": 4.5,
@@ -532,5 +532,43 @@
         1.0
       ]
     ]
+  },
+  "success_correlation": {
+    "strict": {
+      "label": "Top Company badge",
+      "count": 91,
+      "rate": 0.0188,
+      "r_complexity": -0.003,
+      "r_technical": -0.015,
+      "r_practical": 0.005,
+      "mean_by_group": [
+        {
+          "status": "Top Company",
+          "mean_complexity": 27.08
+        },
+        {
+          "status": "Not top company",
+          "mean_complexity": 27.37
+        }
+      ]
+    },
+    "broad": {
+      "label": "Acquired or Public status",
+      "count": 598,
+      "rate": 0.1235,
+      "r_complexity": -0.105,
+      "r_technical": -0.07,
+      "r_practical": -0.078,
+      "mean_by_group": [
+        {
+          "status": "Acquired / Public",
+          "mean_complexity": 24.02
+        },
+        {
+          "status": "Active / Inactive",
+          "mean_complexity": 27.83
+        }
+      ]
+    }
   }
 }

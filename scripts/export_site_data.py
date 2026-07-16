@@ -26,6 +26,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 SCORES_PATH = REPO_ROOT / "data" / "processed" / "scores" / "complexity_index_v2.csv"
 INDUSTRIES_PATH = REPO_ROOT / "data" / "processed" / "step3_enriched" / "industries_enriched.csv"
 COMPANIES_PATH = REPO_ROOT / "data" / "processed" / "step3_enriched" / "companies_enriched.csv"
+BADGES_PATH = REPO_ROOT / "data" / "processed" / "step3_enriched" / "badges_enriched.csv"
 RUBRIC_PATH = REPO_ROOT / "config" / "rubric_v2.yaml"
 SITE_DATA_DIR = REPO_ROOT / "site" / "data"
 
@@ -133,8 +134,41 @@ def build_correlation_matrix(scores_df: pd.DataFrame) -> Dict[str, Any]:
     return {"columns": ordered_cols, "values": corr.values.tolist()}
 
 
+def build_success_correlation(scores_df: pd.DataFrame, badges_df: pd.DataFrame) -> Dict[str, Any]:
+    """Point-biserial correlation between complexity and two outcome proxies
+    documented in documentation/dataset/dataset_overview.md: the strict
+    `topCompany` badge (1.9% of companies), and the broader Acquired/Public
+    status definition (12.4%). `.corr()` against a 0/1 float column is exactly
+    the point-biserial correlation."""
+    top_company_ids = set(badges_df.loc[badges_df["badge"] == "topCompany", "id"])
+    is_top_company = scores_df["id"].isin(top_company_ids).astype(float)
+    is_acquired_or_public = scores_df["status"].isin(["Acquired", "Public"]).astype(float)
+
+    def _definition(flag: pd.Series, label: str, positive_label: str, negative_label: str) -> Dict[str, Any]:
+        return {
+            "label": label,
+            "count": int(flag.sum()),
+            "rate": round(flag.mean(), 4),
+            "r_complexity": round(scores_df["complexity_score"].corr(flag), 3),
+            "r_technical": round(scores_df["technical_score"].corr(flag), 3),
+            "r_practical": round(scores_df["practical_score"].corr(flag), 3),
+            "mean_by_group": [
+                {"status": positive_label, "mean_complexity": round(scores_df.loc[flag == 1, "complexity_score"].mean(), 2)},
+                {"status": negative_label, "mean_complexity": round(scores_df.loc[flag == 0, "complexity_score"].mean(), 2)},
+            ],
+        }
+
+    return {
+        "strict": _definition(is_top_company, "Top Company badge", "Top Company", "Not top company"),
+        "broad": _definition(is_acquired_or_public, "Acquired or Public status", "Acquired / Public", "Active / Inactive"),
+    }
+
+
 def build_summary(
-    scores_df: pd.DataFrame, industry_exploded_df: pd.DataFrame, generated_at: str
+    scores_df: pd.DataFrame,
+    industry_exploded_df: pd.DataFrame,
+    badges_df: pd.DataFrame,
+    generated_at: str,
 ) -> Dict[str, Any]:
     """Everything the landing hero stats and dashboard charts need,
     pre-aggregated so the browser never re-derives them from 4,844 rows."""
@@ -157,6 +191,7 @@ def build_summary(
         "mean_by_status": build_mean_by_status(scores_df),
         "industry_ranking": industry_ranking,
         "correlation_matrix": build_correlation_matrix(scores_df),
+        "success_correlation": build_success_correlation(scores_df, badges_df),
     }
 
 
@@ -226,6 +261,7 @@ def main() -> None:
     scores_df = pd.read_csv(SCORES_PATH)
     industries_df = pd.read_csv(INDUSTRIES_PATH)
     companies_df = pd.read_csv(COMPANIES_PATH)
+    badges_df = pd.read_csv(BADGES_PATH)
     rubric = load_rubric(RUBRIC_PATH)
 
     company_industries_df = aggregate_company_industries(scores_df, industries_df)
@@ -239,7 +275,7 @@ def main() -> None:
     )
     write_json(
         SITE_DATA_DIR / "summary.json",
-        build_summary(scores_df, industry_exploded_df, generated_at),
+        build_summary(scores_df, industry_exploded_df, badges_df, generated_at),
     )
     write_json(SITE_DATA_DIR / "pipeline.json", build_pipeline_config(rubric))
 

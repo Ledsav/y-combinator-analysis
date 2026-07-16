@@ -12,6 +12,7 @@ from scripts.export_site_data import (
     build_mean_by_batch,
     build_mean_by_status,
     build_pipeline_config,
+    build_success_correlation,
     build_summary,
     write_json,
 )
@@ -134,8 +135,9 @@ def test_build_summary_includes_headline_stats_and_top_industry():
     # Expand to >= 20 rows (min_count requirement) by repeating rows
     scores_df = pd.concat([scores_df] * 7, ignore_index=True).iloc[:20]
     industry_exploded_df = scores_df.assign(industry="Fintech")
+    badges_df = pd.DataFrame({"id": [1], "badge": ["topCompany"]})
 
-    summary = build_summary(scores_df, industry_exploded_df, generated_at="2026-07-15")
+    summary = build_summary(scores_df, industry_exploded_df, badges_df, generated_at="2026-07-15")
 
     assert summary["generated_at"] == "2026-07-15"
     assert summary["company_count"] == 20
@@ -146,6 +148,35 @@ def test_build_summary_includes_headline_stats_and_top_industry():
     assert "distribution_bins" in summary
     assert "mean_by_batch" in summary
     assert "correlation_matrix" in summary
+    assert "success_correlation" in summary
+
+
+def test_build_success_correlation_computes_point_biserial_r_for_both_definitions():
+    scores_df = pd.DataFrame(
+        {
+            "id": [1, 2, 3, 4],
+            "status": ["Public", "Active", "Acquired", "Active"],
+            "technical_score": [10.0, 20.0, 30.0, 40.0],
+            "practical_score": [10.0, 20.0, 30.0, 40.0],
+            "complexity_score": [20.0, 40.0, 60.0, 80.0],
+        }
+    )
+    badges_df = pd.DataFrame({"id": [1], "badge": ["topCompany"]})
+
+    result = build_success_correlation(scores_df, badges_df)
+
+    assert result["strict"]["count"] == 1
+    assert result["strict"]["mean_by_group"] == [
+        {"status": "Top Company", "mean_complexity": 20.0},
+        {"status": "Not top company", "mean_complexity": 60.0},
+    ]
+    assert result["broad"]["count"] == 2
+    assert result["broad"]["mean_by_group"] == [
+        {"status": "Acquired / Public", "mean_complexity": 40.0},
+        {"status": "Active / Inactive", "mean_complexity": 60.0},
+    ]
+    assert -1.0 <= result["strict"]["r_complexity"] <= 1.0
+    assert -1.0 <= result["broad"]["r_complexity"] <= 1.0
 
 
 def test_build_pipeline_config_maps_rubric_buckets_and_fixed_etl_steps():
