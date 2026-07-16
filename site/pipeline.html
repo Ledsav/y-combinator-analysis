@@ -85,7 +85,29 @@
       <li><strong>Team-size correlation is weak.</strong> <code class="mono">complexity_score</code>
       correlates with log(team size) at r&asymp;0.10, roughly half the dataset carries
       no deep-tech signal at all, which caps how strongly team size can track the score.</li>
+      <li><strong>Complexity does not predict success.</strong> Point-biserial correlation with
+      the <code class="mono">topCompany</code> badge is r&asymp;0 (n=91), and with Acquired or
+      Public status is r&asymp;&minus;0.11 (n=598). A confound-controlled logistic regression
+      traces that negative reading to batch vintage and team growth, not to complexity itself,
+      complexity's own coefficient is not significant once those are controlled for. See the
+      <a href="dashboard#success-correlation">dashboard's success section</a> and
+      <code class="mono">notebooks/complexity_analysis.ipynb</code>, section 11.</li>
     </ul>
+  </section>
+
+  <section class="wrap">
+    <div class="callout-box">
+      <h3>Checked against outside research</h3>
+      <p>
+        The success-correlation result above was compared against published research on
+        founder pedigree, team growth, and VC vintage-year effects. Three of the four findings
+        line up with existing literature, including a paper studying founder backgrounds
+        within Y Combinator itself. Full comparison and sources in the
+        <a href="dashboard#research-comparison">dashboard</a> and in
+        <code class="mono">documentation/plan_complexity_metric/objectives_and_metrics.md</code>,
+        section 5.
+      </p>
+    </div>
   </section>
 
   <footer class="site-footer">

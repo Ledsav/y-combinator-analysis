@@ -75,7 +75,7 @@
     <div id="chart-status" style="position: relative;"></div>
   </section>
 
-  <section class="wrap chart-section">
+  <section class="wrap chart-section" id="success-correlation">
     <h2>Complexity vs. success</h2>
     <p class="chart-section__insight">Two outcome definitions: the strict <code>topCompany</code>
     badge (1.9% of companies), and the broader Acquired/Public status (12.4%). Neither correlates
@@ -90,6 +90,82 @@
         <div id="chart-success-broad" style="position: relative;"></div>
       </div>
     </div>
+    <div class="callout-box">
+      <h3>Why the broad definition trends negative</h3>
+      <p>
+        That r&nbsp;=&nbsp;&minus;0.105 is a confound, not a real effect. Older batches score
+        <em>lower</em> on complexity and have had <em>more time</em> to reach Acquired/Public.
+        A logistic regression of Acquired/Public on complexity, team size, batch year, and two
+        founder-pedigree signals (elite-school attendance, prior research-heavy-company
+        experience) finds complexity&rsquo;s effect is not significant (p&nbsp;=&nbsp;0.36) once
+        vintage and team growth are controlled for. Batch year dominates (mechanically: less
+        time to exit) and team size is the only other real signal. Neither founder-pedigree
+        covariate predicts success either, once the same confounds are controlled for. Having
+        an elite-school founder (24.4% of companies do) looks slightly more likely to succeed
+        on its own, but that effect washes out too.
+      </p>
+      <p style="margin: var(--space-2) 0 0;">Full model in
+      <code class="mono">notebooks/complexity_analysis.ipynb</code>, section 11.</p>
+    </div>
+  </section>
+
+  <section class="wrap chart-section" id="research-comparison">
+    <h2>Does this match published research?</h2>
+    <p class="chart-section__insight">Each finding above checked against outside research.
+    Three of four land on well covered ground.</p>
+
+    <div class="callout-box">
+      <h3>Elite-school pedigree: strongly corroborated</h3>
+      <p>A 2026 paper studying founder backgrounds within Y Combinator itself found top-school
+      attendance is not a significant predictor of funding (p &gt; 0.10), and that founder
+      credentials overall explain under 4% of the variance in outcomes. Their reasoning
+      matches ours: YC's admissions process already filters for founder quality, so pedigree
+      has little left to predict inside that filtered population.</p>
+    </div>
+
+    <div class="callout-box">
+      <h3>Batch vintage dominating: very strongly corroborated</h3>
+      <p>Venture capital research treats fund vintage year as one of the single largest
+      drivers of returns, with roughly 80% of returns concentrated in 22% to 30% of vintages.
+      Our <code class="mono">batch_year</code> coefficient dominating the regression is the
+      same effect, one level down, at the company instead of the fund.</p>
+    </div>
+
+    <div class="callout-box">
+      <h3>Team size correlating with success: corroborated, with a live debate attached</h3>
+      <p>Some research finds a positive team-size-to-success relationship. Other work argues
+      this is survivorship bias, since only the eventual winners' hiring sprees get
+      remembered. Startup Genome's widely cited estimate puts premature scaling (hiring too
+      fast, among other causes) behind 70% to 74% of startup failures. A cross-sectional
+      regression like ours cannot separate cause from effect here either.</p>
+    </div>
+
+    <div class="callout-box">
+      <h3>Complexity not predicting success: no direct precedent, two adjacent signals</h3>
+      <p>No published metric matches the Complexity Index directly, since it is custom to this
+      project. Y Combinator's own public philosophy, from Paul Graham and CEO Michael Seibel,
+      treats early-stage idea difficulty as close to unmeasurable and names founder execution
+      as the real predictor instead. Separately, deep-tech and biotech companies, the
+      highest-complexity segment here, are known to take structurally longer to reach IPO or
+      acquisition, so a same-batch snapshot could still understate their outcomes even after
+      the <code class="mono">batch_year</code> control. That gap is untested in this
+      analysis.</p>
+    </div>
+
+    <p class="eyebrow" style="margin-top: var(--space-4);">Sources</p>
+    <ul style="color: var(--color-ink-muted); font-size: 0.9rem; padding-left: 1.2em;">
+      <li><a href="https://arxiv.org/html/2512.13755v1">Founder Backgrounds and Startup Funding: Evidence from Y Combinator</a></li>
+      <li><a href="https://www.tandfonline.com/doi/full/10.1080/23322039.2024.2354281">Does more education lead to better startup funding outcomes?</a></li>
+      <li><a href="https://www.betaboom.com/magazine/article/pedigree-bias-venture-capital">VC's Pedigree Bias: Data Reveals Funding Inequality</a></li>
+      <li><a href="https://www.stepstonegroup.com/news-insights/the-vintage-year-power-law/">The Vintage Year Power Law, StepStone Group</a></li>
+      <li><a href="https://www.fbventures.vc/post/why-vintage-year-matters-in-venture-capital">Why Fund Vintage Matters and How Timing Shapes Venture Outcomes</a></li>
+      <li><a href="https://www.nber.org/system/files/working_papers/w28417/revisions/w28417.rev0.pdf">Founding Teams and Startup Performance, NBER working paper</a></li>
+      <li><a href="https://thepiegrower.medium.com/graduating-the-old-guard-will-more-startups-succeed-without-their-survivorship-bias-6ebad632d6f5">Graduating the Old Guard: survivorship bias in startup hiring</a></li>
+      <li><a href="https://startupgenome.com/insights/a-deep-dive-into-the-anatomy-of-premature-scaling">A Deep Dive Into the Anatomy of Premature Scaling, Startup Genome</a></li>
+      <li><a href="https://www.paulgraham.com/founders.html">What We Look for in Founders, Paul Graham</a></li>
+      <li><a href="https://www.ycombinator.com/library/64-what-makes-great-founders-stand-out">What Makes Great Founders Stand Out?, Y Combinator</a></li>
+      <li><a href="https://growthequityinterviewguide.com/venture-capital/sector-focused-venture-capital/deep-tech-venture-capital">Deep Tech Venture Capital: Key Strategies and Evaluations</a></li>
+    </ul>
   </section>
 
   <section class="wrap chart-section">

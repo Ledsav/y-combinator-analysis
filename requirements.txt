@@ -5,6 +5,7 @@ pyarrow
 jupyter
 nbconvert
 scipy
+statsmodels
 matplotlib
 plotly
 pyyaml

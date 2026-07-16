@@ -130,6 +130,63 @@ Expected relationships (to validate scoring):
 
 ---
 
+## 5. External Research Comparison
+
+The success correlation (section 3.3) and the confound-controlled model in
+`notebooks/complexity_analysis.ipynb` (section 11) were checked against published research on
+the same questions, to see whether the results land on familiar ground or contradict it.
+
+**Elite-school founder pedigree not predicting success.** This is the strongest match. A 2026
+arXiv paper studying founder backgrounds within Y Combinator itself, "Founder Backgrounds and
+Startup Funding: Evidence from Y Combinator," found that founder credentials, including
+top-school attendance, explain only 0.6% to 3.5% of variance in funding outcomes, with a
+top-school coefficient that is not statistically significant (p > 0.10). Their explanation
+matches ours: YC's own admissions process already filters for founder quality, so within that
+filtered population, pedigree has little predictive power left. Broader literature agrees more
+generally, describing the founder education to outcome link as "scant" or "weak/inconsistent,"
+despite clear investor bias toward pedigree at the funding stage.
+
+**Batch vintage dominating the outcome.** This is the best established pattern in the
+comparison set. Venture capital research treats fund vintage year as one of the single most
+important factors in fund performance, with roughly 80% of returns concentrated in 22% to 30%
+of vintages, driven by how much time a cohort has had to mature and the market conditions it
+was deployed into. Our `batch_year` coefficient dominating the regression is the same
+phenomenon at the company level.
+
+**Team size correlating with success.** Corroborated, but with a live methodological debate
+attached. Some research finds a positive team-size-to-success relationship, while other work
+frames this as survivorship bias: only the hiring sprees of eventual winners get remembered,
+while the far larger set of companies that hired aggressively and failed do not. Startup
+Genome's widely cited finding that premature scaling, including hiring too fast, is behind 70%
+to 74% of startup failures points in the same direction. Our regression is cross-sectional and
+cannot separate cause from effect here either.
+
+**Complexity not predicting success.** No directly comparable published metric exists, since
+the Complexity Index is custom to this project. Two adjacent findings are still relevant. Y
+Combinator's own public philosophy, described by Paul Graham and CEO Michael Seibel, treats
+idea difficulty as close to unmeasurable at the earliest stage and instead names founder
+execution, formidability, communication, and motivation as the real predictors. Separately,
+deep-tech and biotech companies, the highest-complexity segment in this dataset, are well
+documented to take structurally longer to reach IPO or acquisition than software companies.
+That means a same-batch, point-in-time Acquired/Public snapshot could still understate outcomes
+for complex companies even after the `batch_year` control. This is a real, untested limitation
+of the current model, not a resolved question.
+
+**Sources**
+- [Founder Backgrounds and Startup Funding: Evidence from Y Combinator](https://arxiv.org/html/2512.13755v1)
+- [Does more education lead to better startup funding outcomes?](https://www.tandfonline.com/doi/full/10.1080/23322039.2024.2354281)
+- [VC's Pedigree Bias: Data Reveals Funding Inequality](https://www.betaboom.com/magazine/article/pedigree-bias-venture-capital)
+- [The Vintage Year Power Law, StepStone Group](https://www.stepstonegroup.com/news-insights/the-vintage-year-power-law/)
+- [Why Fund Vintage Matters and How Timing Shapes Venture Outcomes](https://www.fbventures.vc/post/why-vintage-year-matters-in-venture-capital)
+- [Founding Teams and Startup Performance, NBER working paper](https://www.nber.org/system/files/working_papers/w28417/revisions/w28417.rev0.pdf)
+- [Graduating the Old Guard: survivorship bias in startup hiring](https://thepiegrower.medium.com/graduating-the-old-guard-will-more-startups-succeed-without-their-survivorship-bias-6ebad632d6f5)
+- [A Deep Dive Into the Anatomy of Premature Scaling, Startup Genome](https://startupgenome.com/insights/a-deep-dive-into-the-anatomy-of-premature-scaling)
+- [What We Look for in Founders, Paul Graham](https://www.paulgraham.com/founders.html)
+- [What Makes Great Founders Stand Out?, Y Combinator](https://www.ycombinator.com/library/64-what-makes-great-founders-stand-out)
+- [Deep Tech Venture Capital: Key Strategies and Evaluations](https://growthequityinterviewguide.com/venture-capital/sector-focused-venture-capital/deep-tech-venture-capital)
+
+---
+
 ## 6. Risks & Mitigation
 
 | Risk | Impact | Probability | Mitigation |
