@@ -4,15 +4,15 @@
 // the header HTML verbatim across all 3 pages.
 (function () {
   const NAV_LINKS = [
-    { href: "index.html", label: "Overview" },
-    { href: "dashboard.html", label: "Dashboard" },
-    { href: "pipeline.html", label: "Pipeline" },
+    { href: "index", label: "Overview" },
+    { href: "dashboard", label: "Dashboard" },
+    { href: "pipeline", label: "Pipeline" },
   ];
 
   function renderNav() {
     const mount = document.getElementById("site-nav");
     if (!mount) return;
-    const path = window.location.pathname.split("/").pop() || "index.html";
+    const path = window.location.pathname.split("/").pop().replace(/\.html$/, "") || "index";
 
     const links = NAV_LINKS.map((link) => {
       const current = link.href === path ? ' aria-current="page"' : "";
@@ -22,7 +22,7 @@
     mount.outerHTML = `
 <header class="site-nav">
   <div class="wrap">
-    <a class="site-nav__mark" href="index.html">
+    <a class="site-nav__mark" href="index">
       <svg width="20" height="14" viewBox="0 0 20 14" aria-hidden="true">
         <rect x="0" y="4" width="12" height="6" fill="#3A5A96" />
         <rect x="12" y="4" width="8" height="6" fill="#C08A2E" />
