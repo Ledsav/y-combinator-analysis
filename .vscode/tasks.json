@@ -1,0 +1,70 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "setup: create venv",
+      "type": "shell",
+      "command": "python3 -m venv .venv",
+      "windows": {"command": "python -m venv .venv"},
+      "problemMatcher": []
+    },
+    {
+      "label": "setup: install requirements",
+      "type": "shell",
+      "command": ".venv/bin/python -m pip install -r requirements.txt",
+      "windows": {"command": ".venv\\Scripts\\python -m pip install -r requirements.txt"},
+      "problemMatcher": []
+    },
+    {
+      "label": "setup: run tests",
+      "type": "shell",
+      "command": ".venv/bin/python -m pytest -q",
+      "windows": {"command": ".venv\\Scripts\\python -m pytest -q"},
+      "problemMatcher": []
+    },
+    {
+      "label": "Setup (fresh clone)",
+      "detail": "Creates .venv, installs requirements.txt, runs pytest (processed data is tracked, no Kaggle download needed)",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "setup: create venv",
+        "setup: install requirements",
+        "setup: run tests"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Dev",
+      "detail": "Serves site/ on http://localhost:8000 (the pages fetch site/data/*.json, so file:// does not work)",
+      "type": "shell",
+      "command": ".venv/bin/python -m http.server 8000 --directory site",
+      "windows": {"command": ".venv\\Scripts\\python -m http.server 8000 --directory site"},
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "Pipeline: recompute scores (v2)",
+      "detail": "impute, features, score from the tracked processed data -> data/processed/scores/complexity_index_v2.csv",
+      "type": "shell",
+      "command": ".venv/bin/python scripts/run_complexity_pipeline.py --steps impute,features,score --output-version v2",
+      "windows": {"command": ".venv\\Scripts\\python scripts/run_complexity_pipeline.py --steps impute,features,score --output-version v2"},
+      "problemMatcher": []
+    },
+    {
+      "label": "Site: export data",
+      "detail": "Rewrites site/data/*.json from complexity_index_v2.csv",
+      "type": "shell",
+      "command": ".venv/bin/python scripts/export_site_data.py",
+      "windows": {"command": ".venv\\Scripts\\python scripts/export_site_data.py"},
+      "problemMatcher": []
+    },
+    {
+      "label": "Test",
+      "type": "shell",
+      "command": ".venv/bin/python -m pytest -v",
+      "windows": {"command": ".venv\\Scripts\\python -m pytest -v"},
+      "problemMatcher": [],
+      "group": {"kind": "test", "isDefault": true}
+    }
+  ]
+}

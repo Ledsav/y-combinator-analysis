@@ -13,14 +13,17 @@ The 30/70 split (not 50/50) is a deliberate revision made in Phase 9.5, after di
 
 ## Quickstart
 
+Live site: https://www.albertovaldesrey.com/y-combinator-analysis/
+
 ### Prerequisites
 - Python 3.12 or higher
 - pip (Python package manager)
+- A Kaggle account only if you want to rerun the `clean` step from raw data (see [Raw data](#raw-data)). The processed outputs of steps 1-3 are committed, so everything else works from a fresh clone.
 
 ### Installation
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/Ledsav/y-combinator-analysis.git
 cd y-combinator-analysis
 python -m venv .venv
 # Windows:
@@ -30,19 +33,25 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+In VS Code, **Terminal → Run Task… → Setup (fresh clone)** does the same and then runs the test suite. **Dev** serves `site/` on http://localhost:8000. The commands below use the Windows venv path; on macOS/Linux use `.venv/bin/python`.
+
 ### Run the pipeline
 
-The full pipeline (clean → impute → enrich → features → score) is orchestrated by one CLI:
+The full pipeline (clean → impute → enrich → features → score) is orchestrated by one CLI. `--output-version` defaults to `v1`, so pass `v2` to regenerate the current scores:
 
 ```bash
-# Run everything (enrich is opt-in — see the --steps help text for why)
-./.venv/Scripts/python.exe scripts/run_complexity_pipeline.py --steps all --output-version v3
+# Recompute scores from the committed processed data (fastest — skips scraping/cleaning, works from a fresh clone)
+./.venv/Scripts/python.exe scripts/run_complexity_pipeline.py --steps impute,features,score --output-version v2
 
-# Or just recompute scores from existing features (fastest — skips scraping/cleaning)
-./.venv/Scripts/python.exe scripts/run_complexity_pipeline.py --steps impute,features,score --output-version v3
+# Run everything (needs the raw CSVs in data/raw/; enrich is opt-in — see the --steps help text for why)
+./.venv/Scripts/python.exe scripts/run_complexity_pipeline.py --steps all --output-version v2
 ```
 
-This writes `data/processed/scores/complexity_index_v3.csv`. See [Data Versioning](#data-versioning) for what version number to use.
+This writes `data/processed/scores/complexity_index_v2.csv`. See [Data Versioning](#data-versioning) for what version number to use.
+
+### Raw data
+
+`clean` reads the 8 CSVs of the Kaggle dataset [sashakorovkina/ycombinator-all-funded-companies-dataset](https://www.kaggle.com/datasets/sashakorovkina/ycombinator-all-funded-companies-dataset) from `data/raw/` (gitignored). Download them with a Kaggle account (web UI, or `kaggle datasets download -d sashakorovkina/ycombinator-all-funded-companies-dataset --unzip -p data/raw` with the Kaggle CLI and an API token) only if you need to rerun that step.
 
 ### Regenerate the analysis notebook
 
@@ -60,6 +69,17 @@ Produces `notebooks/complexity_analysis.ipynb` — score distribution, batch/sta
 ```
 
 Produces `output/complexity_dashboard_v2.html` — a single self-contained, offline HTML file (no server needed). Open it directly in a browser. Includes an "About This Index" section, key findings, 6 interactive charts, and a searchable/filterable table of all 4,844 companies.
+
+### The website (`site/`)
+
+`site/` is the public, static version of the project (landing page, dashboard, pipeline diagram). The pages fetch `site/data/*.json`, which `scripts/export_site_data.py` writes from `complexity_index_v2.csv` (no rescoring):
+
+```bash
+./.venv/Scripts/python.exe scripts/export_site_data.py
+./.venv/Scripts/python.exe -m http.server 8000 --directory site   # http://localhost:8000 (file:// can't fetch the JSON)
+```
+
+**Deploy:** `.github/workflows/deploy-pages.yml` publishes `site/` to GitHub Pages on every push to `master` that touches `site/**` (or manually from the Actions tab). One-time setup: repo → **Settings → Pages → Source: GitHub Actions**. The JSON in `site/data/` is committed, so re-run the export and commit it after changing scores.
 
 ## Data Versioning
 
@@ -83,7 +103,8 @@ y-combinator-analysis/
 ├── scripts/                    # CLI entry points and notebook/dashboard generators
 ├── notebooks/                  # Jupyter analysis notebooks
 ├── output/                     # Generated dashboard HTML
-├── tests/                      # pytest test suite (129 tests)
+├── site/                       # Static website deployed to GitHub Pages (data/ from export_site_data.py)
+├── tests/                      # pytest test suite (155 tests)
 ├── documentation/plan_complexity_metric/  # Roadmap, objectives & success metrics
 ├── docs/superpowers/specs/     # Per-phase design specs (full decision history)
 └── requirements.txt
@@ -103,7 +124,7 @@ y-combinator-analysis/
 ./.venv/Scripts/python.exe -m pytest -v
 ```
 
-129 tests covering every `src/etl/` module (clean, impute, enrich, features, score, pipeline) and the dashboard/notebook generator scripts.
+155 tests covering every `src/etl/` module (clean, impute, enrich, features, score, pipeline) and the dashboard/notebook generator scripts.
 
 ## Further Reading
 
